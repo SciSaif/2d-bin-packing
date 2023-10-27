@@ -12,5 +12,6 @@ export const pack = (rects: UnpackedRect[], container_size: Dimension) => {
     const packer = new BinPacker(C);
 
     const packedConfig = packer.PackConfiguration(C);
+
     return getResult(packedConfig);
 };

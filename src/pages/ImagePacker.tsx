@@ -17,17 +17,69 @@ interface Box {
 const PADDING = 10; // 10 pixels padding, adjust as needed
 
 const ImagePacker: React.FC = () => {
-    const [boxes, setBoxes] = useState<Box[]>([]);
+    const [boxes, setBoxes] = useState<Box[][]>([]);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [containerWidth, setContainerWidth] = useState<number>(1000);
-    const [containerHeight, setContainerHeight] = useState<number>(1500);
+    const [containerWidth, setContainerWidth] = useState<number>(800);
+    const [containerHeight, setContainerHeight] = useState<number>(800);
     const [uploadedFiles, setUploadedFiles] = useState<
         { id: string; file: File }[]
     >([]);
+    const [canvasRefs, setCanvasRefs] = useState<
+        React.RefObject<HTMLCanvasElement>[]
+    >([]);
+
+    // useEffect(() => {
+    //     if (boxes) {
+    //         const canvas = canvasRef.current;
+    //         if (!canvas) return;
+    //         const ctx = canvas.getContext("2d");
+    //         if (!ctx) return;
+    //         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //         // Redraw the bounding box around the canvas
+    //         ctx.strokeStyle = "black";
+    //         ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+    //         boxes.forEach((box, index) => {
+    //             const correspondingFile = uploadedFiles.find(
+    //                 (f) => f.id === box.id
+    //             );
+    //             if (!correspondingFile) return;
+
+    //             const img = new Image();
+
+    //             // reduce the opacity to 50%
+    //             img.onload = () => {
+    //                 console.log(box);
+
+    //                 if (box.rotated) {
+    //                     // Translate to the position where you want the top-left corner of the rotated image
+    //                     ctx.translate(box.x, box.y + box.h);
+    //                     // Rotate the context
+    //                     ctx.rotate(-Math.PI / 2); // Rotate 90 degrees anticlockwise
+    //                     // Draw the image with its top-left corner at the origin
+    //                     ctx.drawImage(img, 0, 0, box.h, box.w); // Note the swapped width and height
+    //                     // Draw a border around the image
+    //                     ctx.strokeStyle = "red";
+    //                     ctx.strokeRect(0, 0, box.h, box.w); // Note the swapped width and height
+    //                     // Reset the transformation matrix to the identity matrix
+    //                     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    //                 } else {
+    //                     ctx.drawImage(img, box.x, box.y, box.w, box.h);
+    //                     ctx.strokeStyle = "red";
+    //                     ctx.strokeRect(box.x, box.y, box.w, box.h);
+    //                 }
+    //             };
+
+    //             img.src = URL.createObjectURL(correspondingFile.file);
+    //         });
+    //     }
+    // }, [boxes, uploadedFiles]);
 
     useEffect(() => {
-        if (boxes) {
-            const canvas = canvasRef.current;
+        if (!boxes || boxes.length === 0) return;
+        boxes.forEach((boxSet, canvasIndex) => {
+            const canvas = canvasRefs[canvasIndex].current;
             if (!canvas) return;
             const ctx = canvas.getContext("2d");
             if (!ctx) return;
@@ -37,7 +89,7 @@ const ImagePacker: React.FC = () => {
             ctx.strokeStyle = "black";
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-            boxes.forEach((box, index) => {
+            boxSet.forEach((box) => {
                 const correspondingFile = uploadedFiles.find(
                     (f) => f.id === box.id
                 );
@@ -45,13 +97,8 @@ const ImagePacker: React.FC = () => {
 
                 const img = new Image();
 
-                // reduce the opacity to 50%
                 img.onload = () => {
-                    console.log(box);
-
                     if (box.rotated) {
-                        console.log("rotated");
-
                         // Translate to the position where you want the top-left corner of the rotated image
                         ctx.translate(box.x, box.y + box.h);
                         // Rotate the context
@@ -67,14 +114,13 @@ const ImagePacker: React.FC = () => {
                         ctx.drawImage(img, box.x, box.y, box.w, box.h);
                         ctx.strokeStyle = "red";
                         ctx.strokeRect(box.x, box.y, box.w, box.h);
-                        console.log("not rotated");
                     }
                 };
 
                 img.src = URL.createObjectURL(correspondingFile.file);
             });
-        }
-    }, [boxes, uploadedFiles]);
+        });
+    }, [boxes, uploadedFiles, canvasRefs]);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
@@ -88,12 +134,33 @@ const ImagePacker: React.FC = () => {
                     const img = new Image();
                     const id = uuidv4();
                     img.onload = () => {
+                        // boxesFromImages.push({
+                        //     w: img.width,
+                        //     h: img.height,
+                        //     id,
+                        // });
+                        let imgWidth = img.width;
+                        let imgHeight = img.height;
+
+                        // Check if the image's width or height exceeds the container's dimensions
+                        if (
+                            imgWidth > containerWidth ||
+                            imgHeight > containerHeight
+                        ) {
+                            const scaleFactor = Math.min(
+                                containerWidth / imgWidth,
+                                containerHeight / imgHeight
+                            );
+                            imgWidth = imgWidth * scaleFactor;
+                            imgHeight = imgHeight * scaleFactor;
+                        }
+
                         boxesFromImages.push({
-                            w: img.width,
-                            h: img.height,
+                            w: imgWidth,
+                            h: imgHeight,
                             id,
                         });
-                        uploadedFiles.push({ id, file });
+                        setUploadedFiles((prev) => [...prev, { id, file }]);
                         resolve();
                     };
                     img.src = URL.createObjectURL(file);
@@ -102,11 +169,32 @@ const ImagePacker: React.FC = () => {
         });
 
         Promise.all(promises).then(() => {
-            const packedBoxes = pack(boxesFromImages, {
-                w: containerWidth,
-                h: containerHeight,
-            });
-            setBoxes(packedBoxes);
+            // const { packed_rectangles, unpacked_rectangles, isRemaining } =
+            //     pack(boxesFromImages, {
+            //         w: containerWidth,
+            //         h: containerHeight,
+            //     });
+            // setBoxes((prev) => [...prev, packed_rectangles]);
+            let remainingRectangles = boxesFromImages;
+            const allPackedBoxes: Box[][] = [];
+
+            while (remainingRectangles.length > 0) {
+                const { packed_rectangles, unpacked_rectangles } = pack(
+                    remainingRectangles,
+                    {
+                        w: containerWidth,
+                        h: containerHeight,
+                    }
+                );
+
+                allPackedBoxes.push(packed_rectangles);
+                remainingRectangles = unpacked_rectangles;
+            }
+
+            setBoxes(allPackedBoxes);
+            setCanvasRefs(
+                allPackedBoxes.map(() => React.createRef<HTMLCanvasElement>())
+            );
         });
     };
 
@@ -132,25 +220,29 @@ const ImagePacker: React.FC = () => {
                 />
             </div>
 
-            <input type="file" multiple onChange={handleImageUpload} />
+            <input
+                type="file"
+                multiple
+                onChange={handleImageUpload}
+                accept="image/*"
+            />
 
-            {/* <button
-                onClick={goo}
-                className="px-10 py-2 text-white rounded shadow w-fit bg-cyan-500 hover:bg-cyan-600"
-            >
-                Gooo
-            </button> */}
-            <canvas
-                ref={canvasRef}
-                width={containerWidth}
-                height={containerHeight}
-                style={{
-                    width: `${containerWidth}px`,
-                    height: `${containerHeight}px`,
-                }}
-                className="w-fit"
-            ></canvas>
-
+            <div className="flex flex-wrap w-full gap-5">
+                {boxes.length === canvasRefs.length &&
+                    boxes.map((boxSet, index) => (
+                        <canvas
+                            key={index}
+                            ref={canvasRefs[index]}
+                            width={containerWidth}
+                            height={containerHeight}
+                            style={{
+                                width: `${containerWidth}px`,
+                                height: `${containerHeight}px`,
+                            }}
+                            className="w-fit"
+                        ></canvas>
+                    ))}
+            </div>
             <footer className="mt-10 border-t ">
                 <div className="text-sm text-center text-gray-500">
                     <p>

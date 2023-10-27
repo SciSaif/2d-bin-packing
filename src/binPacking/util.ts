@@ -20,7 +20,13 @@ export interface Rectangle {
     rotated: boolean;
 }
 
-export function getResult(C: Configuration): Rectangle[] {
+interface Result {
+    packed_rectangles: Rectangle[];
+    unpacked_rectangles: Rectangle[];
+    isRemaining: boolean;
+}
+
+export function getResult(C: Configuration): Result {
     let rectangles_data: Rectangle[] = [];
     for (let rect of C.packed_rects) {
         let rectangle_info: Rectangle = {
@@ -34,5 +40,24 @@ export function getResult(C: Configuration): Rectangle[] {
         rectangles_data.push(rectangle_info);
     }
     console.log(rectangles_data);
-    return rectangles_data;
+
+    let remaining_rectangles_data: Rectangle[] = [];
+    for (let rect of C.unpacked_rects) {
+        let rectangle_info: Rectangle = {
+            id: rect.id,
+            w: rect.w,
+            h: rect.h,
+            x: 0,
+            y: 0,
+            rotated: false,
+        };
+        remaining_rectangles_data.push(rectangle_info);
+    }
+    console.log(remaining_rectangles_data);
+
+    return {
+        packed_rectangles: rectangles_data,
+        unpacked_rectangles: remaining_rectangles_data,
+        isRemaining: C.unpacked_rects.length > 0,
+    };
 }
