@@ -53,6 +53,7 @@ const App: React.FC = () => {
         if (boxes) {
             console.log("boxes", boxes);
             const boxesCopy = [...boxes];
+
             // apply random colors to each box
             boxesCopy.forEach((box) => {
                 box.color = `#${Math.floor(Math.random() * 16777215).toString(
@@ -81,65 +82,64 @@ const App: React.FC = () => {
             });
         }
     }, [boxes]);
-    console.log("hi");
 
     return (
-        <div className="px-2 py-2 flex flex-col gap-2">
-            <h1 className="text-3xl text-cyan-500 mb-2 border-b pb-2 font-bold">
+        <div className="flex flex-col gap-2 px-2 py-2">
+            <h1 className="pb-2 mb-2 text-3xl font-bold border-b text-cyan-500">
                 Bin Packing
             </h1>
-            <div className="flex flex-row gap-2 items-center">
+            <div className="flex flex-row items-center gap-2">
                 <label>Number of Boxes:</label>
                 <input
                     type="number"
-                    className="border border-gray-400 rounded-md px-2 py-1"
+                    className="px-2 py-1 border border-gray-400 rounded-md"
                     value={numberOfBoxes}
                     onChange={(e) => setNumberOfBoxes(+e.target.value)}
                 />
             </div>
 
-            <div className="flex flex-row gap-2 items-center">
+            <div className="flex flex-row items-center gap-2">
                 <label>Container dimensions:</label>
                 <input
                     type="number"
-                    className="border border-gray-400 rounded-md px-2 py-1"
+                    className="px-2 py-1 border border-gray-400 rounded-md"
                     value={containerWidth}
                     onChange={(e) => setContainerWidth(+e.target.value)}
                 />
                 <input
                     type="number"
-                    className="border border-gray-400 rounded-md px-2 py-1"
+                    className="px-2 py-1 border border-gray-400 rounded-md"
                     value={containerHeight}
                     onChange={(e) => setContainerHeight(+e.target.value)}
                 />
             </div>
-            <div className="flex flex-row gap-2 items-center">
+            <div className="flex flex-row items-center gap-2">
                 <label>Width Range:</label>
                 <input
                     type="number"
-                    className="border border-gray-400 rounded-md px-2 py-1"
+                    className="px-2 py-1 border border-gray-400 rounded-md"
                     value={rangeW[0]}
                     onChange={(e) => setRangeW([+e.target.value, rangeW[1]])}
                 />
                 <input
-                    className="border border-gray-400 rounded-md px-2 py-1"
+                    className="px-2 py-1 border border-gray-400 rounded-md"
                     type="number"
                     value={rangeW[1]}
                     onChange={(e) => setRangeW([rangeW[0], +e.target.value])}
                 />
             </div>
 
-            <div className="flex flex-row gap-2 items-center">
+            <div className="flex flex-row items-center gap-2">
                 <label>Height Range:</label>
                 <input
                     type="number"
-                    className="border border-gray-400 rounded-md px-2 py-1"
+                    className="px-2 py-1 border border-gray-400 rounded-md"
                     value={rangeH[0]}
                     onChange={(e) => setRangeH([+e.target.value, rangeH[1]])}
                 />
                 <input
                     type="number"
-                    className="border border-gray-400 rounded-md px-2 py-1"
+                    className="px-2 py-1 border border-gray-400 rounded-md"
                     value={rangeH[1]}
                     onChange={(e) => setRangeH([rangeH[0], +e.target.value])}
                 />
@@ -147,7 +147,7 @@ const App: React.FC = () => {
 
             <button
                 onClick={goo}
-                className="w-fit px-10 py-2 rounded shadow text-white bg-cyan-500 hover:bg-cyan-600"
+                className="px-10 py-2 text-white rounded shadow w-fit bg-cyan-500 hover:bg-cyan-600"
             >
                 Gooo
             </button>
@@ -163,7 +163,7 @@ const App: React.FC = () => {
             ></canvas>
 
             <footer className="mt-10 border-t ">
-                <div className="text-center text-gray-500 text-sm">
+                <div className="text-sm text-center text-gray-500">
                     <p>
                         Made with{" "}
                         <span role="img" aria-label="heart">

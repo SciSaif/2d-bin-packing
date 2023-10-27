@@ -1,3 +1,5 @@
+import Configuration from "./configuration";
+
 export enum PointType {
     BOTTOM_LEFT = 0,
     BOTTOM_RIGHT = 1,
@@ -14,9 +16,10 @@ export interface Rectangle {
     h: number;
     x: number;
     y: number;
+    rotated?: boolean;
 }
 
-export function plotConfiguration(C: any): Rectangle[] {
+export function getResult(C: Configuration): Rectangle[] {
     let rectangles_data: Rectangle[] = [];
     for (let rect of C.packed_rects) {
         let rectangle_info: Rectangle = {
@@ -24,6 +27,7 @@ export function plotConfiguration(C: any): Rectangle[] {
             h: rect.height,
             x: rect.origin[0],
             y: rect.origin[1],
+            rotated: rect.rotated,
         };
         rectangles_data.push(rectangle_info);
     }
