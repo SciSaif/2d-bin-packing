@@ -103,6 +103,21 @@ export default class Rect {
         }
         return true;
     }
+    // overlaps(other: Rect, padding: number = 0): boolean {
+    //     if (
+    //         this.right + padding <= other.left ||
+    //         other.right + padding <= this.left
+    //     ) {
+    //         return false;
+    //     }
+    //     if (
+    //         this.top + padding <= other.bottom ||
+    //         other.top + padding <= this.bottom
+    //     ) {
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     *[Symbol.iterator]() {
         yield this.corner_bot_l;

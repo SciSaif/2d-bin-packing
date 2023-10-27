@@ -28,54 +28,6 @@ const ImagePacker: React.FC = () => {
         React.RefObject<HTMLCanvasElement>[]
     >([]);
 
-    // useEffect(() => {
-    //     if (boxes) {
-    //         const canvas = canvasRef.current;
-    //         if (!canvas) return;
-    //         const ctx = canvas.getContext("2d");
-    //         if (!ctx) return;
-    //         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    //         // Redraw the bounding box around the canvas
-    //         ctx.strokeStyle = "black";
-    //         ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-    //         boxes.forEach((box, index) => {
-    //             const correspondingFile = uploadedFiles.find(
-    //                 (f) => f.id === box.id
-    //             );
-    //             if (!correspondingFile) return;
-
-    //             const img = new Image();
-
-    //             // reduce the opacity to 50%
-    //             img.onload = () => {
-    //                 console.log(box);
-
-    //                 if (box.rotated) {
-    //                     // Translate to the position where you want the top-left corner of the rotated image
-    //                     ctx.translate(box.x, box.y + box.h);
-    //                     // Rotate the context
-    //                     ctx.rotate(-Math.PI / 2); // Rotate 90 degrees anticlockwise
-    //                     // Draw the image with its top-left corner at the origin
-    //                     ctx.drawImage(img, 0, 0, box.h, box.w); // Note the swapped width and height
-    //                     // Draw a border around the image
-    //                     ctx.strokeStyle = "red";
-    //                     ctx.strokeRect(0, 0, box.h, box.w); // Note the swapped width and height
-    //                     // Reset the transformation matrix to the identity matrix
-    //                     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    //                 } else {
-    //                     ctx.drawImage(img, box.x, box.y, box.w, box.h);
-    //                     ctx.strokeStyle = "red";
-    //                     ctx.strokeRect(box.x, box.y, box.w, box.h);
-    //                 }
-    //             };
-
-    //             img.src = URL.createObjectURL(correspondingFile.file);
-    //         });
-    //     }
-    // }, [boxes, uploadedFiles]);
-
     useEffect(() => {
         if (!boxes || boxes.length === 0) return;
         boxes.forEach((boxSet, canvasIndex) => {
@@ -169,12 +121,6 @@ const ImagePacker: React.FC = () => {
         });
 
         Promise.all(promises).then(() => {
-            // const { packed_rectangles, unpacked_rectangles, isRemaining } =
-            //     pack(boxesFromImages, {
-            //         w: containerWidth,
-            //         h: containerHeight,
-            //     });
-            // setBoxes((prev) => [...prev, packed_rectangles]);
             let remainingRectangles = boxesFromImages;
             const allPackedBoxes: Box[][] = [];
 
@@ -184,7 +130,8 @@ const ImagePacker: React.FC = () => {
                     {
                         w: containerWidth,
                         h: containerHeight,
-                    }
+                    },
+                    50
                 );
 
                 allPackedBoxes.push(packed_rectangles);
@@ -239,7 +186,7 @@ const ImagePacker: React.FC = () => {
                                 width: `${containerWidth}px`,
                                 height: `${containerHeight}px`,
                             }}
-                            className="w-fit"
+                            className="w-fit shadow border border-gray-400"
                         ></canvas>
                     ))}
             </div>

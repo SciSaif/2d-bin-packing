@@ -18,17 +18,19 @@ export default class Configuration {
     packed_rects: Rect[];
     L: Rect[] = [];
     concave_corners: [Point, PointType][] = [];
-
+    padding: number;
     constructor(
         size: Dimension,
         unpacked_rects: UnpackedRect[],
-        packed_rects: Rect[] = []
+        packed_rects: Rect[] = [],
+        padding: number = 0
     ) {
         this.size = size;
         this.unpacked_rects = unpacked_rects;
         this.packed_rects = packed_rects;
+        this.padding = padding;
         this.generate_L();
-        console.log("total ccoas", this.L.length);
+        // console.log("total ccoas", this.L.length);
     }
 
     //   """
@@ -46,6 +48,8 @@ export default class Configuration {
         // 1. concave corners
 
         this.concave_corners = this.getConcaveCorners();
+        // console.log("concave corners", this.concave_corners.length);
+
         // 2. generate ccoas for every rect
         const ccoas: Rect[] = [];
         for (let rect of this.unpacked_rects) {
@@ -61,6 +65,8 @@ export default class Configuration {
                     );
                     // 3. Add if it fits
                     if (this.fits(ccoa)) {
+                        // console.log("fits");
+
                         ccoas.push(ccoa);
                     }
                 }
