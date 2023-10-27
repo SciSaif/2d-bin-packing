@@ -13,7 +13,7 @@ class BinPacker {
         const d_mins: number[] = C.packed_rects.map((m) => i.min_distance(m));
 
         // Add the distances to the borders
-        d_mins.push(i.bottom, i.left, C.size[1] - i.top, C.size[0] - i.right);
+        d_mins.push(i.bottom, i.left, C.size.h - i.top, C.size.w - i.right);
 
         // Remove two smallest elements, which will be 0 - the two immediate neighbours
         const minVal = Math.min(...d_mins);
@@ -80,7 +80,10 @@ class BinPacker {
             console.log("Found successful configuration");
         } else {
             console.log("Stopped with failure");
-            console.log(`Rects remaining: ${C.unpacked_rects}`);
+            console.log(`Rects remaining: `);
+            for (const rect of C.unpacked_rects) {
+                console.log(rect);
+            }
         }
         return C;
     }

@@ -1,17 +1,27 @@
-import Rect from "./rect";
+import Rect, { Point } from "./rect";
 import { PointType } from "./util";
+export interface UnpackedRect {
+    id: string;
+    w: number;
+    h: number;
+}
+
+export interface Dimension {
+    w: number;
+    h: number;
+}
 
 export default class Configuration {
     private static readonly eps: number = 0.001; //The amount to look in each direction when determining if a corner is concave
-    size: [number, number];
-    unpacked_rects: [number, number][];
+    size: Dimension;
+    unpacked_rects: UnpackedRect[];
     packed_rects: Rect[];
     L: Rect[] = [];
-    concave_corners: [[number, number], PointType][] = [];
+    concave_corners: [Point, PointType][] = [];
 
     constructor(
-        size: [number, number],
-        unpacked_rects: [number, number][],
+        size: Dimension,
+        unpacked_rects: UnpackedRect[],
         packed_rects: Rect[] = []
     ) {
         this.size = size;
@@ -34,13 +44,21 @@ export default class Configuration {
     //     """
     generate_L(): void {
         // 1. concave corners
+
         this.concave_corners = this.getConcaveCorners();
         // 2. generate ccoas for every rect
         const ccoas: Rect[] = [];
-        for (let [x, y] of this.unpacked_rects) {
+        for (let rect of this.unpacked_rects) {
             for (let [corner, type] of this.concave_corners) {
                 for (let rotated of [false, true]) {
-                    const ccoa = new Rect(corner, x, y, type, rotated);
+                    const ccoa = new Rect(
+                        rect.id,
+                        corner,
+                        rect.w,
+                        rect.h,
+                        type,
+                        rotated
+                    );
                     // 3. Add if it fits
                     if (this.fits(ccoa)) {
                         ccoas.push(ccoa);
@@ -51,8 +69,8 @@ export default class Configuration {
         this.L = ccoas;
     }
 
-    getConcaveCorners(): [[number, number], PointType][] {
-        const concave_corners: [[number, number], PointType][] = [];
+    getConcaveCorners(): [Point, PointType][] {
+        const concave_corners: [Point, PointType][] = [];
         for (let corner of this.getAllCorners()) {
             const corner_type = this.getCornerType(corner);
             if (corner_type !== null) {
@@ -62,7 +80,7 @@ export default class Configuration {
         return concave_corners;
     }
 
-    getCornerType(p: [number, number]): PointType | null {
+    getCornerType(p: Point): PointType | null {
         const checks = this.checkBoundaries(p);
         const sumChecks = checks.reduce((acc, val) => acc + (val ? 1 : 0), 0);
         // exactly 3 checks must be true for the point to be concave
@@ -73,29 +91,38 @@ export default class Configuration {
         return null;
     }
 
-    checkBoundaries(p: [number, number]): boolean[] {
-        // check
+    checkBoundaries(p: Point): boolean[] {
         return [
-            this.contains([p[0] + Configuration.eps, p[1] + Configuration.eps]),
-            this.contains([p[0] - Configuration.eps, p[1] + Configuration.eps]),
-            this.contains([p[0] + Configuration.eps, p[1] - Configuration.eps]),
-            this.contains([p[0] - Configuration.eps, p[1] - Configuration.eps]),
+            this.contains({
+                x: p.x + Configuration.eps,
+                y: p.y + Configuration.eps,
+            }),
+            this.contains({
+                x: p.x - Configuration.eps,
+                y: p.y + Configuration.eps,
+            }),
+            this.contains({
+                x: p.x + Configuration.eps,
+                y: p.y - Configuration.eps,
+            }),
+            this.contains({
+                x: p.x - Configuration.eps,
+                y: p.y - Configuration.eps,
+            }),
         ];
     }
 
     // checks if a point is inside any of the rects
-    contains(point: [number, number]): boolean {
-        // Check if the point is out of bounds
+    contains(point: Point): boolean {
         if (
-            point[0] <= 0 ||
-            point[1] <= 0 ||
-            this.size[0] <= point[0] ||
-            this.size[1] <= point[1]
+            point.x <= 0 ||
+            point.y <= 0 ||
+            this.size.w <= point.x ||
+            this.size.h <= point.y
         ) {
             return true;
         }
 
-        // Check if the point is inside any of the rects
         for (let r of this.packed_rects) {
             if (r.contains(point)) {
                 return true;
@@ -108,12 +135,11 @@ export default class Configuration {
     //   or being out of bounds
     fits(ccoa: Rect): boolean {
         // Check if the ccoa is out of bounds in any way
-
         if (
-            ccoa.origin[0] < 0 ||
-            ccoa.origin[1] < 0 ||
-            this.size[0] < ccoa.origin[0] + ccoa.width ||
-            this.size[1] < ccoa.origin[1] + ccoa.height
+            ccoa.origin.x < 0 ||
+            ccoa.origin.y < 0 ||
+            this.size.w < ccoa.origin.x + ccoa.width ||
+            this.size.h < ccoa.origin.y + ccoa.height
         ) {
             return false;
         }
@@ -129,12 +155,11 @@ export default class Configuration {
     placeRect(rect: Rect): void {
         // Add rect to packed rects
         this.packed_rects.push(rect);
-
         // Remove the rect from unpacked rects
         const index = this.unpacked_rects.findIndex(
-            ([w, h]) =>
-                (w === rect.width && h === rect.height) ||
-                (w === rect.height && h === rect.width)
+            (r) =>
+                (r.w === rect.width && r.h === rect.height) ||
+                (r.w === rect.height && r.h === rect.width)
         );
         if (index !== -1) {
             this.unpacked_rects.splice(index, 1);
@@ -144,7 +169,7 @@ export default class Configuration {
 
     // Return the percentage of total container area filled by packed rects
     density(): number {
-        const total_area = this.size[0] * this.size[1];
+        const total_area = this.size.w * this.size.h;
         const occupied_area = this.packed_rects.reduce(
             (acc, rect) => acc + rect.area,
             0
@@ -152,13 +177,13 @@ export default class Configuration {
         return occupied_area / total_area;
     }
 
-    getAllCorners(): [number, number][] {
+    getAllCorners(): Point[] {
         // container corners
-        const corners: [number, number][] = [
-            [0, 0],
-            [0, this.size[1]],
-            [this.size[0], 0],
-            this.size,
+        const corners: Point[] = [
+            { x: 0, y: 0 },
+            { x: 0, y: this.size.h },
+            { x: this.size.w, y: 0 },
+            { x: this.size.w, y: this.size.h },
         ];
 
         // rect corners

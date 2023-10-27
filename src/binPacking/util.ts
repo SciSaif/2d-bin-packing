@@ -12,21 +12,23 @@ export function argmax(lst: number[]): number {
 }
 
 export interface Rectangle {
+    id: string;
     w: number;
     h: number;
     x: number;
     y: number;
-    rotated?: boolean;
+    rotated: boolean;
 }
 
 export function getResult(C: Configuration): Rectangle[] {
     let rectangles_data: Rectangle[] = [];
     for (let rect of C.packed_rects) {
         let rectangle_info: Rectangle = {
+            id: rect.id,
             w: rect.width,
             h: rect.height,
-            x: rect.origin[0],
-            y: rect.origin[1],
+            x: rect.origin.x,
+            y: rect.origin.y,
             rotated: rect.rotated,
         };
         rectangles_data.push(rectangle_info);

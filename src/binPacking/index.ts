@@ -1,10 +1,7 @@
 import { BinPacker } from "./binPacker";
-import Configuration from "./configuration";
+import Configuration, { Dimension, UnpackedRect } from "./configuration";
 import { getResult } from "./util";
-export const pack = (
-    rects: [number, number][],
-    container_size: [number, number]
-) => {
+export const pack = (rects: UnpackedRect[], container_size: Dimension) => {
     // const rects = cat1_p1;
 
     const C = new Configuration(

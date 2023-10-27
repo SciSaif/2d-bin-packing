@@ -1,7 +1,13 @@
 import { PointType } from "./util";
 
+export interface Point {
+    x: number;
+    y: number;
+}
+
 export default class Rect {
-    origin: [number, number];
+    id: string;
+    origin: Point;
     width: number;
     height: number;
     rotated: boolean;
@@ -9,18 +15,20 @@ export default class Rect {
     top: number;
     left: number;
     right: number;
-    corner_bot_l: [number, number];
-    corner_top_l: [number, number];
-    corner_top_r: [number, number];
-    corner_bot_r: [number, number];
+    corner_bot_l: Point;
+    corner_top_l: Point;
+    corner_top_r: Point;
+    corner_bot_r: Point;
 
     constructor(
-        origin: [number, number],
+        id: string,
+        origin: Point,
         width: number,
         height: number,
         origin_type: PointType = PointType.BOTTOM_LEFT,
         rotated: boolean = false
     ) {
+        this.id = id;
         if (rotated) {
             [height, width] = [width, height];
         }
@@ -30,13 +38,13 @@ export default class Rect {
                 this.origin = origin;
                 break;
             case PointType.TOP_LEFT:
-                this.origin = [origin[0], origin[1] - height];
+                this.origin = { x: origin.x, y: origin.y - height };
                 break;
             case PointType.BOTTOM_RIGHT:
-                this.origin = [origin[0] - width, origin[1]];
+                this.origin = { x: origin.x - width, y: origin.y };
                 break;
             case PointType.TOP_RIGHT:
-                this.origin = [origin[0] - width, origin[1] - height];
+                this.origin = { x: origin.x - width, y: origin.y - height };
                 break;
         }
 
@@ -44,27 +52,27 @@ export default class Rect {
         this.height = height;
         this.rotated = rotated;
 
-        this.bottom = this.origin[1];
-        this.top = this.origin[1] + this.height;
-        this.left = this.origin[0];
-        this.right = this.origin[0] + this.width;
+        this.bottom = this.origin.y;
+        this.top = this.origin.y + this.height;
+        this.left = this.origin.x;
+        this.right = this.origin.x + this.width;
 
-        this.corner_bot_l = [this.left, this.bottom];
-        this.corner_top_l = [this.left, this.top];
-        this.corner_top_r = [this.right, this.top];
-        this.corner_bot_r = [this.right, this.bottom];
+        this.corner_bot_l = { x: this.left, y: this.bottom };
+        this.corner_top_l = { x: this.left, y: this.top };
+        this.corner_top_r = { x: this.right, y: this.top };
+        this.corner_bot_r = { x: this.right, y: this.bottom };
     }
 
     get area(): number {
         return this.width * this.height;
     }
 
-    contains(point: [number, number]): boolean {
+    contains(point: Point): boolean {
         return (
-            this.corner_bot_l[0] <= point[0] &&
-            this.corner_bot_l[1] <= point[1] &&
-            point[0] <= this.corner_top_r[0] &&
-            point[1] <= this.corner_top_r[1]
+            this.corner_bot_l.x <= point.x &&
+            this.corner_bot_l.y <= point.y &&
+            point.x <= this.corner_top_r.x &&
+            point.y <= this.corner_top_r.y
         );
     }
 
@@ -104,6 +112,6 @@ export default class Rect {
     }
 
     toString(): string {
-        return `R = ((${this.origin[0]}, ${this.origin[1]}), w=${this.width}, h=${this.height}, r=${this.rotated})`;
+        return `R = ((${this.origin.x}, ${this.origin.y}), w=${this.width}, h=${this.height}, r=${this.rotated})`;
     }
 }
