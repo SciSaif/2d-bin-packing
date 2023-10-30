@@ -63,6 +63,7 @@ const ResizingCanvas: React.FC<Props> = ({
                     if (imageFile) {
                         imageObj.src = URL.createObjectURL(imageFile.file);
                     }
+
                     return (
                         <React.Fragment key={index}>
                             <KonvaImage
@@ -84,35 +85,6 @@ const ResizingCanvas: React.FC<Props> = ({
                                     };
                                     setImages(updatedImages);
                                 }}
-                                //     onTransformEnd={(e) => {
-                                //         const node = e.target;
-                                //         const scaleX = node.scaleX();
-                                //         const scaleY = node.scaleY();
-
-                                //         // Adjust the width and height based on the scale
-                                //         const updatedWidth = Math.max(
-                                //             5,
-                                //             node.width() * scaleX
-                                //         );
-                                //         const updatedHeight = Math.max(
-                                //             5,
-                                //             node.height() * scaleY
-                                //         );
-
-                                //         const updatedImages = [...images];
-                                //         updatedImages[index] = {
-                                //             ...imgData,
-                                //             x: node.x(),
-                                //             y: node.y(),
-                                //             w: updatedWidth,
-                                //             h: updatedHeight,
-                                //         };
-                                //         setImages(updatedImages);
-
-                                //         // Reset the scale
-                                //         node.scaleX(1);
-                                //         node.scaleY(1);
-                                //     }}
                                 onTransformEnd={(e) => {
                                     const node = e.target;
                                     const scaleX = node.scaleX();

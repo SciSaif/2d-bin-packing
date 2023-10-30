@@ -4,15 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UnpackedRect } from "../binPacking/configuration";
 import { pack } from "../binPacking";
 import ResizingCanvas from "../components/ResizingCanvas";
-
-// I want a feature where we can input multiple images and display those images in a canvas ,
-// the canvas should have a fixed width but the height will by dynamic and will increase if the images need space to fit.
-// The images will  be place one below the other.
-// Now, I want the feature to click on the bottom right corner of the images and drag to resize them.
-// As I am resizing, the images should move so as to not overlap.
-// while resizing, the image's aspect ratio should not change.
-// I need to keep track of each image's new dimensions.
-
+import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
 interface Box {
     // img: HTMLImageElement;
     id: string;
@@ -22,8 +14,9 @@ interface Box {
     y: number;
     rotated: boolean;
     color?: string;
+    image?: HTMLImageElement;
 }
-const PADDING = 5; // 10 pixels padding, adjust as needed
+const PADDING = 3; // 10 pixels padding, adjust as needed
 
 const ImagePacker: React.FC = () => {
     const [boxes, setBoxes] = useState<Box[][]>([]);
@@ -49,8 +42,8 @@ const ImagePacker: React.FC = () => {
         console.log(storedWidth, storedHeight);
 
         // If dimensions exist in local storage, use them. Otherwise, use default values
-        const initialWidth = storedWidth ? parseInt(storedWidth) : 800;
-        const initialHeight = storedHeight ? parseInt(storedHeight) : 800;
+        const initialWidth = storedWidth ? parseInt(storedWidth) : 1000;
+        const initialHeight = storedHeight ? parseInt(storedHeight) : 1500;
 
         setContainerWidth(initialWidth);
         setContainerHeight(initialHeight);
@@ -63,51 +56,71 @@ const ImagePacker: React.FC = () => {
         localStorage.setItem("containerHeight", containerHeight.toString());
     }, [containerWidth, containerHeight]);
 
+    // useEffect(() => {
+    //     if (!boxes || boxes.length === 0) return;
+    //     boxes.forEach((boxSet, canvasIndex) => {
+    //         const canvas = canvasRefs[canvasIndex].current;
+    //         if (!canvas) return;
+    //         const ctx = canvas.getContext("2d");
+    //         if (!ctx) return;
+    //         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //         // Redraw the bounding box around the canvas
+    //         ctx.strokeStyle = "black";
+    //         ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+    //         boxSet.forEach((box) => {
+    //             const correspondingFile = uploadedFiles.find(
+    //                 (f) => f.id === box.id
+    //             );
+    //             if (!correspondingFile) return;
+
+    //             const img = new Image();
+
+    //             img.onload = () => {
+    //                 if (box.rotated) {
+    //                     // Translate to the position where you want the top-left corner of the rotated image
+    //                     ctx.translate(box.x, box.y + box.h);
+    //                     // Rotate the context
+    //                     ctx.rotate(-Math.PI / 2); // Rotate 90 degrees anticlockwise
+    //                     // Draw the image with its top-left corner at the origin
+    //                     ctx.drawImage(img, 0, 0, box.h, box.w); // Note the swapped width and height
+    //                     // Draw a border around the image
+    //                     ctx.strokeStyle = "red";
+    //                     ctx.strokeRect(0, 0, box.h, box.w); // Note the swapped width and height
+    //                     // Reset the transformation matrix to the identity matrix
+    //                     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    //                 } else {
+    //                     ctx.drawImage(img, box.x, box.y, box.w, box.h);
+    //                     ctx.strokeStyle = "red";
+    //                     ctx.strokeRect(box.x, box.y, box.w, box.h);
+    //                 }
+    //             };
+
+    //             img.src = URL.createObjectURL(correspondingFile.file);
+    //         });
+    //     });
+    // }, [boxes, uploadedFiles, canvasRefs]);
     useEffect(() => {
         if (!boxes || boxes.length === 0) return;
-        boxes.forEach((boxSet, canvasIndex) => {
-            const canvas = canvasRefs[canvasIndex].current;
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Redraw the bounding box around the canvas
-            ctx.strokeStyle = "black";
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
+        boxes.forEach((boxSet) => {
             boxSet.forEach((box) => {
                 const correspondingFile = uploadedFiles.find(
                     (f) => f.id === box.id
                 );
                 if (!correspondingFile) return;
 
-                const img = new Image();
-
+                const img = new window.Image();
                 img.onload = () => {
-                    if (box.rotated) {
-                        // Translate to the position where you want the top-left corner of the rotated image
-                        ctx.translate(box.x, box.y + box.h);
-                        // Rotate the context
-                        ctx.rotate(-Math.PI / 2); // Rotate 90 degrees anticlockwise
-                        // Draw the image with its top-left corner at the origin
-                        ctx.drawImage(img, 0, 0, box.h, box.w); // Note the swapped width and height
-                        // Draw a border around the image
-                        ctx.strokeStyle = "red";
-                        ctx.strokeRect(0, 0, box.h, box.w); // Note the swapped width and height
-                        // Reset the transformation matrix to the identity matrix
-                        ctx.setTransform(1, 0, 0, 1, 0, 0);
-                    } else {
-                        ctx.drawImage(img, box.x, box.y, box.w, box.h);
-                        ctx.strokeStyle = "red";
-                        ctx.strokeRect(box.x, box.y, box.w, box.h);
-                    }
+                    box.image = img;
+                    // Force a re-render to update the Konva.Image component
+                    setBoxes([...boxes]);
                 };
-
                 img.src = URL.createObjectURL(correspondingFile.file);
             });
         });
-    }, [boxes, uploadedFiles, canvasRefs]);
+    }, [boxes, uploadedFiles]);
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
@@ -172,27 +185,6 @@ const ImagePacker: React.FC = () => {
             );
             setInResizeMode(true);
             setMaxY(maxYc);
-            // let remainingRectangles = boxesFromImages;
-            // const allPackedBoxes: Box[][] = [];
-
-            // while (remainingRectangles.length > 0) {
-            //     const { packed_rectangles, unpacked_rectangles } = pack(
-            //         remainingRectangles,
-            //         {
-            //             w: containerWidth,
-            //             h: containerHeight,
-            //         },
-            //         PADDING
-            //     );
-
-            //     allPackedBoxes.push(packed_rectangles);
-            //     remainingRectangles = unpacked_rectangles;
-            // }
-
-            // setBoxes(allPackedBoxes);
-            // setCanvasRefs(
-            //     allPackedBoxes.map(() => React.createRef<HTMLCanvasElement>())
-            // );
         });
     };
 
@@ -271,32 +263,38 @@ const ImagePacker: React.FC = () => {
             )}
 
             <div className="flex flex-wrap w-full gap-5">
-                {boxes.length === canvasRefs.length &&
-                    boxes.map((boxSet, index) => (
-                        <canvas
-                            key={index}
-                            ref={canvasRefs[index]}
-                            width={containerWidth}
-                            height={containerHeight}
-                            style={{
-                                width: `${containerWidth}px`,
-                                height: `${containerHeight}px`,
-                            }}
-                            className="border border-gray-400 shadow w-fit"
-                        ></canvas>
-                    ))}
+                {boxes.map((boxSet, index) => (
+                    <Stage
+                        key={index}
+                        width={containerWidth}
+                        height={containerHeight}
+                        className="border border-gray-400 shadow w-fit"
+                    >
+                        <Layer>
+                            {boxSet.map((box) => (
+                                <React.Fragment key={box.id}>
+                                    <KonvaImage
+                                        x={box.x}
+                                        y={box.y}
+                                        width={box.rotated ? box.h : box.w}
+                                        height={box.rotated ? box.w : box.h}
+                                        image={box.image}
+                                        rotation={box.rotated ? -90 : 0}
+                                        offsetX={box.rotated ? box.h : 0}
+                                    />
+                                    <Rect
+                                        x={box.x}
+                                        y={box.y}
+                                        width={box.w}
+                                        height={box.h}
+                                        stroke="red"
+                                    />
+                                </React.Fragment>
+                            ))}
+                        </Layer>
+                    </Stage>
+                ))}
             </div>
-            <footer className="mt-10 border-t ">
-                <div className="text-sm text-center text-gray-500">
-                    <p>
-                        Made with{" "}
-                        <span role="img" aria-label="heart">
-                            ❤️
-                        </span>{" "}
-                        by saifullah rahman (sciSaif)
-                    </p>
-                </div>
-            </footer>
         </div>
     );
 };
