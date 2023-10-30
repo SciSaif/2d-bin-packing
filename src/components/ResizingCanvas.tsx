@@ -30,11 +30,26 @@ const ResizingCanvas: React.FC<Props> = ({
 }) => {
     const [selectedId, setSelectedId] = useState<null | string>(null);
     const transformerRef = useRef<any>(null);
+    const [loadedImages, setLoadedImages] = useState<
+        Map<string, HTMLImageElement>
+    >(new Map());
 
     const handleSelect = (id: string) => {
         setSelectedId(id);
     };
-
+    useEffect(() => {
+        uploadedFiles.forEach((file) => {
+            if (!loadedImages.has(file.id)) {
+                const imageObj = new window.Image();
+                imageObj.onload = () => {
+                    setLoadedImages((prev) =>
+                        new Map(prev).set(file.id, imageObj)
+                    );
+                };
+                imageObj.src = URL.createObjectURL(file.file);
+            }
+        });
+    }, [uploadedFiles, loadedImages]);
     useEffect(() => {
         if (transformerRef.current && selectedId) {
             const selectedNode = transformerRef.current
@@ -73,19 +88,9 @@ const ResizingCanvas: React.FC<Props> = ({
                                 y={imgData.y}
                                 width={imgData.w}
                                 height={imgData.h}
-                                image={imageObj}
-                                draggable
+                                image={loadedImages.get(imgData.id)}
                                 onClick={() => handleSelect(imgData.id)}
                                 onTap={() => handleSelect(imgData.id)}
-                                onDragEnd={(e) => {
-                                    const updatedImages = [...images];
-                                    updatedImages[index] = {
-                                        ...imgData,
-                                        x: e.target.x(),
-                                        y: e.target.y(),
-                                    };
-                                    setImages(updatedImages);
-                                }}
                                 onTransformEnd={(e) => {
                                     const node = e.target;
                                     const scaleX = node.scaleX();
