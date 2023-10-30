@@ -1,25 +1,18 @@
 import { BinPacker } from "./binPacker";
 import Configuration, { Dimension, UnpackedRect } from "./configuration";
-import { getResult } from "./util";
-// export const pack = (rects: UnpackedRect[], container_size: Dimension) => {
-//     // const rects = cat1_p1;
+import { Rectangle, getResult, increaseDimensionsForPadding } from "./util";
 
-//     const C = new Configuration(
-//         container_size,
-//         [...rects] // Using spread operator to create a shallow copy
-//     );
-
-//     const packer = new BinPacker(C);
-
-//     const packedConfig = packer.PackConfiguration(C);
-
-//     return getResult(packedConfig);
-// };
 export const pack = (
     rects: UnpackedRect[],
     container_size: Dimension,
     padding: number = 0
 ) => {
+    if (padding > 0) {
+        rects = increaseDimensionsForPadding(rects, padding);
+        container_size.w += padding + padding;
+        container_size.h += padding + padding;
+    }
+
     const C = new Configuration(
         container_size,
         [...rects], // Using spread operator to create a shallow copy
@@ -31,5 +24,5 @@ export const pack = (
 
     const packedConfig = packer.PackConfiguration(C);
 
-    return getResult(packedConfig);
+    return getResult(packedConfig, padding);
 };

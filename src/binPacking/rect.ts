@@ -95,6 +95,8 @@ export default class Rect {
     }
 
     overlaps(other: Rect): boolean {
+        // console.log("overlap", this, other, padding);
+
         if (this.right <= other.left || other.right <= this.left) {
             return false;
         }

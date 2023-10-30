@@ -3,6 +3,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { UnpackedRect } from "../binPacking/configuration";
 import { pack } from "../binPacking";
+import ResizingCanvas from "../components/ResizingCanvas";
+
+// I want a feature where we can input multiple images and display those images in a canvas ,
+// the canvas should have a fixed width but the height will by dynamic and will increase if the images need space to fit.
+// The images will  be place one below the other.
+// Now, I want the feature to click on the bottom right corner of the images and drag to resize them.
+// As I am resizing, the images should move so as to not overlap.
+// while resizing, the image's aspect ratio should not change.
+// I need to keep track of each image's new dimensions.
 
 interface Box {
     // img: HTMLImageElement;
@@ -14,19 +23,45 @@ interface Box {
     rotated: boolean;
     color?: string;
 }
-const PADDING = 10; // 10 pixels padding, adjust as needed
+const PADDING = 5; // 10 pixels padding, adjust as needed
 
 const ImagePacker: React.FC = () => {
     const [boxes, setBoxes] = useState<Box[][]>([]);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [containerWidth, setContainerWidth] = useState<number>(800);
-    const [containerHeight, setContainerHeight] = useState<number>(800);
+    const [containerWidth, setContainerWidth] = useState<number>(0);
+    const [containerHeight, setContainerHeight] = useState<number>(0);
     const [uploadedFiles, setUploadedFiles] = useState<
         { id: string; file: File }[]
     >([]);
     const [canvasRefs, setCanvasRefs] = useState<
         React.RefObject<HTMLCanvasElement>[]
     >([]);
+
+    const [inResizeMode, setInResizeMode] = useState<boolean>(false);
+    const [unpackedRectangles, setUnpackedRectangles] = useState<
+        { id: string; w: number; h: number; x: number; y: number }[]
+    >([]);
+    const [maxY, setMaxY] = useState<number>(0);
+
+    useEffect(() => {
+        // Get dimensions from local storage
+        const storedWidth = localStorage.getItem("containerWidth");
+        const storedHeight = localStorage.getItem("containerHeight");
+        console.log(storedWidth, storedHeight);
+
+        // If dimensions exist in local storage, use them. Otherwise, use default values
+        const initialWidth = storedWidth ? parseInt(storedWidth) : 800;
+        const initialHeight = storedHeight ? parseInt(storedHeight) : 800;
+
+        setContainerWidth(initialWidth);
+        setContainerHeight(initialHeight);
+    }, []);
+
+    useEffect(() => {
+        // Store dimensions in local storage whenever they change
+        if (containerWidth === 0 || containerHeight === 0) return;
+        localStorage.setItem("containerWidth", containerWidth.toString());
+        localStorage.setItem("containerHeight", containerHeight.toString());
+    }, [containerWidth, containerHeight]);
 
     useEffect(() => {
         if (!boxes || boxes.length === 0) return;
@@ -121,28 +156,70 @@ const ImagePacker: React.FC = () => {
         });
 
         Promise.all(promises).then(() => {
-            let remainingRectangles = boxesFromImages;
-            const allPackedBoxes: Box[][] = [];
-
-            while (remainingRectangles.length > 0) {
-                const { packed_rectangles, unpacked_rectangles } = pack(
-                    remainingRectangles,
-                    {
-                        w: containerWidth,
-                        h: containerHeight,
-                    },
-                    50
-                );
-
-                allPackedBoxes.push(packed_rectangles);
-                remainingRectangles = unpacked_rectangles;
-            }
-
-            setBoxes(allPackedBoxes);
-            setCanvasRefs(
-                allPackedBoxes.map(() => React.createRef<HTMLCanvasElement>())
+            let maxYc = 0;
+            setUnpackedRectangles(
+                boxesFromImages.map((box) => {
+                    const res = {
+                        id: box.id,
+                        w: box.w,
+                        h: box.h,
+                        x: 0,
+                        y: maxYc + 5,
+                    };
+                    maxYc += box.h + 5;
+                    return res;
+                })
             );
+            setInResizeMode(true);
+            setMaxY(maxYc);
+            // let remainingRectangles = boxesFromImages;
+            // const allPackedBoxes: Box[][] = [];
+
+            // while (remainingRectangles.length > 0) {
+            //     const { packed_rectangles, unpacked_rectangles } = pack(
+            //         remainingRectangles,
+            //         {
+            //             w: containerWidth,
+            //             h: containerHeight,
+            //         },
+            //         PADDING
+            //     );
+
+            //     allPackedBoxes.push(packed_rectangles);
+            //     remainingRectangles = unpacked_rectangles;
+            // }
+
+            // setBoxes(allPackedBoxes);
+            // setCanvasRefs(
+            //     allPackedBoxes.map(() => React.createRef<HTMLCanvasElement>())
+            // );
         });
+    };
+
+    const startPacking = () => {
+        setInResizeMode(false);
+
+        let remainingRectangles = unpackedRectangles;
+        const allPackedBoxes: Box[][] = [];
+
+        while (remainingRectangles.length > 0) {
+            const { packed_rectangles, unpacked_rectangles } = pack(
+                remainingRectangles,
+                {
+                    w: containerWidth,
+                    h: containerHeight,
+                },
+                PADDING
+            );
+
+            allPackedBoxes.push(packed_rectangles);
+            remainingRectangles = unpacked_rectangles;
+        }
+
+        setBoxes(allPackedBoxes);
+        setCanvasRefs(
+            allPackedBoxes.map(() => React.createRef<HTMLCanvasElement>())
+        );
     };
 
     return (
@@ -174,6 +251,25 @@ const ImagePacker: React.FC = () => {
                 accept="image/*"
             />
 
+            {inResizeMode && (
+                <button
+                    onClick={() => startPacking()}
+                    className="px-10 py-2 text-white bg-blue-500 rounded w-fit hover:bg-blue-600"
+                >
+                    Start packing
+                </button>
+            )}
+
+            {inResizeMode && (
+                <ResizingCanvas
+                    containerWidth={containerWidth}
+                    images={unpackedRectangles}
+                    uploadedFiles={uploadedFiles}
+                    maxY={maxY}
+                    setImages={setUnpackedRectangles}
+                />
+            )}
+
             <div className="flex flex-wrap w-full gap-5">
                 {boxes.length === canvasRefs.length &&
                     boxes.map((boxSet, index) => (
@@ -186,7 +282,7 @@ const ImagePacker: React.FC = () => {
                                 width: `${containerWidth}px`,
                                 height: `${containerHeight}px`,
                             }}
-                            className="w-fit shadow border border-gray-400"
+                            className="border border-gray-400 shadow w-fit"
                         ></canvas>
                     ))}
             </div>

@@ -13,6 +13,12 @@ const Home = () => {
             >
                 Image Packer
             </Link>
+            <Link
+                to={"/image-sizing"}
+                className="text-blue-500 hover:underline"
+            >
+                Image Sizing
+            </Link>
         </div>
     );
 };

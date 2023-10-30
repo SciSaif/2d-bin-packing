@@ -1,4 +1,4 @@
-import Configuration from "./configuration";
+import Configuration, { UnpackedRect } from "./configuration";
 
 export enum PointType {
     BOTTOM_LEFT = 0,
@@ -10,6 +10,20 @@ export enum PointType {
 export function argmax(lst: number[]): number {
     return lst.indexOf(Math.max(...lst));
 }
+
+// function to add increase the width and height of the rects by the padding value
+export const increaseDimensionsForPadding = (
+    rects: UnpackedRect[],
+    padding: number
+) => {
+    return rects.map((rect) => {
+        return {
+            id: rect.id,
+            w: rect.w + padding + padding,
+            h: rect.h + padding + padding,
+        };
+    });
+};
 
 export interface Rectangle {
     id: string;
@@ -26,34 +40,39 @@ interface Result {
     isRemaining: boolean;
 }
 
-export function getResult(C: Configuration): Result {
+export function getResult(C: Configuration, padding: number): Result {
+    // Note: if there is padding, then we had added 2 x padding to the width and height of the rectangles
+    // so now we need to subtract 2 x padding from the width and height of the rectangles
+    // and shift the x and y coordinates by padding
+
     let rectangles_data: Rectangle[] = [];
     for (let rect of C.packed_rects) {
         let rectangle_info: Rectangle = {
             id: rect.id,
-            w: rect.width,
-            h: rect.height,
+            w: rect.width - padding - padding,
+            h: rect.height - padding - padding,
             x: rect.origin.x,
             y: rect.origin.y,
             rotated: rect.rotated,
         };
         rectangles_data.push(rectangle_info);
     }
-    console.log(rectangles_data);
 
     let remaining_rectangles_data: Rectangle[] = [];
     for (let rect of C.unpacked_rects) {
         let rectangle_info: Rectangle = {
             id: rect.id,
-            w: rect.w,
-            h: rect.h,
+            w: rect.w - padding - padding,
+            h: rect.h - padding - padding,
             x: 0,
             y: 0,
             rotated: false,
         };
         remaining_rectangles_data.push(rectangle_info);
     }
-    console.log(remaining_rectangles_data);
+
+    console.log("packed", rectangles_data);
+    console.log("unpacked", remaining_rectangles_data);
 
     return {
         packed_rectangles: rectangles_data,

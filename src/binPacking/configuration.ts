@@ -18,7 +18,6 @@ export default class Configuration {
     packed_rects: Rect[];
     L: Rect[] = [];
     concave_corners: [Point, PointType][] = [];
-    padding: number;
     constructor(
         size: Dimension,
         unpacked_rects: UnpackedRect[],
@@ -28,7 +27,6 @@ export default class Configuration {
         this.size = size;
         this.unpacked_rects = unpacked_rects;
         this.packed_rects = packed_rects;
-        this.padding = padding;
         this.generate_L();
         // console.log("total ccoas", this.L.length);
     }
