@@ -46,7 +46,7 @@ const ResizingCanvas: React.FC<Props> = ({
     }, [selectedId]);
 
     return (
-        <Stage width={containerWidth} height={maxY + 5}>
+        <Stage width={containerWidth} height={maxY + 5} className="">
             <Layer>
                 <Rect
                     x={0}
@@ -54,6 +54,7 @@ const ResizingCanvas: React.FC<Props> = ({
                     width={containerWidth}
                     height={maxY + 5}
                     stroke="black"
+                    fill="white"
                 />
                 {images.map((imgData, index) => {
                     const imageFile = uploadedFiles.find(

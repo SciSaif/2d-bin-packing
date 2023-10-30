@@ -7,7 +7,7 @@ import Footer from "./components/Footer";
 
 const App = () => {
     return (
-        <div>
+        <div className="min-h-screen bg-orange-50">
             <Router>
                 <Routes>
                     <Route path="/" element={<Home />} />

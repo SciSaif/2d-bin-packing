@@ -86,13 +86,13 @@ const ImagePacker: React.FC = () => {
                         let imgWidth = img.width;
                         let imgHeight = img.height;
 
-                        // Check if the image's width or height exceeds the container's dimensions
+                        // initial image size should not be more than half of the container
                         if (
-                            imgWidth > containerWidth ||
+                            imgWidth > containerWidth / 2 ||
                             imgHeight > containerHeight
                         ) {
                             const scaleFactor = Math.min(
-                                containerWidth / imgWidth,
+                                containerWidth / 2 / imgWidth,
                                 containerHeight / imgHeight
                             );
                             imgWidth = imgWidth * scaleFactor;
@@ -216,62 +216,6 @@ const ImagePacker: React.FC = () => {
         pdf.save("packed-images.pdf");
     };
 
-    // const handleSaveAsPDF = () => {
-    //     const pdf = new jsPDF("p", "pt", "a4");
-    //     pdf.setTextColor("#000000");
-
-    //     boxes.forEach((boxSet, index) => {
-    //         if (index > 0) {
-    //             pdf.addPage("a4", "portrait");
-    //         }
-
-    //         const stage = new Konva.Stage({
-    //             container: "temp-container",
-    //             width: containerWidth,
-    //             height: containerHeight,
-    //         });
-
-    //         const layer = new Konva.Layer();
-    //         stage.add(layer);
-
-    //         boxSet.forEach((box) => {
-    //             if (box.image) {
-    //                 const konvaImage = new Konva.Image({
-    //                     x: box.x,
-    //                     y: box.y,
-    //                     width: box.rotated ? box.h : box.w,
-    //                     height: box.rotated ? box.w : box.h,
-    //                     image: box.image,
-    //                     rotation: box.rotated ? -90 : 0,
-    //                     offsetX: box.rotated ? box.h : 0,
-    //                 });
-    //                 layer.add(konvaImage);
-    //             }
-
-    //             const rect = new Konva.Rect({
-    //                 x: box.x,
-    //                 y: box.y,
-    //                 width: box.w,
-    //                 height: box.h,
-    //                 stroke: "red",
-    //             });
-    //             layer.add(rect);
-    //         });
-
-    //         pdf.addImage(
-    //             stage.toDataURL({ pixelRatio: 2 }),
-    //             0,
-    //             0,
-    //             containerWidth,
-    //             containerHeight
-    //         );
-
-    //         stage.destroy();
-    //     });
-
-    //     pdf.save("packed-images.pdf");
-    // };
-
     return (
         <div className="flex flex-col gap-2 px-2 py-2">
             <h1 className="pb-2 mb-2 text-3xl font-bold border-b text-cyan-500">
@@ -329,7 +273,7 @@ const ImagePacker: React.FC = () => {
                 />
             )}
 
-            <div className="flex flex-wrap w-full gap-5">
+            <div className="flex flex-wrap w-full gap-10">
                 {boxes.map((boxSet, index) => (
                     <Stage
                         key={index}
@@ -338,6 +282,14 @@ const ImagePacker: React.FC = () => {
                         className="border border-gray-400 shadow w-fit"
                     >
                         <Layer>
+                            <Rect
+                                x={0}
+                                y={0}
+                                width={containerWidth}
+                                height={containerHeight}
+                                stroke="black"
+                                fill="white"
+                            />
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (
