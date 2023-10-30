@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { v4 as uuidv4 } from "uuid";
-import { UnpackedRect } from "../binPacking/configuration";
-import { pack } from "../binPacking";
-import ResizingCanvas from "../components/ResizingCanvas";
+import { UnpackedRect } from "../../binPacking/configuration";
+import { pack } from "../../binPacking";
+import ResizingCanvas from "../../components/ResizingCanvas";
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
-import jsPDF from "jspdf";
-import Konva from "konva";
+import { handleSaveAsPDF } from "./utils";
 
-interface Box {
+export interface Box {
     // img: HTMLImageElement;
     id: string;
     w: number;
@@ -78,11 +77,6 @@ const ImagePacker: React.FC = () => {
                     const img = new Image();
                     const id = uuidv4();
                     img.onload = () => {
-                        // boxesFromImages.push({
-                        //     w: img.width,
-                        //     h: img.height,
-                        //     id,
-                        // });
                         let imgWidth = img.width;
                         let imgHeight = img.height;
 
@@ -154,67 +148,6 @@ const ImagePacker: React.FC = () => {
 
         setBoxes(allPackedBoxes);
     };
-    const handleSaveAsPDF = () => {
-        const pdf = new jsPDF("p", "pt", "a4");
-        pdf.setTextColor("#000000");
-
-        const a4Width = 595; // A4 width in points
-        const a4Height = 842; // A4 height in points
-
-        const scaleX = a4Width / containerWidth;
-        const scaleY = a4Height / containerHeight;
-
-        boxes.forEach((boxSet, index) => {
-            if (index > 0) {
-                pdf.addPage("a4", "portrait");
-            }
-
-            const stage = new Konva.Stage({
-                container: "temp-container",
-                width: containerWidth,
-                height: containerHeight,
-            });
-
-            const layer = new Konva.Layer();
-            stage.add(layer);
-
-            boxSet.forEach((box) => {
-                if (box.image) {
-                    const konvaImage = new Konva.Image({
-                        x: box.x,
-                        y: box.y,
-                        width: box.rotated ? box.h : box.w,
-                        height: box.rotated ? box.w : box.h,
-                        image: box.image,
-                        rotation: box.rotated ? -90 : 0,
-                        offsetX: box.rotated ? box.h : 0,
-                    });
-                    layer.add(konvaImage);
-                }
-
-                const rect = new Konva.Rect({
-                    x: box.x,
-                    y: box.y,
-                    width: box.w,
-                    height: box.h,
-                    stroke: "red",
-                });
-                layer.add(rect);
-            });
-
-            pdf.addImage(
-                stage.toDataURL({ pixelRatio: 2 }),
-                0,
-                0,
-                containerWidth * scaleX,
-                containerHeight * scaleY
-            );
-
-            stage.destroy();
-        });
-
-        pdf.save("packed-images.pdf");
-    };
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2">
@@ -256,7 +189,13 @@ const ImagePacker: React.FC = () => {
 
             {boxes.length > 0 && (
                 <button
-                    onClick={handleSaveAsPDF}
+                    onClick={() =>
+                        handleSaveAsPDF({
+                            boxes,
+                            containerWidth,
+                            containerHeight,
+                        })
+                    }
                     className="px-10 py-2 mt-4 text-white bg-green-500 rounded w-fit hover:bg-green-600"
                 >
                     Save as PDF
@@ -270,6 +209,7 @@ const ImagePacker: React.FC = () => {
                     uploadedFiles={uploadedFiles}
                     maxY={maxY}
                     setImages={setUnpackedRectangles}
+                    setMaxY={setMaxY}
                 />
             )}
 

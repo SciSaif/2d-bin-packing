@@ -6,6 +6,7 @@ import {
     Image as KonvaImage,
     Transformer,
 } from "react-konva";
+
 interface ImageData {
     id: string;
     w: number;
@@ -13,10 +14,12 @@ interface ImageData {
     x: number;
     y: number;
 }
+
 interface Props {
     containerWidth: number;
     images: ImageData[];
     maxY: number;
+    setMaxY: (maxY: number) => void;
     uploadedFiles: { id: string; file: File }[];
     setImages: (images: ImageData[]) => void;
 }
@@ -25,6 +28,7 @@ const ResizingCanvas: React.FC<Props> = ({
     containerWidth,
     images,
     maxY,
+    setMaxY,
     uploadedFiles,
     setImages,
 }) => {
@@ -118,6 +122,20 @@ const ResizingCanvas: React.FC<Props> = ({
                                         h: updatedHeight,
                                     };
 
+                                    let currentTotalHeight = 0;
+                                    updatedImages.forEach((img) => {
+                                        currentTotalHeight += img.h;
+                                    });
+
+                                    // Adjust the maxY if the total height of all images is greater than the current maxY
+                                    if (currentTotalHeight > maxY) {
+                                        setMaxY(
+                                            currentTotalHeight +
+                                                updatedImages.length * 5 +
+                                                5
+                                        );
+                                    }
+
                                     // Adjust the y position of all images below the resized image
                                     for (
                                         let i = index + 1;
@@ -135,7 +153,15 @@ const ResizingCanvas: React.FC<Props> = ({
                                 }}
                             />
                             {selectedId === imgData.id && (
-                                <Transformer ref={transformerRef} />
+                                <Transformer
+                                    ref={transformerRef}
+                                    enabledAnchors={[
+                                        "bottom-right",
+                                        "bottom-center",
+                                        "middle-right",
+                                    ]}
+                                    rotateEnabled={false}
+                                />
                             )}
                         </React.Fragment>
                     );
