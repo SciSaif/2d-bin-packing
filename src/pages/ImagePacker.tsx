@@ -5,6 +5,9 @@ import { UnpackedRect } from "../binPacking/configuration";
 import { pack } from "../binPacking";
 import ResizingCanvas from "../components/ResizingCanvas";
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
+import jsPDF from "jspdf";
+import Konva from "konva";
+
 interface Box {
     // img: HTMLImageElement;
     id: string;
@@ -16,17 +19,15 @@ interface Box {
     color?: string;
     image?: HTMLImageElement;
 }
+
 const PADDING = 3; // 10 pixels padding, adjust as needed
 
 const ImagePacker: React.FC = () => {
     const [boxes, setBoxes] = useState<Box[][]>([]);
-    const [containerWidth, setContainerWidth] = useState<number>(0);
-    const [containerHeight, setContainerHeight] = useState<number>(0);
+    const [containerWidth, setContainerWidth] = useState<number>(595 * 2);
+    const [containerHeight, setContainerHeight] = useState<number>(842 * 2);
     const [uploadedFiles, setUploadedFiles] = useState<
         { id: string; file: File }[]
-    >([]);
-    const [canvasRefs, setCanvasRefs] = useState<
-        React.RefObject<HTMLCanvasElement>[]
     >([]);
 
     const [inResizeMode, setInResizeMode] = useState<boolean>(false);
@@ -36,48 +37,6 @@ const ImagePacker: React.FC = () => {
     const [maxY, setMaxY] = useState<number>(0);
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
 
-    useEffect(() => {
-        // Get dimensions from local storage
-        const storedWidth = localStorage.getItem("containerWidth");
-        const storedHeight = localStorage.getItem("containerHeight");
-        console.log(storedWidth, storedHeight);
-
-        // If dimensions exist in local storage, use them. Otherwise, use default values
-        const initialWidth = storedWidth ? parseInt(storedWidth) : 1000;
-        const initialHeight = storedHeight ? parseInt(storedHeight) : 1500;
-
-        setContainerWidth(initialWidth);
-        setContainerHeight(initialHeight);
-    }, []);
-
-    useEffect(() => {
-        // Store dimensions in local storage whenever they change
-        if (containerWidth === 0 || containerHeight === 0) return;
-        localStorage.setItem("containerWidth", containerWidth.toString());
-        localStorage.setItem("containerHeight", containerHeight.toString());
-    }, [containerWidth, containerHeight]);
-    console.log("hi");
-
-    // useEffect(() => {
-    //     if (!boxes || boxes.length === 0) return;
-
-    //     boxes.forEach((boxSet) => {
-    //         boxSet.forEach((box) => {
-    //             const correspondingFile = uploadedFiles.find(
-    //                 (f) => f.id === box.id
-    //             );
-    //             if (!correspondingFile) return;
-
-    //             const img = new window.Image();
-    //             img.onload = () => {
-    //                 box.image = img;
-    //                 // Force a re-render to update the Konva.Image component
-    //                 setBoxes([...boxes]);
-    //             };
-    //             img.src = URL.createObjectURL(correspondingFile.file);
-    //         });
-    //     });
-    // }, [boxes, uploadedFiles]);
     useEffect(() => {
         if (!boxes || boxes.length === 0) return;
 
@@ -194,10 +153,124 @@ const ImagePacker: React.FC = () => {
         }
 
         setBoxes(allPackedBoxes);
-        setCanvasRefs(
-            allPackedBoxes.map(() => React.createRef<HTMLCanvasElement>())
-        );
     };
+    const handleSaveAsPDF = () => {
+        const pdf = new jsPDF("p", "pt", "a4");
+        pdf.setTextColor("#000000");
+
+        const a4Width = 595; // A4 width in points
+        const a4Height = 842; // A4 height in points
+
+        const scaleX = a4Width / containerWidth;
+        const scaleY = a4Height / containerHeight;
+
+        boxes.forEach((boxSet, index) => {
+            if (index > 0) {
+                pdf.addPage("a4", "portrait");
+            }
+
+            const stage = new Konva.Stage({
+                container: "temp-container",
+                width: containerWidth,
+                height: containerHeight,
+            });
+
+            const layer = new Konva.Layer();
+            stage.add(layer);
+
+            boxSet.forEach((box) => {
+                if (box.image) {
+                    const konvaImage = new Konva.Image({
+                        x: box.x,
+                        y: box.y,
+                        width: box.rotated ? box.h : box.w,
+                        height: box.rotated ? box.w : box.h,
+                        image: box.image,
+                        rotation: box.rotated ? -90 : 0,
+                        offsetX: box.rotated ? box.h : 0,
+                    });
+                    layer.add(konvaImage);
+                }
+
+                const rect = new Konva.Rect({
+                    x: box.x,
+                    y: box.y,
+                    width: box.w,
+                    height: box.h,
+                    stroke: "red",
+                });
+                layer.add(rect);
+            });
+
+            pdf.addImage(
+                stage.toDataURL({ pixelRatio: 2 }),
+                0,
+                0,
+                containerWidth * scaleX,
+                containerHeight * scaleY
+            );
+
+            stage.destroy();
+        });
+
+        pdf.save("packed-images.pdf");
+    };
+
+    // const handleSaveAsPDF = () => {
+    //     const pdf = new jsPDF("p", "pt", "a4");
+    //     pdf.setTextColor("#000000");
+
+    //     boxes.forEach((boxSet, index) => {
+    //         if (index > 0) {
+    //             pdf.addPage("a4", "portrait");
+    //         }
+
+    //         const stage = new Konva.Stage({
+    //             container: "temp-container",
+    //             width: containerWidth,
+    //             height: containerHeight,
+    //         });
+
+    //         const layer = new Konva.Layer();
+    //         stage.add(layer);
+
+    //         boxSet.forEach((box) => {
+    //             if (box.image) {
+    //                 const konvaImage = new Konva.Image({
+    //                     x: box.x,
+    //                     y: box.y,
+    //                     width: box.rotated ? box.h : box.w,
+    //                     height: box.rotated ? box.w : box.h,
+    //                     image: box.image,
+    //                     rotation: box.rotated ? -90 : 0,
+    //                     offsetX: box.rotated ? box.h : 0,
+    //                 });
+    //                 layer.add(konvaImage);
+    //             }
+
+    //             const rect = new Konva.Rect({
+    //                 x: box.x,
+    //                 y: box.y,
+    //                 width: box.w,
+    //                 height: box.h,
+    //                 stroke: "red",
+    //             });
+    //             layer.add(rect);
+    //         });
+
+    //         pdf.addImage(
+    //             stage.toDataURL({ pixelRatio: 2 }),
+    //             0,
+    //             0,
+    //             containerWidth,
+    //             containerHeight
+    //         );
+
+    //         stage.destroy();
+    //     });
+
+    //     pdf.save("packed-images.pdf");
+    // };
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2">
@@ -234,6 +307,15 @@ const ImagePacker: React.FC = () => {
                     className="px-10 py-2 text-white bg-blue-500 rounded w-fit hover:bg-blue-600"
                 >
                     Start packing
+                </button>
+            )}
+
+            {boxes.length > 0 && (
+                <button
+                    onClick={handleSaveAsPDF}
+                    className="px-10 py-2 mt-4 text-white bg-green-500 rounded w-fit hover:bg-green-600"
+                >
+                    Save as PDF
                 </button>
             )}
 
@@ -282,6 +364,7 @@ const ImagePacker: React.FC = () => {
                     </Stage>
                 ))}
             </div>
+            <div id="temp-container" style={{ display: "none" }}></div>
         </div>
     );
 };
