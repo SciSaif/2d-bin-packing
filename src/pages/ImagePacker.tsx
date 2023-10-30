@@ -34,6 +34,7 @@ const ImagePacker: React.FC = () => {
         { id: string; w: number; h: number; x: number; y: number }[]
     >([]);
     const [maxY, setMaxY] = useState<number>(0);
+    const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         // Get dimensions from local storage
@@ -55,54 +56,36 @@ const ImagePacker: React.FC = () => {
         localStorage.setItem("containerWidth", containerWidth.toString());
         localStorage.setItem("containerHeight", containerHeight.toString());
     }, [containerWidth, containerHeight]);
+    console.log("hi");
 
     // useEffect(() => {
     //     if (!boxes || boxes.length === 0) return;
-    //     boxes.forEach((boxSet, canvasIndex) => {
-    //         const canvas = canvasRefs[canvasIndex].current;
-    //         if (!canvas) return;
-    //         const ctx = canvas.getContext("2d");
-    //         if (!ctx) return;
-    //         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    //         // Redraw the bounding box around the canvas
-    //         ctx.strokeStyle = "black";
-    //         ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
+    //     boxes.forEach((boxSet) => {
     //         boxSet.forEach((box) => {
     //             const correspondingFile = uploadedFiles.find(
     //                 (f) => f.id === box.id
     //             );
     //             if (!correspondingFile) return;
 
-    //             const img = new Image();
-
+    //             const img = new window.Image();
     //             img.onload = () => {
-    //                 if (box.rotated) {
-    //                     // Translate to the position where you want the top-left corner of the rotated image
-    //                     ctx.translate(box.x, box.y + box.h);
-    //                     // Rotate the context
-    //                     ctx.rotate(-Math.PI / 2); // Rotate 90 degrees anticlockwise
-    //                     // Draw the image with its top-left corner at the origin
-    //                     ctx.drawImage(img, 0, 0, box.h, box.w); // Note the swapped width and height
-    //                     // Draw a border around the image
-    //                     ctx.strokeStyle = "red";
-    //                     ctx.strokeRect(0, 0, box.h, box.w); // Note the swapped width and height
-    //                     // Reset the transformation matrix to the identity matrix
-    //                     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    //                 } else {
-    //                     ctx.drawImage(img, box.x, box.y, box.w, box.h);
-    //                     ctx.strokeStyle = "red";
-    //                     ctx.strokeRect(box.x, box.y, box.w, box.h);
-    //                 }
+    //                 box.image = img;
+    //                 // Force a re-render to update the Konva.Image component
+    //                 setBoxes([...boxes]);
     //             };
-
     //             img.src = URL.createObjectURL(correspondingFile.file);
     //         });
     //     });
-    // }, [boxes, uploadedFiles, canvasRefs]);
+    // }, [boxes, uploadedFiles]);
     useEffect(() => {
         if (!boxes || boxes.length === 0) return;
+
+        let loadedCount = 0;
+        const totalImages = boxes.reduce(
+            (acc, boxSet) => acc + boxSet.length,
+            0
+        );
 
         boxes.forEach((boxSet) => {
             boxSet.forEach((box) => {
@@ -114,8 +97,10 @@ const ImagePacker: React.FC = () => {
                 const img = new window.Image();
                 img.onload = () => {
                     box.image = img;
-                    // Force a re-render to update the Konva.Image component
-                    setBoxes([...boxes]);
+                    loadedCount++;
+                    if (loadedCount === totalImages) {
+                        setImagesLoaded(true);
+                    }
                 };
                 img.src = URL.createObjectURL(correspondingFile.file);
             });
@@ -273,15 +258,17 @@ const ImagePacker: React.FC = () => {
                         <Layer>
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
-                                    <KonvaImage
-                                        x={box.x}
-                                        y={box.y}
-                                        width={box.rotated ? box.h : box.w}
-                                        height={box.rotated ? box.w : box.h}
-                                        image={box.image}
-                                        rotation={box.rotated ? -90 : 0}
-                                        offsetX={box.rotated ? box.h : 0}
-                                    />
+                                    {imagesLoaded && (
+                                        <KonvaImage
+                                            x={box.x}
+                                            y={box.y}
+                                            width={box.rotated ? box.h : box.w}
+                                            height={box.rotated ? box.w : box.h}
+                                            image={box.image}
+                                            rotation={box.rotated ? -90 : 0}
+                                            offsetX={box.rotated ? box.h : 0}
+                                        />
+                                    )}
                                     <Rect
                                         x={box.x}
                                         y={box.y}
