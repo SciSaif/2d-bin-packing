@@ -127,14 +127,17 @@ const ImagePacker: React.FC = () => {
         });
     };
 
-    const startPacking = () => {
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const startPacking = async () => {
         setInResizeMode(false);
+        setLoading(true);
 
         let remainingRectangles = unpackedRectangles;
         const allPackedBoxes: Box[][] = [];
 
         while (remainingRectangles.length > 0) {
-            const { packed_rectangles, unpacked_rectangles } = pack(
+            const { packed_rectangles, unpacked_rectangles } = await pack(
                 remainingRectangles,
                 {
                     w: containerWidth,
@@ -146,10 +149,19 @@ const ImagePacker: React.FC = () => {
             allPackedBoxes.push(packed_rectangles);
             remainingRectangles = unpacked_rectangles;
         }
-
+        setLoading(false);
         setBoxes(allPackedBoxes);
     };
     const stageRefs = boxes.map(() => React.createRef<Konva.Stage>());
+
+    const reset = () => {
+        setBoxes([]);
+        setUnpackedRectangles([]);
+        setUploadedFiles([]);
+        setImagesLoaded(false);
+        setMaxY(0);
+        setInResizeMode(false);
+    };
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2">
@@ -172,14 +184,21 @@ const ImagePacker: React.FC = () => {
                     onChange={(e) => setContainerHeight(+e.target.value)}
                 />
             </div>
-
-            <input
-                type="file"
-                multiple
-                onChange={handleImageUpload}
-                accept="image/*"
-            />
-
+            {uploadedFiles?.length === 0 ? (
+                <input
+                    type="file"
+                    multiple
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                />
+            ) : (
+                <button
+                    onClick={reset}
+                    className="px-10 py-2 text-white bg-green-500 rounded w-fit hover:bg-green-600"
+                >
+                    Reset
+                </button>
+            )}
             {inResizeMode && (
                 <button
                     onClick={() => startPacking()}
@@ -226,6 +245,12 @@ const ImagePacker: React.FC = () => {
                     setImages={setUnpackedRectangles}
                     setMaxY={setMaxY}
                 />
+            )}
+
+            {loading && (
+                <div className="py-10 text-2xl text-green-900 ">
+                    Packing your images...
+                </div>
             )}
 
             <div className="flex flex-wrap w-full gap-10">

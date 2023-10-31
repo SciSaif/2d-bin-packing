@@ -58,7 +58,7 @@ class BinPacker {
             let max_benefit_ccoa: Rect | null = null;
 
             for (const ccoa of C.L) {
-                console.log(`Trying ${ccoa}`);
+                // console.log(`Trying ${ccoa}`);
                 const d = this._BenefitA1(ccoa, C.clone());
                 if (d instanceof Configuration) {
                     console.log("Found successful configuration");
