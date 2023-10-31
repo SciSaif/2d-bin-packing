@@ -169,6 +169,8 @@ const ResizingCanvas: React.FC<Props> = ({
                                         "middle-right",
                                     ]}
                                     rotateEnabled={false}
+                                    borderStrokeWidth={4}
+                                    anchorSize={15}
                                 />
                             )}
                         </React.Fragment>
