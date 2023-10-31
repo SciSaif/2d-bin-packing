@@ -101,14 +101,22 @@ const ResizingCanvas: React.FC<Props> = ({
                                     const scaleY = node.scaleY();
 
                                     // Adjust the width and height based on the scale
-                                    const updatedWidth = Math.max(
+                                    let updatedWidth = Math.max(
                                         5,
                                         node.width() * scaleX
                                     );
-                                    const updatedHeight = Math.max(
+                                    let updatedHeight = Math.max(
                                         5,
                                         node.height() * scaleY
                                     );
+
+                                    // if the width is more than the container width, set the width to the container width
+                                    if (updatedWidth > containerWidth) {
+                                        updatedWidth = containerWidth;
+                                        updatedHeight =
+                                            (updatedWidth / node.width()) *
+                                            node.height();
+                                    }
 
                                     const deltaHeight =
                                         updatedHeight - imgData.h; // Calculate the change in height

@@ -70,3 +70,61 @@ export const handleSaveAsPDF = ({
 
     pdf.save("packed-images.pdf");
 };
+
+export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
+    let imagesContent = "";
+
+    stages.forEach((stage) => {
+        if (!stage) {
+            return;
+        }
+        const dataUrl = stage.toDataURL();
+        // imagesContent += `<img class="print-page" src="${dataUrl}">`;
+        imagesContent += `<img class="print-page" src="${dataUrl}" style="page-break-after: always; width: 100%; height: auto; display: block; margin: 0 !important; padding: 0 !important;">`;
+    });
+
+    const iframeContent = `
+            <html>
+                <head>
+                    <title>Print canvas</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 0;
+                        }
+                        .print-page {
+                            page-break-after: always;
+                            width: 100%;
+                            height: auto;
+                            display: block;
+                        }
+                        @media print {
+                            body {
+                                margin: 0;
+                                padding: 0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body style="margin: 0 !important; padding: 0 !important;">
+                    ${imagesContent}
+                </body>
+            </html>`;
+
+    const iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+    iframe.style.display = "none";
+
+    iframe.onload = function () {
+        const doc = iframe.contentWindow?.document;
+        if (doc) {
+            doc.open();
+            doc.write(iframeContent);
+            doc.close();
+            setTimeout(() => {
+                iframe.contentWindow?.print();
+                document.body.removeChild(iframe);
+            }, 500); // Give it half a second to load the images
+        }
+    };
+};

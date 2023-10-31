@@ -5,7 +5,8 @@ import { UnpackedRect } from "../../binPacking/configuration";
 import { pack } from "../../binPacking";
 import ResizingCanvas from "../../components/ResizingCanvas";
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
-import { handleSaveAsPDF } from "./utils";
+import { handlePrintMultipleStages, handleSaveAsPDF } from "./utils";
+import Konva from "konva";
 
 export interface Box {
     // img: HTMLImageElement;
@@ -148,6 +149,7 @@ const ImagePacker: React.FC = () => {
 
         setBoxes(allPackedBoxes);
     };
+    const stageRefs = boxes.map(() => React.createRef<Konva.Stage>());
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2">
@@ -202,6 +204,19 @@ const ImagePacker: React.FC = () => {
                 </button>
             )}
 
+            {boxes.length > 0 && (
+                <button
+                    onClick={() =>
+                        handlePrintMultipleStages(
+                            stageRefs.map((ref) => ref.current)
+                        )
+                    }
+                    className="px-10 py-2 mt-4 text-white bg-purple-500 rounded w-fit hover:bg-purple-600"
+                >
+                    Print Canvases
+                </button>
+            )}
+
             {inResizeMode && (
                 <ResizingCanvas
                     containerWidth={containerWidth}
@@ -217,6 +232,7 @@ const ImagePacker: React.FC = () => {
                 {boxes.map((boxSet, index) => (
                     <Stage
                         key={index}
+                        ref={stageRefs[index]}
                         width={containerWidth}
                         height={containerHeight}
                         className="border border-gray-400 shadow w-fit"
