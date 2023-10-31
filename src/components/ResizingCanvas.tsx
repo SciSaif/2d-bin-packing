@@ -17,6 +17,7 @@ interface ImageData {
 
 interface Props {
     containerWidth: number;
+    scaleFactor: number;
     images: ImageData[];
     maxY: number;
     setMaxY: (maxY: number) => void;
@@ -30,6 +31,7 @@ const ResizingCanvas: React.FC<Props> = ({
     maxY,
     setMaxY,
     uploadedFiles,
+    scaleFactor,
     setImages,
 }) => {
     const [selectedId, setSelectedId] = useState<null | string>(null);
@@ -70,8 +72,10 @@ const ResizingCanvas: React.FC<Props> = ({
                 <Rect
                     x={0}
                     y={0}
-                    width={containerWidth}
-                    height={maxY + 5}
+                    // width={containerWidth}
+                    // height={maxY + 5}
+                    width={containerWidth * scaleFactor}
+                    height={(maxY + 5) * scaleFactor}
                     stroke="black"
                     fill="white"
                 />
@@ -88,10 +92,14 @@ const ResizingCanvas: React.FC<Props> = ({
                         <React.Fragment key={index}>
                             <KonvaImage
                                 id={imgData.id}
-                                x={imgData.x}
-                                y={imgData.y}
-                                width={imgData.w}
-                                height={imgData.h}
+                                // x={imgData.x}
+                                // y={imgData.y}
+                                // width={imgData.w}
+                                // height={imgData.h}
+                                x={imgData.x * scaleFactor}
+                                y={imgData.y * scaleFactor}
+                                width={imgData.w * scaleFactor}
+                                height={imgData.h * scaleFactor}
                                 image={loadedImages.get(imgData.id)}
                                 onClick={() => handleSelect(imgData.id)}
                                 onTap={() => handleSelect(imgData.id)}
@@ -101,13 +109,21 @@ const ResizingCanvas: React.FC<Props> = ({
                                     const scaleY = node.scaleY();
 
                                     // Adjust the width and height based on the scale
+                                    // let updatedWidth = Math.max(
+                                    //     5,
+                                    //     node.width() * scaleX
+                                    // );
+                                    // let updatedHeight = Math.max(
+                                    //     5,
+                                    //     node.height() * scaleY
+                                    // );
                                     let updatedWidth = Math.max(
                                         5,
-                                        node.width() * scaleX
+                                        (node.width() * scaleX) / scaleFactor
                                     );
                                     let updatedHeight = Math.max(
                                         5,
-                                        node.height() * scaleY
+                                        (node.height() * scaleY) / scaleFactor
                                     );
 
                                     // if the width is more than the container width, set the width to the container width
@@ -124,8 +140,8 @@ const ResizingCanvas: React.FC<Props> = ({
                                     const updatedImages = [...images];
                                     updatedImages[index] = {
                                         ...imgData,
-                                        x: node.x(),
-                                        y: node.y(),
+                                        x: node.x() / scaleFactor,
+                                        y: node.y() / scaleFactor,
                                         w: updatedWidth,
                                         h: updatedHeight,
                                     };

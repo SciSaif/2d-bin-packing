@@ -29,6 +29,7 @@ const ImagePacker: React.FC = () => {
     const [uploadedFiles, setUploadedFiles] = useState<
         { id: string; file: File }[]
     >([]);
+    const [scaleFactor, setScaleFactor] = useState(0.5);
 
     const [inResizeMode, setInResizeMode] = useState<boolean>(false);
     const [unpackedRectangles, setUnpackedRectangles] = useState<
@@ -238,6 +239,7 @@ const ImagePacker: React.FC = () => {
 
             {inResizeMode && (
                 <ResizingCanvas
+                    scaleFactor={scaleFactor}
                     containerWidth={containerWidth}
                     images={unpackedRectangles}
                     uploadedFiles={uploadedFiles}
@@ -258,37 +260,67 @@ const ImagePacker: React.FC = () => {
                     <Stage
                         key={index}
                         ref={stageRefs[index]}
-                        width={containerWidth}
-                        height={containerHeight}
+                        // width={containerWidth}
+                        // height={containerHeight}
+                        width={containerWidth * scaleFactor}
+                        height={containerHeight * scaleFactor}
                         className="border border-gray-400 shadow w-fit"
                     >
                         <Layer>
                             <Rect
                                 x={0}
                                 y={0}
-                                width={containerWidth}
-                                height={containerHeight}
+                                // width={containerWidth}
+                                // height={containerHeight}
+                                width={containerWidth * scaleFactor}
+                                height={containerHeight * scaleFactor}
                                 stroke="black"
                                 fill="white"
                             />
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (
+                                        // <KonvaImage
+                                        //     x={box.x}
+                                        //     y={box.y}
+                                        //     width={box.rotated ? box.h : box.w}
+                                        //     height={box.rotated ? box.w : box.h}
+                                        //     image={box.image}
+                                        //     rotation={box.rotated ? -90 : 0}
+                                        //     offsetX={box.rotated ? box.h : 0}
+                                        // />
                                         <KonvaImage
-                                            x={box.x}
-                                            y={box.y}
-                                            width={box.rotated ? box.h : box.w}
-                                            height={box.rotated ? box.w : box.h}
+                                            x={box.x * scaleFactor}
+                                            y={box.y * scaleFactor}
+                                            width={
+                                                (box.rotated ? box.h : box.w) *
+                                                scaleFactor
+                                            }
+                                            height={
+                                                (box.rotated ? box.w : box.h) *
+                                                scaleFactor
+                                            }
                                             image={box.image}
                                             rotation={box.rotated ? -90 : 0}
-                                            offsetX={box.rotated ? box.h : 0}
+                                            offsetX={
+                                                box.rotated
+                                                    ? box.h * scaleFactor
+                                                    : 0
+                                            }
                                         />
                                     )}
-                                    <Rect
+                                    {/* <Rect
                                         x={box.x}
                                         y={box.y}
                                         width={box.w}
                                         height={box.h}
+                                        stroke="red"
+                                    /> */}
+                                    <Rect
+                                        x={box.x * scaleFactor}
+                                        y={box.y * scaleFactor}
+                                        width={box.w * scaleFactor}
+                                        height={box.h * scaleFactor}
                                         stroke="red"
                                     />
                                 </React.Fragment>
