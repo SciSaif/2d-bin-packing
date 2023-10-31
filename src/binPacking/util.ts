@@ -34,7 +34,7 @@ export interface Rectangle {
     rotated: boolean;
 }
 
-interface Result {
+export interface Result {
     packed_rectangles: Rectangle[];
     unpacked_rectangles: Rectangle[];
     isRemaining: boolean;

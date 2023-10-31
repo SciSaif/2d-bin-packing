@@ -30,7 +30,7 @@ const AlgoTest: React.FC = () => {
     const [rangeW, setRangeW] = useState<[number, number]>([50, 700]);
     const [rangeH, setRangeH] = useState<[number, number]>([50, 700]);
 
-    const goo = () => {
+    const goo = async () => {
         // clear the canvas
         // const canvas = canvasRef.current;
         // if (!canvas) return;
@@ -56,7 +56,7 @@ const AlgoTest: React.FC = () => {
         const allPackedBoxes: Box[][] = [];
 
         while (remainingRectangles.length > 0) {
-            const { packed_rectangles, unpacked_rectangles } = pack(
+            const { packed_rectangles, unpacked_rectangles } = await pack(
                 remainingRectangles,
                 {
                     w: containerWidth,

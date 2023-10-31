@@ -1,6 +1,11 @@
 import { BinPacker } from "./binPacker";
 import Configuration, { Dimension, UnpackedRect } from "./configuration";
-import { Rectangle, getResult, increaseDimensionsForPadding } from "./util";
+import {
+    Rectangle,
+    Result,
+    getResult,
+    increaseDimensionsForPadding,
+} from "./util";
 
 // export const pack = (
 //     rects: UnpackedRect[],
@@ -26,11 +31,12 @@ import { Rectangle, getResult, increaseDimensionsForPadding } from "./util";
 
 //     return getResult(packedConfig, padding);
 // };
+
 export const pack = async (
     rects: UnpackedRect[],
     container_size: Dimension,
     padding: number = 0
-): Promise<any> => {
+): Promise<Result> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             if (padding > 0) {
