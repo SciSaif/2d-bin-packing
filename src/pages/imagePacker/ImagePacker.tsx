@@ -7,6 +7,7 @@ import ResizingCanvas from "../../components/ResizingCanvas";
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
 import { handlePrintMultipleStages, handleSaveAsPDF } from "./utils";
 import Konva from "konva";
+import { Link } from "react-router-dom";
 
 export interface Box {
     // img: HTMLImageElement;
@@ -166,9 +167,12 @@ const ImagePacker: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2">
-            <h1 className="pb-2 mb-2 text-3xl font-bold border-b text-cyan-500">
+            <Link
+                to={"/"}
+                className="pb-2 mb-2 text-3xl font-bold border-b text-cyan-500"
+            >
                 Bin Packing
-            </h1>
+            </Link>
 
             <div className="flex flex-row items-center gap-2">
                 <label>Container dimensions:</label>
@@ -239,7 +243,7 @@ const ImagePacker: React.FC = () => {
 
             {inResizeMode && (
                 <ResizingCanvas
-                    scaleFactor={scaleFactor}
+                    // scaleFactor={scaleFactor}
                     containerWidth={containerWidth}
                     images={unpackedRectangles}
                     uploadedFiles={uploadedFiles}
