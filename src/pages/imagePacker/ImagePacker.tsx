@@ -174,21 +174,6 @@ const ImagePacker: React.FC = () => {
                 Bin Packing
             </Link>
 
-            <div className="flex flex-row items-center gap-2">
-                <label>Container dimensions:</label>
-                <input
-                    type="number"
-                    className="px-2 py-1 border border-gray-400 rounded-md"
-                    value={containerWidth}
-                    onChange={(e) => setContainerWidth(+e.target.value)}
-                />
-                <input
-                    type="number"
-                    className="px-2 py-1 border border-gray-400 rounded-md"
-                    value={containerHeight}
-                    onChange={(e) => setContainerHeight(+e.target.value)}
-                />
-            </div>
             {uploadedFiles?.length === 0 ? (
                 <input
                     type="file"
@@ -243,8 +228,9 @@ const ImagePacker: React.FC = () => {
 
             {inResizeMode && (
                 <ResizingCanvas
-                    // scaleFactor={scaleFactor}
+                    scaleFactor={scaleFactor}
                     containerWidth={containerWidth}
+                    containerHeight={containerHeight}
                     images={unpackedRectangles}
                     uploadedFiles={uploadedFiles}
                     maxY={maxY}

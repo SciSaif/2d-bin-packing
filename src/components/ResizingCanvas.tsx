@@ -10,20 +10,24 @@ interface ImageData {
 
 interface Props {
     containerWidth: number;
+    containerHeight: number;
     images: ImageData[];
     maxY: number;
     setMaxY: (maxY: number) => void;
     uploadedFiles: { id: string; file: File }[];
     setImages: (images: ImageData[]) => void;
+    scaleFactor: number;
 }
 
 const ResizingDiv: React.FC<Props> = ({
     containerWidth,
+    containerHeight,
     images,
     maxY,
     setMaxY,
     uploadedFiles,
     setImages,
+    scaleFactor,
 }) => {
     const [selectedId, setSelectedId] = useState<null | string>(null);
     const [isResizing, setIsResizing] = useState(false);
@@ -47,17 +51,6 @@ const ResizingDiv: React.FC<Props> = ({
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
         imgData: ImageData
     ) => {
-        // e.preventDefault();
-
-        const clientX =
-            (e as React.TouchEvent<HTMLDivElement>).touches?.[0]?.clientX ||
-            (e as React.MouseEvent<HTMLDivElement>).clientX;
-        const clientY =
-            (e as React.TouchEvent<HTMLDivElement>).touches?.[0]?.clientY ||
-            (e as React.MouseEvent<HTMLDivElement>).clientY;
-
-        const rect = (e.target as HTMLDivElement).getBoundingClientRect();
-
         if (
             e.target instanceof HTMLElement &&
             e.target.classList.contains("resize-handle")
@@ -112,33 +105,45 @@ const ResizingDiv: React.FC<Props> = ({
         const selectedImage = localImages.find((img) => img.id === selectedId);
         if (selectedImage && containerRef.current) {
             const aspectRatio = selectedImage.w / selectedImage.h;
-            const mouseX = clientX;
+            const mouseX = clientX / scaleFactor;
             const mouseY = clientY;
 
             const rect = containerRef.current.getBoundingClientRect();
             const newWidth = mouseX - rect.left - selectedImage.x;
             const newHeight = newWidth / aspectRatio;
 
+            if (newWidth > containerWidth || newHeight > containerHeight) {
+                return;
+            }
+
             const updatedImages = [...localImages];
             const index = updatedImages.findIndex(
                 (img) => img.id === selectedId
             );
+            let accumulatedHeight = 0;
             if (index !== -1) {
                 updatedImages[index] = {
                     ...updatedImages[index],
                     w: newWidth,
                     h: newHeight,
                 };
+
+                // Reposition images below the resized image
+                accumulatedHeight = updatedImages[index].y + newHeight;
+                for (let i = index + 1; i < updatedImages.length; i++) {
+                    updatedImages[i].y = accumulatedHeight + 5;
+                    accumulatedHeight += updatedImages[i].h + 5;
+                }
+
                 setLocalImages(updatedImages);
             }
+
+            // Update maxY if needed
+            const newMaxY = accumulatedHeight > maxY ? accumulatedHeight : maxY;
+            setMaxY(newMaxY);
         }
     };
 
-    // const handleMouseUp = () => {
-    //     setIsResizing(false);
-    //     setSelectedId(null);
-    //     setImages(localImages);
-    // };
     const handleMouseUp = () => {
         setIsResizing(false);
         setImages(localImages);
@@ -161,12 +166,12 @@ const ResizingDiv: React.FC<Props> = ({
         <div
             ref={containerRef}
             style={{
-                width: containerWidth,
-                height: maxY + 5,
+                width: containerWidth * scaleFactor,
+                height: (maxY + 5) * scaleFactor,
                 border: "1px solid black",
                 position: "relative",
             }}
-            className="bg-white"
+            className="overflow-hidden bg-white"
         >
             {localImages.map((imgData, index) => {
                 const imageUrl = imageUrls.get(imgData.id) || "";
@@ -178,9 +183,9 @@ const ResizingDiv: React.FC<Props> = ({
                         style={{
                             position: "absolute",
                             left: imgData.x,
-                            top: imgData.y,
-                            width: imgData.w,
-                            height: imgData.h,
+                            top: imgData.y * scaleFactor,
+                            width: imgData.w * scaleFactor,
+                            height: imgData.h * scaleFactor,
                             backgroundImage: `url(${imageUrl})`,
                             backgroundSize: "cover",
                             border:
@@ -199,8 +204,8 @@ const ResizingDiv: React.FC<Props> = ({
                                     position: "absolute",
                                     right: -4,
                                     bottom: -4,
-                                    width: 10,
-                                    height: 10,
+                                    width: 16,
+                                    height: 16,
                                     backgroundColor: "white",
                                     cursor: "se-resize",
                                     border: "1px solid blue",
