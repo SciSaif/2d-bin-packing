@@ -1,205 +1,4 @@
-// import React, { useEffect, useState, useRef } from "react";
-// import {
-//     Stage,
-//     Layer,
-//     Rect,
-//     Image as KonvaImage,
-//     Transformer,
-// } from "react-konva";
-
-// interface ImageData {
-//     id: string;
-//     w: number;
-//     h: number;
-//     x: number;
-//     y: number;
-// }
-
-// interface Props {
-//     containerWidth: number;
-//     scaleFactor: number;
-//     images: ImageData[];
-//     maxY: number;
-//     setMaxY: (maxY: number) => void;
-//     uploadedFiles: { id: string; file: File }[];
-//     setImages: (images: ImageData[]) => void;
-// }
-
-// const ResizingCanvas: React.FC<Props> = ({
-//     containerWidth,
-//     images,
-//     maxY,
-//     setMaxY,
-//     uploadedFiles,
-//     scaleFactor,
-//     setImages,
-// }) => {
-//     const [selectedId, setSelectedId] = useState<null | string>(null);
-//     const transformerRef = useRef<any>(null);
-//     const [loadedImages, setLoadedImages] = useState<
-//         Map<string, HTMLImageElement>
-//     >(new Map());
-
-//     const handleSelect = (id: string) => {
-//         setSelectedId(id);
-//     };
-//     useEffect(() => {
-//         uploadedFiles.forEach((file) => {
-//             if (!loadedImages.has(file.id)) {
-//                 const imageObj = new window.Image();
-//                 imageObj.onload = () => {
-//                     setLoadedImages((prev) =>
-//                         new Map(prev).set(file.id, imageObj)
-//                     );
-//                 };
-//                 imageObj.src = URL.createObjectURL(file.file);
-//             }
-//         });
-//     }, [uploadedFiles, loadedImages]);
-//     useEffect(() => {
-//         if (transformerRef.current && selectedId) {
-//             const selectedNode = transformerRef.current
-//                 .getStage()
-//                 .findOne(`#${selectedId}`);
-//             transformerRef.current.nodes([selectedNode]);
-//             transformerRef.current.getLayer().batchDraw();
-//         }
-//     }, [selectedId]);
-
-//     return (
-//         <Stage width={containerWidth} height={maxY + 5} className="">
-//             <Layer>
-//                 <Rect
-//                     x={0}
-//                     y={0}
-//                     // width={containerWidth}
-//                     // height={maxY + 5}
-//                     width={containerWidth * scaleFactor}
-//                     height={(maxY + 5) * scaleFactor}
-//                     stroke="black"
-//                     fill="white"
-//                 />
-//                 {images.map((imgData, index) => {
-//                     const imageFile = uploadedFiles.find(
-//                         (file) => file.id === imgData.id
-//                     );
-//                     const imageObj = new window.Image();
-//                     if (imageFile) {
-//                         imageObj.src = URL.createObjectURL(imageFile.file);
-//                     }
-
-//                     return (
-//                         <React.Fragment key={index}>
-//                             <KonvaImage
-//                                 id={imgData.id}
-//                                 // x={imgData.x}
-//                                 // y={imgData.y}
-//                                 // width={imgData.w}
-//                                 // height={imgData.h}
-//                                 x={imgData.x * scaleFactor}
-//                                 y={imgData.y * scaleFactor}
-//                                 width={imgData.w * scaleFactor}
-//                                 height={imgData.h * scaleFactor}
-//                                 image={loadedImages.get(imgData.id)}
-//                                 onClick={() => handleSelect(imgData.id)}
-//                                 onTap={() => handleSelect(imgData.id)}
-// onTransformEnd={(e) => {
-//     const node = e.target;
-//     const scaleX = node.scaleX();
-//     const scaleY = node.scaleY();
-
-//     // Adjust the width and height based on the scale
-//     // let updatedWidth = Math.max(
-//     //     5,
-//     //     node.width() * scaleX
-//     // );
-//     // let updatedHeight = Math.max(
-//     //     5,
-//     //     node.height() * scaleY
-//     // );
-//     let updatedWidth = Math.max(
-//         5,
-//         (node.width() * scaleX) / scaleFactor
-//     );
-//     let updatedHeight = Math.max(
-//         5,
-//         (node.height() * scaleY) / scaleFactor
-//     );
-
-//     // if the width is more than the container width, set the width to the container width
-//     if (updatedWidth > containerWidth) {
-//         updatedWidth = containerWidth;
-//         updatedHeight =
-//             (updatedWidth / node.width()) *
-//             node.height();
-//     }
-
-//     const deltaHeight =
-//         updatedHeight - imgData.h; // Calculate the change in height
-
-//     const updatedImages = [...images];
-//     updatedImages[index] = {
-//         ...imgData,
-//         x: node.x() / scaleFactor,
-//         y: node.y() / scaleFactor,
-//         w: updatedWidth,
-//         h: updatedHeight,
-//     };
-
-//     let currentTotalHeight = 0;
-//     updatedImages.forEach((img) => {
-//         currentTotalHeight += img.h;
-//     });
-
-//     // Adjust the maxY if the total height of all images is greater than the current maxY
-//     if (currentTotalHeight > maxY) {
-//         setMaxY(
-//             currentTotalHeight +
-//                 updatedImages.length * 5 +
-//                 5
-//         );
-//     }
-
-//     // Adjust the y position of all images below the resized image
-//     for (
-//         let i = index + 1;
-//         i < updatedImages.length;
-//         i++
-//     ) {
-//         updatedImages[i].y += deltaHeight;
-//     }
-
-//     setImages(updatedImages);
-
-//     // Reset the scale
-//     node.scaleX(1);
-//     node.scaleY(1);
-// }}
-//                             />
-//                             {selectedId === imgData.id && (
-//                                 <Transformer
-//                                     ref={transformerRef}
-//                                     enabledAnchors={[
-//                                         "bottom-right",
-//                                         "bottom-center",
-//                                         "middle-right",
-//                                     ]}
-//                                     rotateEnabled={false}
-//                                     borderStrokeWidth={4}
-//                                     anchorSize={15}
-//                                 />
-//                             )}
-//                         </React.Fragment>
-//                     );
-//                 })}
-//             </Layer>
-//         </Stage>
-//     );
-// };
-
-// export default ResizingCanvas;
-
-import React, { useEffect, useState } from "react";
+import React, { TouchEvent, useEffect, useState } from "react";
 
 interface ImageData {
     id: string;
@@ -245,57 +44,116 @@ const ResizingDiv: React.FC<Props> = ({
     }, [images]);
 
     const handleMouseDown = (
-        e: React.MouseEvent<HTMLDivElement>,
+        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
         imgData: ImageData
     ) => {
-        e.preventDefault();
-        setIsResizing(true);
-        setSelectedId(imgData.id);
-    };
+        // e.preventDefault();
 
+        const clientX =
+            (e as React.TouchEvent<HTMLDivElement>).touches?.[0]?.clientX ||
+            (e as React.MouseEvent<HTMLDivElement>).clientX;
+        const clientY =
+            (e as React.TouchEvent<HTMLDivElement>).touches?.[0]?.clientY ||
+            (e as React.MouseEvent<HTMLDivElement>).clientY;
+
+        const rect = (e.target as HTMLDivElement).getBoundingClientRect();
+
+        if (
+            e.target instanceof HTMLElement &&
+            e.target.classList.contains("resize-handle")
+        ) {
+            setIsResizing(true);
+            setSelectedId(imgData.id);
+            return;
+        }
+
+        if (selectedId !== imgData.id) {
+            setSelectedId(imgData.id);
+        }
+    };
+    useEffect(() => {
+        const preventDefaultWhenResizing = (e: globalThis.TouchEvent) => {
+            if (isResizing) {
+                e.preventDefault();
+            }
+        };
+
+        document.addEventListener("touchmove", preventDefaultWhenResizing, {
+            passive: false,
+        });
+
+        return () => {
+            document.removeEventListener(
+                "touchmove",
+                preventDefaultWhenResizing
+            );
+        };
+    }, [isResizing]);
     const handleMouseMove = (e: MouseEvent) => {
         if (isResizing && selectedId) {
-            const selectedImage = localImages.find(
+            const clientX = e.clientX;
+            const clientY = e.clientY;
+
+            updateImageSize(clientX, clientY);
+        }
+    };
+
+    const handleTouchMove = (e: globalThis.TouchEvent) => {
+        if (isResizing && selectedId && e.touches.length > 0) {
+            // e.preventDefault();
+            const clientX = e.touches[0].clientX;
+            const clientY = e.touches[0].clientY;
+
+            updateImageSize(clientX, clientY);
+        }
+    };
+
+    const updateImageSize = (clientX: number, clientY: number) => {
+        const selectedImage = localImages.find((img) => img.id === selectedId);
+        if (selectedImage && containerRef.current) {
+            const aspectRatio = selectedImage.w / selectedImage.h;
+            const mouseX = clientX;
+            const mouseY = clientY;
+
+            const rect = containerRef.current.getBoundingClientRect();
+            const newWidth = mouseX - rect.left - selectedImage.x;
+            const newHeight = newWidth / aspectRatio;
+
+            const updatedImages = [...localImages];
+            const index = updatedImages.findIndex(
                 (img) => img.id === selectedId
             );
-            if (selectedImage && containerRef.current) {
-                const aspectRatio = selectedImage.w / selectedImage.h;
-                const mouseX = e.clientX;
-                const mouseY = e.clientY;
-
-                const rect = containerRef.current.getBoundingClientRect();
-                const newWidth = mouseX - rect.left - selectedImage.x;
-                const newHeight = newWidth / aspectRatio;
-
-                const updatedImages = [...localImages];
-                const index = updatedImages.findIndex(
-                    (img) => img.id === selectedId
-                );
-                if (index !== -1) {
-                    updatedImages[index] = {
-                        ...updatedImages[index],
-                        w: newWidth,
-                        h: newHeight,
-                    };
-                    setLocalImages(updatedImages);
-                }
+            if (index !== -1) {
+                updatedImages[index] = {
+                    ...updatedImages[index],
+                    w: newWidth,
+                    h: newHeight,
+                };
+                setLocalImages(updatedImages);
             }
         }
     };
 
+    // const handleMouseUp = () => {
+    //     setIsResizing(false);
+    //     setSelectedId(null);
+    //     setImages(localImages);
+    // };
     const handleMouseUp = () => {
         setIsResizing(false);
-        setSelectedId(null);
         setImages(localImages);
     };
-
     useEffect(() => {
         window.addEventListener("mousemove", handleMouseMove);
         window.addEventListener("mouseup", handleMouseUp);
+        window.addEventListener("touchmove", handleTouchMove); // Add this
+        window.addEventListener("touchend", handleMouseUp); // Add this
 
         return () => {
             window.removeEventListener("mousemove", handleMouseMove);
             window.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("touchmove", handleTouchMove); // Add this
+            window.removeEventListener("touchend", handleMouseUp); // Add this
         };
     }, [localImages, selectedId, isResizing]);
 
@@ -329,20 +187,23 @@ const ResizingDiv: React.FC<Props> = ({
                                 selectedId === imgData.id
                                     ? "2px solid blue"
                                     : "none",
-                            overflow: "hidden",
+                            // overflow: "hidden",
                         }}
                         onMouseDown={(e) => handleMouseDown(e, imgData)}
+                        onTouchStart={(e) => handleMouseDown(e, imgData)}
                     >
                         {selectedId === imgData.id && (
                             <div
+                                className="resize-handle" // Add this class
                                 style={{
                                     position: "absolute",
-                                    right: 0,
-                                    bottom: 0,
+                                    right: -4,
+                                    bottom: -4,
                                     width: 10,
                                     height: 10,
-                                    backgroundColor: "blue",
+                                    backgroundColor: "white",
                                     cursor: "se-resize",
+                                    border: "1px solid blue",
                                 }}
                             ></div>
                         )}
