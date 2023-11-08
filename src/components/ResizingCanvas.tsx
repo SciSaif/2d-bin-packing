@@ -1,4 +1,6 @@
 import React, { TouchEvent, useEffect, useState } from "react";
+import { Dimension } from "../pages/imagePacker/ImagePacker";
+import { positionImages } from "../pages/imagePacker/utils";
 
 interface ImageData {
     id: string;
@@ -6,26 +8,19 @@ interface ImageData {
     h: number;
     x: number;
     y: number;
+    file?: File;
 }
 
 interface Props {
-    containerWidth: number;
-    containerHeight: number;
+    containerDimensions: Dimension;
     images: ImageData[];
-    maxY: number;
-    setMaxY: (maxY: number) => void;
-    uploadedFiles: { id: string; file: File }[];
     setImages: (images: ImageData[]) => void;
     scaleFactor: number;
 }
 
 const ResizingDiv: React.FC<Props> = ({
-    containerWidth,
-    containerHeight,
+    containerDimensions,
     images,
-    maxY,
-    setMaxY,
-    uploadedFiles,
     setImages,
     scaleFactor,
 }) => {
@@ -35,17 +30,28 @@ const ResizingDiv: React.FC<Props> = ({
     const [localImages, setLocalImages] = useState<ImageData[]>(images);
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
-    useEffect(() => {
-        const newImageUrls = new Map<string, string>();
-        uploadedFiles.forEach((file) => {
-            newImageUrls.set(file.id, URL.createObjectURL(file.file));
-        });
-        setImageUrls(newImageUrls);
-    }, [uploadedFiles]);
+    const [maxY, setMaxY] = useState(0);
 
     useEffect(() => {
-        setLocalImages(images);
+        const { _maxY, _localImages } = positionImages(
+            images,
+            containerDimensions
+        );
+
+        setMaxY(_maxY);
+        setLocalImages(_localImages);
     }, [images]);
+
+    useEffect(() => {
+        if (!images.length) return;
+        const newImageUrls = new Map<string, string>();
+        images.forEach((image) => {
+            if (image.file) {
+                newImageUrls.set(image.id, URL.createObjectURL(image.file));
+            }
+        });
+        setImageUrls(newImageUrls);
+    }, []);
 
     const handleMouseDown = (
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
@@ -112,7 +118,10 @@ const ResizingDiv: React.FC<Props> = ({
             const newWidth = mouseX - rect.left - selectedImage.x;
             const newHeight = newWidth / aspectRatio;
 
-            if (newWidth > containerWidth || newHeight > containerHeight) {
+            if (
+                newWidth > containerDimensions.w ||
+                newHeight > containerDimensions.h
+            ) {
                 return;
             }
 
@@ -166,7 +175,7 @@ const ResizingDiv: React.FC<Props> = ({
         <div
             ref={containerRef}
             style={{
-                width: containerWidth * scaleFactor,
+                width: containerDimensions.w * scaleFactor,
                 height: (maxY + 5) * scaleFactor,
                 border: "1px solid black",
                 position: "relative",

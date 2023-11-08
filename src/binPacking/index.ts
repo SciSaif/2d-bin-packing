@@ -3,6 +3,7 @@ import Configuration, { Dimension, UnpackedRect } from "./configuration";
 import {
     Rectangle,
     Result,
+    checkIfRectanglesExceedContainer,
     getResult,
     increaseDimensionsForPadding,
 } from "./util";
@@ -39,6 +40,24 @@ export const pack = async (
 ): Promise<Result> => {
     return new Promise((resolve) => {
         setTimeout(() => {
+            if (checkIfRectanglesExceedContainer(rects, container_size)) {
+                resolve({
+                    packed_rectangles: [],
+                    unpacked_rectangles: rects.map((rect) => {
+                        return {
+                            id: rect.id,
+                            w: rect.w,
+                            h: rect.h,
+                            x: 0,
+                            y: 0,
+                            rotated: false,
+                        };
+                    }),
+                    isRemaining: true,
+                    error: "Some rectangles exceed container dimensions",
+                });
+            }
+
             if (padding > 0) {
                 rects = increaseDimensionsForPadding(rects, padding);
                 container_size.w += padding + padding;

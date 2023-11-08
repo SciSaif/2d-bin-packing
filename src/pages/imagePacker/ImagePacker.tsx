@@ -1,42 +1,50 @@
 import React, { useEffect, useState } from "react";
 
-import { v4 as uuidv4 } from "uuid";
-import { UnpackedRect } from "../../binPacking/configuration";
-import { pack } from "../../binPacking";
 import ResizingCanvas from "../../components/ResizingCanvas";
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
-import { handlePrintMultipleStages, handleSaveAsPDF } from "./utils";
+import {
+    createImages,
+    handlePrintMultipleStages,
+    handleSaveAsPDF,
+    packBoxes,
+} from "./utils";
 import Konva from "konva";
 import { Link } from "react-router-dom";
 
-export interface Box {
-    // img: HTMLImageElement;
+export interface ImageBox {
     id: string;
     w: number;
     h: number;
     x: number;
     y: number;
-    rotated: boolean;
-    color?: string;
-    image?: HTMLImageElement;
+    file?: File;
+    imageElement?: HTMLImageElement;
+    rotated?: boolean;
 }
 
-const PADDING = 3; // 10 pixels padding, adjust as needed
+export interface Dimension {
+    w: number;
+    h: number;
+}
+
+const PADDING = 3;
 
 const ImagePacker: React.FC = () => {
-    const [boxes, setBoxes] = useState<Box[][]>([]);
-    const [containerWidth, setContainerWidth] = useState<number>(595 * 2);
-    const [containerHeight, setContainerHeight] = useState<number>(842 * 2);
-    const [uploadedFiles, setUploadedFiles] = useState<
-        { id: string; file: File }[]
-    >([]);
+    const [containerDimensions, setContainerDimensions] = useState<Dimension>({
+        w: 595 * 2,
+        h: 842 * 2,
+    });
+
     const [scaleFactor, setScaleFactor] = useState(0.5);
 
+    const [images, setImages] = useState<ImageBox[]>([]);
+    const [boxes, setBoxes] = useState<ImageBox[][]>([]);
+    const [isPacking, setIsPacking] = useState(false);
+
+    const stageRefs = boxes.map(() => React.createRef<Konva.Stage>());
+
     const [inResizeMode, setInResizeMode] = useState<boolean>(false);
-    const [unpackedRectangles, setUnpackedRectangles] = useState<
-        { id: string; w: number; h: number; x: number; y: number }[]
-    >([]);
-    const [maxY, setMaxY] = useState<number>(0);
+
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
 
     useEffect(() => {
@@ -50,118 +58,59 @@ const ImagePacker: React.FC = () => {
 
         boxes.forEach((boxSet) => {
             boxSet.forEach((box) => {
-                const correspondingFile = uploadedFiles.find(
-                    (f) => f.id === box.id
-                );
+                console.log(box);
+
+                const correspondingFile = images.find((f) => f.id === box.id);
+
                 if (!correspondingFile) return;
 
                 const img = new window.Image();
                 img.onload = () => {
-                    box.image = img;
+                    box.imageElement = img;
                     loadedCount++;
                     if (loadedCount === totalImages) {
                         setImagesLoaded(true);
                     }
                 };
+
+                if (!correspondingFile.file) return;
                 img.src = URL.createObjectURL(correspondingFile.file);
             });
         });
-    }, [boxes, uploadedFiles]);
+    }, [boxes, images]);
 
-    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(event.target.files || []);
-
-        const boxesFromImages: UnpackedRect[] = [];
-        const promises: Promise<void>[] = [];
-
-        files.forEach((file) => {
-            promises.push(
-                new Promise((resolve) => {
-                    const img = new Image();
-                    const id = uuidv4();
-                    img.onload = () => {
-                        let imgWidth = img.width;
-                        let imgHeight = img.height;
-
-                        // initial image size should not be more than half of the container
-                        if (
-                            imgWidth > containerWidth / 2 ||
-                            imgHeight > containerHeight
-                        ) {
-                            const scaleFactor = Math.min(
-                                containerWidth / 2 / imgWidth,
-                                containerHeight / imgHeight
-                            );
-                            imgWidth = imgWidth * scaleFactor;
-                            imgHeight = imgHeight * scaleFactor;
-                        }
-
-                        boxesFromImages.push({
-                            w: imgWidth,
-                            h: imgHeight,
-                            id,
-                        });
-                        setUploadedFiles((prev) => [...prev, { id, file }]);
-                        resolve();
-                    };
-                    img.src = URL.createObjectURL(file);
-                })
-            );
-        });
-
-        Promise.all(promises).then(() => {
-            let maxYc = 0;
-            setUnpackedRectangles(
-                boxesFromImages.map((box) => {
-                    const res = {
-                        id: box.id,
-                        w: box.w,
-                        h: box.h,
-                        x: 0,
-                        y: maxYc + 5,
-                    };
-                    maxYc += box.h + 5;
-                    return res;
-                })
-            );
+    const handleImageUpload = async (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        if (event.target.files) {
+            const newImages = await createImages(event.target.files);
+            setImages([...images, ...newImages]);
             setInResizeMode(true);
-            setMaxY(maxYc);
-        });
+        }
     };
 
     const [loading, setLoading] = useState<boolean>(false);
 
     const startPacking = async () => {
-        setInResizeMode(false);
+        setIsPacking(true);
         setLoading(true);
+        setInResizeMode(false);
 
-        let remainingRectangles = unpackedRectangles;
-        const allPackedBoxes: Box[][] = [];
+        const packedBoxes = await packBoxes({
+            images,
+            containerDimensions,
+            padding: PADDING,
+        });
 
-        while (remainingRectangles.length > 0) {
-            const { packed_rectangles, unpacked_rectangles } = await pack(
-                remainingRectangles,
-                {
-                    w: containerWidth,
-                    h: containerHeight,
-                },
-                PADDING
-            );
-
-            allPackedBoxes.push(packed_rectangles);
-            remainingRectangles = unpacked_rectangles;
-        }
+        setIsPacking(false);
+        setBoxes(packedBoxes);
         setLoading(false);
-        setBoxes(allPackedBoxes);
     };
-    const stageRefs = boxes.map(() => React.createRef<Konva.Stage>());
 
     const reset = () => {
         setBoxes([]);
-        setUnpackedRectangles([]);
-        setUploadedFiles([]);
+        setImages([]);
         setImagesLoaded(false);
-        setMaxY(0);
         setInResizeMode(false);
     };
 
@@ -174,7 +123,7 @@ const ImagePacker: React.FC = () => {
                 Bin Packing
             </Link>
 
-            {uploadedFiles?.length === 0 ? (
+            {images?.length === 0 ? (
                 <input
                     type="file"
                     multiple
@@ -198,13 +147,12 @@ const ImagePacker: React.FC = () => {
                 </button>
             )}
 
-            {boxes.length > 0 && (
+            {boxes.length > 0 && containerDimensions && (
                 <button
                     onClick={() =>
                         handleSaveAsPDF({
                             boxes,
-                            containerWidth,
-                            containerHeight,
+                            containerDimensions,
                         })
                     }
                     className="px-10 py-2 mt-4 text-white bg-green-500 rounded w-fit hover:bg-green-600"
@@ -229,13 +177,9 @@ const ImagePacker: React.FC = () => {
             {inResizeMode && (
                 <ResizingCanvas
                     scaleFactor={scaleFactor}
-                    containerWidth={containerWidth}
-                    containerHeight={containerHeight}
-                    images={unpackedRectangles}
-                    uploadedFiles={uploadedFiles}
-                    maxY={maxY}
-                    setImages={setUnpackedRectangles}
-                    setMaxY={setMaxY}
+                    containerDimensions={containerDimensions}
+                    images={images}
+                    setImages={setImages}
                 />
             )}
 
@@ -250,35 +194,22 @@ const ImagePacker: React.FC = () => {
                     <Stage
                         key={index}
                         ref={stageRefs[index]}
-                        // width={containerWidth}
-                        // height={containerHeight}
-                        width={containerWidth * scaleFactor}
-                        height={containerHeight * scaleFactor}
+                        width={containerDimensions.w * scaleFactor}
+                        height={containerDimensions.h * scaleFactor}
                         className="border border-gray-400 shadow w-fit"
                     >
                         <Layer>
                             <Rect
                                 x={0}
                                 y={0}
-                                // width={containerWidth}
-                                // height={containerHeight}
-                                width={containerWidth * scaleFactor}
-                                height={containerHeight * scaleFactor}
+                                width={containerDimensions.w * scaleFactor}
+                                height={containerDimensions.h * scaleFactor}
                                 stroke="black"
                                 fill="white"
                             />
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (
-                                        // <KonvaImage
-                                        //     x={box.x}
-                                        //     y={box.y}
-                                        //     width={box.rotated ? box.h : box.w}
-                                        //     height={box.rotated ? box.w : box.h}
-                                        //     image={box.image}
-                                        //     rotation={box.rotated ? -90 : 0}
-                                        //     offsetX={box.rotated ? box.h : 0}
-                                        // />
                                         <KonvaImage
                                             x={box.x * scaleFactor}
                                             y={box.y * scaleFactor}
@@ -290,7 +221,7 @@ const ImagePacker: React.FC = () => {
                                                 (box.rotated ? box.w : box.h) *
                                                 scaleFactor
                                             }
-                                            image={box.image}
+                                            image={box.imageElement}
                                             rotation={box.rotated ? -90 : 0}
                                             offsetX={
                                                 box.rotated
@@ -299,13 +230,7 @@ const ImagePacker: React.FC = () => {
                                             }
                                         />
                                     )}
-                                    {/* <Rect
-                                        x={box.x}
-                                        y={box.y}
-                                        width={box.w}
-                                        height={box.h}
-                                        stroke="red"
-                                    /> */}
+
                                     <Rect
                                         x={box.x * scaleFactor}
                                         y={box.y * scaleFactor}

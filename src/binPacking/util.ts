@@ -38,6 +38,7 @@ export interface Result {
     packed_rectangles: Rectangle[];
     unpacked_rectangles: Rectangle[];
     isRemaining: boolean;
+    error?: string;
 }
 
 export function getResult(C: Configuration, padding: number): Result {
@@ -80,3 +81,13 @@ export function getResult(C: Configuration, padding: number): Result {
         isRemaining: C.unpacked_rects.length > 0,
     };
 }
+
+// function to check if any rectangle has dimensions greater than the container
+export const checkIfRectanglesExceedContainer = (
+    rects: UnpackedRect[],
+    container_size: { w: number; h: number }
+) => {
+    return rects.some((rect) => {
+        return rect.w > container_size.w || rect.h > container_size.h;
+    });
+};

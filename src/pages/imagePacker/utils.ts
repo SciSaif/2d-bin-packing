@@ -1,14 +1,16 @@
 import jsPDF from "jspdf";
-import { Box } from "./ImagePacker";
+// import { Box } from "./ImagePacker";
 import Konva from "konva";
+import { v4 as uuidv4 } from "uuid";
+
+import { ImageBox } from "./ImagePacker";
+import { pack } from "../../binPacking";
 export const handleSaveAsPDF = ({
     boxes,
-    containerWidth,
-    containerHeight,
+    containerDimensions,
 }: {
-    containerWidth: number;
-    containerHeight: number;
-    boxes: Box[][];
+    boxes: ImageBox[][];
+    containerDimensions: { w: number; h: number };
 }) => {
     const pdf = new jsPDF("p", "pt", "a4");
     pdf.setTextColor("#000000");
@@ -16,8 +18,8 @@ export const handleSaveAsPDF = ({
     const a4Width = 595; // A4 width in points
     const a4Height = 842; // A4 height in points
 
-    const scaleX = a4Width / containerWidth;
-    const scaleY = a4Height / containerHeight;
+    const scaleX = a4Width / containerDimensions.w;
+    const scaleY = a4Height / containerDimensions.h;
 
     boxes.forEach((boxSet, index) => {
         if (index > 0) {
@@ -26,21 +28,21 @@ export const handleSaveAsPDF = ({
 
         const stage = new Konva.Stage({
             container: "temp-container",
-            width: containerWidth,
-            height: containerHeight,
+            width: containerDimensions.w,
+            height: containerDimensions.h,
         });
 
         const layer = new Konva.Layer();
         stage.add(layer);
 
         boxSet.forEach((box) => {
-            if (box.image) {
+            if (box.imageElement) {
                 const konvaImage = new Konva.Image({
                     x: box.x,
                     y: box.y,
                     width: box.rotated ? box.h : box.w,
                     height: box.rotated ? box.w : box.h,
-                    image: box.image,
+                    image: box.imageElement,
                     rotation: box.rotated ? -90 : 0,
                     offsetX: box.rotated ? box.h : 0,
                 });
@@ -61,8 +63,8 @@ export const handleSaveAsPDF = ({
             stage.toDataURL({ pixelRatio: 2 }),
             0,
             0,
-            containerWidth * scaleX,
-            containerHeight * scaleY
+            containerDimensions.w * scaleX,
+            containerDimensions.h * scaleY
         );
 
         stage.destroy();
@@ -127,4 +129,102 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
             }, 500); // Give it half a second to load the images
         }
     };
+};
+
+// function to position the images in the resizing window
+export const positionImages = (
+    images: ImageBox[],
+    containerDimensions: { w: number; h: number }
+) => {
+    let maxY = 0;
+
+    let localImagesTemp = images.map((img) => {
+        let tempMaxY = maxY;
+        if (
+            img.w > containerDimensions.w / 2 ||
+            img.h > containerDimensions.h
+        ) {
+            const scaleFactor = Math.min(
+                containerDimensions.w / 2 / img.w,
+                containerDimensions.h / img.h
+            );
+            img.w = img.w * scaleFactor;
+            img.h = img.h * scaleFactor;
+        }
+
+        maxY += img.h + 10;
+
+        return {
+            id: img.id,
+            w: img.w,
+            h: img.h,
+            x: img.x,
+            y: tempMaxY,
+            file: img.file,
+            imageElement: img.imageElement,
+        };
+    });
+
+    return { _maxY: maxY, _localImages: localImagesTemp };
+};
+
+// function to create the images from files
+export const createImages = async (fileList: FileList) => {
+    const files = Array.from(fileList);
+    const newImages: ImageBox[] = await Promise.all(
+        files.map((file) => {
+            return new Promise<ImageBox>((resolve) => {
+                const img = new Image();
+                const id = uuidv4();
+                img.onload = () => {
+                    resolve({
+                        id,
+                        w: img.width,
+                        h: img.height,
+                        x: 0,
+                        y: 0,
+                        file,
+                    });
+                };
+                img.src = URL.createObjectURL(file);
+            });
+        })
+    );
+
+    return newImages;
+};
+
+// function to pack the images into the container
+export const packBoxes = async ({
+    images,
+    containerDimensions,
+    padding,
+}: {
+    images: ImageBox[];
+    containerDimensions: { w: number; h: number };
+    padding: number;
+}) => {
+    let remainingImages = [...images]; // Copy the images array to manipulate
+    const allPackedBoxes: ImageBox[][] = [];
+
+    while (remainingImages.length > 0) {
+        const { packed_rectangles, unpacked_rectangles, error } = await pack(
+            remainingImages,
+            {
+                w: containerDimensions.w,
+                h: containerDimensions.h,
+            },
+            padding
+        );
+
+        if (error && error.length > 0) {
+            console.error("Packing error:", error);
+            break;
+        }
+
+        allPackedBoxes.push(packed_rectangles);
+        remainingImages = unpacked_rectangles;
+    }
+
+    return allPackedBoxes;
 };
