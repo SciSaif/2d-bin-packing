@@ -1,6 +1,6 @@
 import React, { TouchEvent, useEffect, useState } from "react";
-import { Dimension } from "../pages/imagePacker/ImagePacker";
 import { positionImages } from "../pages/imagePacker/utils";
+import { ContainerType, Margin } from "../pages/imagePacker/ImagePacker";
 
 export interface ImageData {
     id: string;
@@ -12,17 +12,17 @@ export interface ImageData {
 }
 
 interface Props {
-    containerDimensions: Dimension;
     images: ImageData[];
     setImages: (images: ImageData[]) => void;
-    scaleFactor: number;
+    container: ContainerType;
+    setContainer: (container: ContainerType) => void;
 }
 
 const ResizingWindow: React.FC<Props> = ({
-    containerDimensions,
     images,
     setImages,
-    scaleFactor,
+    container,
+    setContainer,
 }) => {
     const [selectedId, setSelectedId] = useState<null | string>(null);
     const [isResizing, setIsResizing] = useState(false);
@@ -31,6 +31,21 @@ const ResizingWindow: React.FC<Props> = ({
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
     const [maxY, setMaxY] = useState(0);
+
+    // Function to handle margin changes
+    const handleMarginChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        side: keyof Margin
+    ) => {
+        const newMarginValue = parseInt(e.target.value, 10);
+        setContainer({
+            ...container,
+            margin: {
+                ...container.margin,
+                [side]: isNaN(newMarginValue) ? 0 : newMarginValue,
+            },
+        });
+    };
 
     useEffect(() => {
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
@@ -47,7 +62,7 @@ const ResizingWindow: React.FC<Props> = ({
 
         const { _maxY, _localImages } = positionImages(
             images,
-            containerDimensions,
+            container,
             10,
             true
         );
@@ -92,39 +107,42 @@ const ResizingWindow: React.FC<Props> = ({
         };
     }, [isResizing]);
 
-    const handleMouseMove = (e: MouseEvent) => {
+    // This function contains the shared logic for resizing
+    const handleResize = (clientX: number, clientY: number) => {
         if (isResizing && selectedId) {
-            const clientX = e.clientX;
-            const clientY = e.clientY;
-
             const updatedImages = updateImageSize(clientX, clientY);
             if (updatedImages) {
-                // Call the function to reposition images during resizing
-                const repositionedImages = repositionImages(
-                    updatedImages,
-                    containerDimensions
-                );
-                // setLocalImages(repositionedImages);
-                // Find the currently selected image after repositioning
+                const repositionedImages = repositionImages(updatedImages);
                 const repositionedImage = repositionedImages.find(
                     (img) => img.id === selectedId
                 );
-
-                // Check if the shelf position changed for the selected image
                 const originalImage = localImages.find(
                     (img) => img.id === selectedId
                 );
+
                 if (
                     originalImage &&
                     repositionedImage &&
                     originalImage.y !== repositionedImage.y
                 ) {
-                    // If the shelf position changed, stop resizing
                     setIsResizing(false);
                     setSelectedId(null);
                 }
                 setLocalImages(repositionedImages);
             }
+        }
+    };
+
+    // Mouse move event handler
+    const handleMouseMove = (e: MouseEvent) => {
+        handleResize(e.clientX, e.clientY);
+    };
+
+    // Touch move event handler
+    const handleTouchMove = (e: globalThis.TouchEvent) => {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            handleResize(touch.clientX, touch.clientY);
         }
     };
 
@@ -135,20 +153,20 @@ const ResizingWindow: React.FC<Props> = ({
         const selectedImage = localImages.find((img) => img.id === selectedId);
         if (selectedImage && containerRef.current) {
             const aspectRatio = selectedImage.w / selectedImage.h;
-            const mouseX = clientX / scaleFactor;
-            const mouseY = clientY / scaleFactor; // Assuming you want to scale Y as well
+            const mouseX = clientX / container.scaleFactor;
+            const mouseY = clientY / container.scaleFactor; // Assuming you want to scale Y as well
 
             const rect = containerRef.current.getBoundingClientRect();
             let newWidth = Math.max(20, mouseX - rect.left - selectedImage.x);
             let newHeight = newWidth / aspectRatio;
 
             // Constrain newWidth and newHeight to not exceed the container's dimensions
-            if (newWidth > containerDimensions.w) {
-                newWidth = containerDimensions.w;
+            if (newWidth > container.w) {
+                newWidth = container.w;
                 newHeight = newWidth / aspectRatio;
             }
-            if (newHeight > containerDimensions.h) {
-                newHeight = containerDimensions.h;
+            if (newHeight > container.h) {
+                newHeight = container.h;
                 newWidth = newHeight * aspectRatio;
             }
 
@@ -170,32 +188,16 @@ const ResizingWindow: React.FC<Props> = ({
         return null;
     };
 
-    const repositionImages = (
-        _images: ImageData[],
-        containerDims: Dimension
-    ): ImageData[] => {
-        const { _localImages } = positionImages(_images, containerDims);
+    const repositionImages = (_images: ImageData[]): ImageData[] => {
+        const { _localImages } = positionImages(_images, container);
 
         return _localImages;
-    };
-
-    const handleTouchMove = (e: globalThis.TouchEvent) => {
-        if (isResizing && selectedId && e.touches.length > 0) {
-            // e.preventDefault();
-            const clientX = e.touches[0].clientX;
-            const clientY = e.touches[0].clientY;
-
-            updateImageSize(clientX, clientY);
-        }
     };
 
     const handleMouseUp = () => {
         setIsResizing(false);
         // Call the function to reposition images after resizing
-        const repositionedImages = repositionImages(
-            localImages,
-            containerDimensions
-        );
+        const repositionedImages = repositionImages(localImages);
         setLocalImages(repositionedImages);
         setImages(repositionedImages);
     };
@@ -215,58 +217,96 @@ const ResizingWindow: React.FC<Props> = ({
     }, [localImages, selectedId, isResizing]);
 
     return (
-        <div
-            ref={containerRef}
-            style={{
-                width: containerDimensions.w * scaleFactor,
-                height: (maxY + 5) * scaleFactor,
-                border: "1px solid black",
-                position: "relative",
-            }}
-            className="overflow-hidden bg-white"
-        >
-            {localImages.map((imgData, index) => {
-                const imageUrl = imageUrls.get(imgData.id) || "";
+        <div>
+            <div className="border-t border-b ">
+                {/* margin controls */}
 
-                return (
-                    <div
-                        key={imgData.id}
-                        data-id={imgData.id}
-                        style={{
-                            position: "absolute",
-                            left: imgData.x,
-                            top: imgData.y * scaleFactor,
-                            width: imgData.w * scaleFactor,
-                            height: imgData.h * scaleFactor,
-                            backgroundImage: `url(${imageUrl})`,
-                            backgroundSize: "cover",
-                            border:
-                                selectedId === imgData.id
-                                    ? "2px solid blue"
-                                    : "none",
-                            // overflow: "hidden",
-                        }}
-                        onMouseDown={(e) => handleMouseDown(e, imgData)}
-                        onTouchStart={(e) => handleMouseDown(e, imgData)}
-                    >
-                        {selectedId === imgData.id && (
-                            <div
-                                className="resize-handle" // Add this class
-                                style={{
-                                    position: "absolute",
-                                    right: -4,
-                                    bottom: -4,
-                                    width: 16,
-                                    height: 16,
-                                    backgroundColor: "white",
-                                    cursor: "se-resize",
-                                    border: "1px solid blue",
-                                }}
-                            ></div>
-                        )}
-                    </div>
-                );
-            })}
+                <label>
+                    Top:
+                    <input
+                        type="number"
+                        value={container.margin.top}
+                        onChange={(e) => handleMarginChange(e, "top")}
+                    />
+                </label>
+                <label>
+                    Right:
+                    <input
+                        type="number"
+                        value={container.margin.right}
+                        onChange={(e) => handleMarginChange(e, "right")}
+                    />
+                </label>
+                <label>
+                    Bottom:
+                    <input
+                        type="number"
+                        value={container.margin.bottom}
+                        onChange={(e) => handleMarginChange(e, "bottom")}
+                    />
+                </label>
+                <label>
+                    Left:
+                    <input
+                        type="number"
+                        value={container.margin.left}
+                        onChange={(e) => handleMarginChange(e, "left")}
+                    />
+                </label>
+            </div>
+            <div
+                ref={containerRef}
+                style={{
+                    width: container.w * container.scaleFactor,
+                    height: (maxY + 5) * container.scaleFactor,
+                    border: "1px solid black",
+                    position: "relative",
+                }}
+                className="overflow-hidden bg-white"
+            >
+                {localImages.map((imgData, index) => {
+                    const imageUrl = imageUrls.get(imgData.id) || "";
+
+                    return (
+                        <div
+                            key={imgData.id}
+                            data-id={imgData.id}
+                            style={{
+                                position: "absolute",
+                                left: imgData.x * container.scaleFactor,
+                                top: imgData.y * container.scaleFactor,
+                                width: imgData.w * container.scaleFactor,
+                                height: imgData.h * container.scaleFactor,
+                                backgroundImage: `url(${imageUrl})`,
+                                backgroundSize: "cover",
+                                border:
+                                    selectedId === imgData.id
+                                        ? "2px solid blue"
+                                        : "none",
+                                // overflow: "hidden",
+                            }}
+                            onMouseDown={(e) => handleMouseDown(e, imgData)}
+                            onTouchStart={(e) => handleMouseDown(e, imgData)}
+                        >
+                            {selectedId === imgData.id && (
+                                <div
+                                    className="resize-handle" // Add this class
+                                    style={{
+                                        position: "absolute",
+                                        right: -4,
+                                        bottom: -4,
+                                        width: 16,
+                                        height: 16,
+                                        backgroundColor: "white",
+                                        cursor: "se-resize",
+                                        border: "1px solid blue",
+                                    }}
+                                ></div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 };

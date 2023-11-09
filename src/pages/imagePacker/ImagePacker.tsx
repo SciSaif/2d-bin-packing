@@ -21,21 +21,31 @@ export interface ImageBox {
     imageElement?: HTMLImageElement;
     rotated?: boolean;
 }
-
-export interface Dimension {
-    w: number;
-    h: number;
+export interface Margin {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
 }
 
-const PADDING = 3;
+export interface ContainerType {
+    w: number;
+    h: number;
+    scaleFactor: number;
+    margin: Margin;
+    padding: number;
+}
 
 const ImagePacker: React.FC = () => {
-    const [containerDimensions, setContainerDimensions] = useState<Dimension>({
+    const [container, setContainer] = useState<ContainerType>({
         w: 595 * 2,
         h: 842 * 2,
+        scaleFactor: 0.5,
+        margin: { top: 0, right: 0, bottom: 0, left: 0 },
+        padding: 5,
     });
 
-    const [scaleFactor, setScaleFactor] = useState(1);
+    const [scaleFactor, setScaleFactor] = useState(0.5);
 
     const [images, setImages] = useState<ImageBox[]>([]);
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
@@ -98,8 +108,7 @@ const ImagePacker: React.FC = () => {
 
         const packedBoxes = await packBoxes({
             images,
-            containerDimensions,
-            padding: PADDING,
+            container,
         });
 
         setIsPacking(false);
@@ -147,12 +156,12 @@ const ImagePacker: React.FC = () => {
                 </button>
             )}
 
-            {boxes.length > 0 && containerDimensions && (
+            {boxes.length > 0 && container && (
                 <button
                     onClick={() =>
                         handleSaveAsPDF({
                             boxes,
-                            containerDimensions,
+                            container,
                         })
                     }
                     className="px-10 py-2 mt-4 text-white bg-green-500 rounded w-fit hover:bg-green-600"
@@ -188,10 +197,10 @@ const ImagePacker: React.FC = () => {
 
             {inResizeMode && (
                 <ResizingWindow
-                    scaleFactor={scaleFactor}
-                    containerDimensions={containerDimensions}
+                    container={container}
                     images={images}
                     setImages={setImages}
+                    setContainer={setContainer}
                 />
             )}
 
@@ -206,16 +215,16 @@ const ImagePacker: React.FC = () => {
                     <Stage
                         key={index}
                         ref={stageRefs[index]}
-                        width={containerDimensions.w * scaleFactor}
-                        height={containerDimensions.h * scaleFactor}
+                        width={container.w * scaleFactor}
+                        height={container.h * scaleFactor}
                         className="border border-gray-400 shadow w-fit"
                     >
                         <Layer>
                             <Rect
                                 x={0}
                                 y={0}
-                                width={containerDimensions.w * scaleFactor}
-                                height={containerDimensions.h * scaleFactor}
+                                width={container.w * scaleFactor}
+                                height={container.h * scaleFactor}
                                 stroke="black"
                                 fill="white"
                             />

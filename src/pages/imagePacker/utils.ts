@@ -3,15 +3,15 @@ import jsPDF from "jspdf";
 import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
-import { Dimension, ImageBox } from "./ImagePacker";
+import { ContainerType, ImageBox } from "./ImagePacker";
 import { pack } from "../../binPacking";
 import { ImageData } from "../../components/ResizingWindow";
 export const handleSaveAsPDF = ({
     boxes,
-    containerDimensions,
+    container,
 }: {
     boxes: ImageBox[][];
-    containerDimensions: { w: number; h: number };
+    container: ContainerType;
 }) => {
     const pdf = new jsPDF("p", "pt", "a4");
     pdf.setTextColor("#000000");
@@ -19,8 +19,8 @@ export const handleSaveAsPDF = ({
     const a4Width = 595; // A4 width in points
     const a4Height = 842; // A4 height in points
 
-    const scaleX = a4Width / containerDimensions.w;
-    const scaleY = a4Height / containerDimensions.h;
+    const scaleX = a4Width / container.w;
+    const scaleY = a4Height / container.h;
 
     boxes.forEach((boxSet, index) => {
         if (index > 0) {
@@ -29,8 +29,8 @@ export const handleSaveAsPDF = ({
 
         const stage = new Konva.Stage({
             container: "temp-container",
-            width: containerDimensions.w,
-            height: containerDimensions.h,
+            width: container.w,
+            height: container.h,
         });
 
         const layer = new Konva.Layer();
@@ -64,8 +64,8 @@ export const handleSaveAsPDF = ({
             stage.toDataURL({ pixelRatio: 2 }),
             0,
             0,
-            containerDimensions.w * scaleX,
-            containerDimensions.h * scaleY
+            container.w * scaleX,
+            container.h * scaleY
         );
 
         stage.destroy();
@@ -134,8 +134,9 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
 
 export const positionImages = (
     images: ImageData[],
-    containerDimensions: Dimension,
-    margin: number = 10, // Margin between images
+    container: ContainerType,
+
+    padding: number = 10,
     constrainToHalfWidth: boolean = false // New parameter to control width constraint
 ) => {
     let maxY = 0;
@@ -145,14 +146,12 @@ export const positionImages = (
 
     let localImagesTemp = images.map((img) => {
         // Determine the maximum width for the image based on the new parameter
-        const maxWidth = constrainToHalfWidth
-            ? containerDimensions.w / 2
-            : containerDimensions.w;
+        const maxWidth = constrainToHalfWidth ? container.w / 2 : container.w;
 
         // Calculate the scale factor to maintain aspect ratio while fitting within constraints
         let scaleFactor = Math.min(
             maxWidth / img.w, // Constraint for width based on the new parameter
-            containerDimensions.h / img.h, // Constraint for height
+            container.h / img.h, // Constraint for height
             1 // Ensure we don't scale up the image
         );
 
@@ -161,8 +160,8 @@ export const positionImages = (
         const scaledHeight = img.h * scaleFactor;
 
         // If the image doesn't fit in the current row, move to the next one
-        if (currentX + scaledWidth + margin > containerDimensions.w) {
-            currentY += shelfHeight + margin; // Add margin between rows
+        if (currentX + scaledWidth + padding > container.w) {
+            currentY += shelfHeight + padding; // Add margin between rows
             currentX = 0; // Reset X position for the new row
             shelfHeight = scaledHeight; // Start with the height of the first image in the new row
         } else {
@@ -184,7 +183,7 @@ export const positionImages = (
         }
 
         // Update X position for the next image
-        currentX += scaledWidth + margin; // Add margin between images
+        currentX += scaledWidth + padding; // Add margin between images
 
         // Update maxY if needed
         maxY = Math.max(maxY, currentY + scaledHeight);
@@ -224,12 +223,10 @@ export const createImages = async (fileList: FileList) => {
 // function to pack the images into the container
 export const packBoxes = async ({
     images,
-    containerDimensions,
-    padding,
+    container,
 }: {
     images: ImageBox[];
-    containerDimensions: { w: number; h: number };
-    padding: number;
+    container: ContainerType;
 }) => {
     let remainingImages = [...images]; // Copy the images array to manipulate
     const allPackedBoxes: ImageBox[][] = [];
@@ -238,11 +235,11 @@ export const packBoxes = async ({
         const { packed_rectangles, unpacked_rectangles, error } = await pack(
             remainingImages,
             {
-                w: containerDimensions.w,
-                h: containerDimensions.h,
+                w: container.w,
+                h: container.h,
             },
             {
-                padding,
+                padding: container.padding,
                 margin: {
                     top: 50,
                     right: 50,
