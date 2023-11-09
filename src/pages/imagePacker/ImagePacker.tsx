@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import ResizingCanvas from "../../components/ResizingCanvas";
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
 import {
     createImages,
@@ -10,6 +9,7 @@ import {
 } from "./utils";
 import Konva from "konva";
 import { Link } from "react-router-dom";
+import ResizingWindow from "../../components/ResizingWindow";
 
 export interface ImageBox {
     id: string;
@@ -35,7 +35,7 @@ const ImagePacker: React.FC = () => {
         h: 842 * 2,
     });
 
-    const [scaleFactor, setScaleFactor] = useState(0.5);
+    const [scaleFactor, setScaleFactor] = useState(1);
 
     const [images, setImages] = useState<ImageBox[]>([]);
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
@@ -173,9 +173,21 @@ const ImagePacker: React.FC = () => {
                     Print Canvases
                 </button>
             )}
+            {!inResizeMode && boxes?.length > 0 && (
+                <button
+                    onClick={() => {
+                        setInResizeMode(true);
+                        setImagesLoaded(false);
+                        setBoxes([]);
+                    }}
+                    className="px-10 py-2 mt-4 text-white bg-yellow-500 rounded w-fit hover:bg-yellow-600"
+                >
+                    Resize images
+                </button>
+            )}
 
             {inResizeMode && (
-                <ResizingCanvas
+                <ResizingWindow
                     scaleFactor={scaleFactor}
                     containerDimensions={containerDimensions}
                     images={images}

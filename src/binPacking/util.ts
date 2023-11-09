@@ -1,4 +1,4 @@
-import Configuration, { UnpackedRect } from "./configuration";
+import Configuration, { Margin, UnpackedRect } from "./configuration";
 
 export enum PointType {
     BOTTOM_LEFT = 0,
@@ -85,9 +85,14 @@ export function getResult(C: Configuration, padding: number): Result {
 // function to check if any rectangle has dimensions greater than the container
 export const checkIfRectanglesExceedContainer = (
     rects: UnpackedRect[],
-    container_size: { w: number; h: number }
+    container_size: { w: number; h: number },
+    margin: Margin
 ) => {
+    // consider the margin as well
     return rects.some((rect) => {
-        return rect.w > container_size.w || rect.h > container_size.h;
+        return (
+            rect.w + margin.left + margin.right > container_size.w ||
+            rect.h + margin.top + margin.bottom > container_size.h
+        );
     });
 };

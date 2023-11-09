@@ -5,6 +5,12 @@ export interface UnpackedRect {
     w: number;
     h: number;
 }
+export interface Margin {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+}
 
 export interface Dimension {
     w: number;
@@ -18,16 +24,20 @@ export default class Configuration {
     packed_rects: Rect[];
     L: Rect[] = [];
     concave_corners: [Point, PointType][] = [];
+    margin: Margin;
     constructor(
         size: Dimension,
         unpacked_rects: UnpackedRect[],
         packed_rects: Rect[] = [],
-        padding: number = 0
+        margin: Margin
     ) {
         this.size = size;
+
         this.unpacked_rects = unpacked_rects;
         this.packed_rects = packed_rects;
+        this.margin = margin;
         this.generate_L();
+
         // console.log("total ccoas", this.L.length);
     }
 
@@ -46,7 +56,6 @@ export default class Configuration {
         // 1. concave corners
 
         this.concave_corners = this.getConcaveCorners();
-        // console.log("concave corners", this.concave_corners.length);
 
         // 2. generate ccoas for every rect
         const ccoas: Rect[] = [];
@@ -77,6 +86,7 @@ export default class Configuration {
         const concave_corners: [Point, PointType][] = [];
         for (let corner of this.getAllCorners()) {
             const corner_type = this.getCornerType(corner);
+
             if (corner_type !== null) {
                 concave_corners.push([corner, corner_type]);
             }
@@ -119,10 +129,10 @@ export default class Configuration {
     // checks if a point is inside any of the rects
     contains(point: Point): boolean {
         if (
-            point.x <= 0 ||
-            point.y <= 0 ||
-            this.size.w <= point.x ||
-            this.size.h <= point.y
+            point.x <= this.margin.left ||
+            point.y <= this.margin.top ||
+            this.size.w - this.margin.right <= point.x ||
+            this.size.h - this.margin.bottom <= point.y
         ) {
             return true;
         }
@@ -137,17 +147,18 @@ export default class Configuration {
 
     //   Returns true if a given ccoa fits into the configuration without overlapping any of the rects
     //   or being out of bounds
+
     fits(ccoa: Rect): boolean {
-        // Check if the ccoa is out of bounds in any way
+        // Check if the ccoa is out of bounds considering the container margins
         if (
-            ccoa.origin.x < 0 ||
-            ccoa.origin.y < 0 ||
-            this.size.w < ccoa.origin.x + ccoa.width ||
-            this.size.h < ccoa.origin.y + ccoa.height
+            ccoa.origin.x < this.margin.left ||
+            ccoa.origin.y < this.margin.top || // Origin is top-left
+            this.size.w - this.margin.right < ccoa.origin.x + ccoa.width ||
+            this.size.h - this.margin.bottom < ccoa.origin.y + ccoa.height
         ) {
             return false;
         }
-        // Check if the rect overlaps any of the already packed rects
+        // Check if the rect overlaps any of the already packed rects without considering margins
         for (let rect of this.packed_rects) {
             if (ccoa.overlaps(rect)) {
                 return false;
@@ -182,12 +193,14 @@ export default class Configuration {
     }
 
     getAllCorners(): Point[] {
-        // container corners
         const corners: Point[] = [
-            { x: 0, y: 0 },
-            { x: 0, y: this.size.h },
-            { x: this.size.w, y: 0 },
-            { x: this.size.w, y: this.size.h },
+            { x: this.margin.left, y: this.margin.top }, // Top-left corner
+            { x: this.margin.left, y: this.size.h - this.margin.bottom }, // Bottom-left corner
+            { x: this.size.w - this.margin.right, y: this.margin.top }, // Top-right corner
+            {
+                x: this.size.w - this.margin.right,
+                y: this.size.h - this.margin.bottom,
+            }, // Bottom-right corner
         ];
 
         // rect corners
@@ -214,7 +227,8 @@ export default class Configuration {
         const cloned = new Configuration(
             this.size,
             [...this.unpacked_rects],
-            [...this.packed_rects]
+            [...this.packed_rects],
+            this.margin
         );
         cloned.L = [...this.L];
         cloned.concave_corners = [...this.concave_corners];

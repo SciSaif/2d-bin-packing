@@ -2,7 +2,7 @@ import React, { TouchEvent, useEffect, useState } from "react";
 import { Dimension } from "../pages/imagePacker/ImagePacker";
 import { positionImages } from "../pages/imagePacker/utils";
 
-interface ImageData {
+export interface ImageData {
     id: string;
     w: number;
     h: number;
@@ -18,7 +18,7 @@ interface Props {
     scaleFactor: number;
 }
 
-const ResizingDiv: React.FC<Props> = ({
+const ResizingWindow: React.FC<Props> = ({
     containerDimensions,
     images,
     setImages,
@@ -33,16 +33,7 @@ const ResizingDiv: React.FC<Props> = ({
     const [maxY, setMaxY] = useState(0);
 
     useEffect(() => {
-        const { _maxY, _localImages } = positionImages(
-            images,
-            containerDimensions
-        );
-
-        setMaxY(_maxY);
-        setLocalImages(_localImages);
-    }, [images]);
-
-    useEffect(() => {
+        // set the image urls ( this is done so that we don't have to re-render the images when resizing)
         if (!images.length) return;
         const newImageUrls = new Map<string, string>();
         images.forEach((image) => {
@@ -51,6 +42,18 @@ const ResizingDiv: React.FC<Props> = ({
             }
         });
         setImageUrls(newImageUrls);
+
+        // position the images in the container
+
+        const { _maxY, _localImages } = positionImages(
+            images,
+            containerDimensions,
+            10,
+            true
+        );
+
+        setMaxY(_maxY);
+        setLocalImages(_localImages);
     }, []);
 
     const handleMouseDown = (
@@ -88,13 +91,92 @@ const ResizingDiv: React.FC<Props> = ({
             );
         };
     }, [isResizing]);
+
     const handleMouseMove = (e: MouseEvent) => {
         if (isResizing && selectedId) {
             const clientX = e.clientX;
             const clientY = e.clientY;
 
-            updateImageSize(clientX, clientY);
+            const updatedImages = updateImageSize(clientX, clientY);
+            if (updatedImages) {
+                // Call the function to reposition images during resizing
+                const repositionedImages = repositionImages(
+                    updatedImages,
+                    containerDimensions
+                );
+                // setLocalImages(repositionedImages);
+                // Find the currently selected image after repositioning
+                const repositionedImage = repositionedImages.find(
+                    (img) => img.id === selectedId
+                );
+
+                // Check if the shelf position changed for the selected image
+                const originalImage = localImages.find(
+                    (img) => img.id === selectedId
+                );
+                if (
+                    originalImage &&
+                    repositionedImage &&
+                    originalImage.y !== repositionedImage.y
+                ) {
+                    // If the shelf position changed, stop resizing
+                    setIsResizing(false);
+                    setSelectedId(null);
+                }
+                setLocalImages(repositionedImages);
+            }
         }
+    };
+
+    const updateImageSize = (
+        clientX: number,
+        clientY: number
+    ): ImageData[] | null => {
+        const selectedImage = localImages.find((img) => img.id === selectedId);
+        if (selectedImage && containerRef.current) {
+            const aspectRatio = selectedImage.w / selectedImage.h;
+            const mouseX = clientX / scaleFactor;
+            const mouseY = clientY / scaleFactor; // Assuming you want to scale Y as well
+
+            const rect = containerRef.current.getBoundingClientRect();
+            let newWidth = Math.max(20, mouseX - rect.left - selectedImage.x);
+            let newHeight = newWidth / aspectRatio;
+
+            // Constrain newWidth and newHeight to not exceed the container's dimensions
+            if (newWidth > containerDimensions.w) {
+                newWidth = containerDimensions.w;
+                newHeight = newWidth / aspectRatio;
+            }
+            if (newHeight > containerDimensions.h) {
+                newHeight = containerDimensions.h;
+                newWidth = newHeight * aspectRatio;
+            }
+
+            const updatedImages = localImages.map((img) =>
+                img.id === selectedId
+                    ? { ...img, w: newWidth, h: newHeight }
+                    : img
+            );
+
+            // Update maxY if needed
+            const newMaxY = updatedImages.reduce(
+                (acc, img) => Math.max(acc, img.y + img.h),
+                0
+            );
+            setMaxY(newMaxY);
+
+            return updatedImages;
+        }
+        return null;
+    };
+
+    const repositionImages = (
+        _images: ImageData[],
+        containerDims: Dimension
+    ): ImageData[] => {
+        const { _localImages } = positionImages(_images, containerDims);
+
+        return _localImages;
     };
 
     const handleTouchMove = (e: globalThis.TouchEvent) => {
@@ -107,56 +189,17 @@ const ResizingDiv: React.FC<Props> = ({
         }
     };
 
-    const updateImageSize = (clientX: number, clientY: number) => {
-        const selectedImage = localImages.find((img) => img.id === selectedId);
-        if (selectedImage && containerRef.current) {
-            const aspectRatio = selectedImage.w / selectedImage.h;
-            const mouseX = clientX / scaleFactor;
-            const mouseY = clientY;
-
-            const rect = containerRef.current.getBoundingClientRect();
-            const newWidth = mouseX - rect.left - selectedImage.x;
-            const newHeight = newWidth / aspectRatio;
-
-            if (
-                newWidth > containerDimensions.w ||
-                newHeight > containerDimensions.h
-            ) {
-                return;
-            }
-
-            const updatedImages = [...localImages];
-            const index = updatedImages.findIndex(
-                (img) => img.id === selectedId
-            );
-            let accumulatedHeight = 0;
-            if (index !== -1) {
-                updatedImages[index] = {
-                    ...updatedImages[index],
-                    w: newWidth,
-                    h: newHeight,
-                };
-
-                // Reposition images below the resized image
-                accumulatedHeight = updatedImages[index].y + newHeight;
-                for (let i = index + 1; i < updatedImages.length; i++) {
-                    updatedImages[i].y = accumulatedHeight + 5;
-                    accumulatedHeight += updatedImages[i].h + 5;
-                }
-
-                setLocalImages(updatedImages);
-            }
-
-            // Update maxY if needed
-            const newMaxY = accumulatedHeight > maxY ? accumulatedHeight : maxY;
-            setMaxY(newMaxY);
-        }
-    };
-
     const handleMouseUp = () => {
         setIsResizing(false);
-        setImages(localImages);
+        // Call the function to reposition images after resizing
+        const repositionedImages = repositionImages(
+            localImages,
+            containerDimensions
+        );
+        setLocalImages(repositionedImages);
+        setImages(repositionedImages);
     };
+
     useEffect(() => {
         window.addEventListener("mousemove", handleMouseMove);
         window.addEventListener("mouseup", handleMouseUp);
@@ -228,4 +271,4 @@ const ResizingDiv: React.FC<Props> = ({
     );
 };
 
-export default ResizingDiv;
+export default ResizingWindow;

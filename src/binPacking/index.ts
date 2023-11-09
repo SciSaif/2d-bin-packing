@@ -1,5 +1,9 @@
 import { BinPacker } from "./binPacker";
-import Configuration, { Dimension, UnpackedRect } from "./configuration";
+import Configuration, {
+    Dimension,
+    Margin,
+    UnpackedRect,
+} from "./configuration";
 import {
     Rectangle,
     Result,
@@ -8,39 +12,24 @@ import {
     increaseDimensionsForPadding,
 } from "./util";
 
-// export const pack = (
-//     rects: UnpackedRect[],
-//     container_size: Dimension,
-//     padding: number = 0
-// ) => {
-//     if (padding > 0) {
-//         rects = increaseDimensionsForPadding(rects, padding);
-//         container_size.w += padding + padding;
-//         container_size.h += padding + padding;
-//     }
-
-//     const C = new Configuration(
-//         container_size,
-//         [...rects], // Using spread operator to create a shallow copy
-//         [],
-//         padding
-//     );
-
-//     const packer = new BinPacker(C);
-
-//     const packedConfig = packer.PackConfiguration(C);
-
-//     return getResult(packedConfig, padding);
-// };
+export interface Options {
+    padding: number;
+    margin: Margin;
+}
 
 export const pack = async (
     rects: UnpackedRect[],
     container_size: Dimension,
-    padding: number = 0
+    { padding, margin }: Options = {
+        padding: 0,
+        margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    }
 ): Promise<Result> => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            if (checkIfRectanglesExceedContainer(rects, container_size)) {
+            if (
+                checkIfRectanglesExceedContainer(rects, container_size, margin)
+            ) {
                 resolve({
                     packed_rectangles: [],
                     unpacked_rectangles: rects.map((rect) => {
@@ -68,7 +57,7 @@ export const pack = async (
                 container_size,
                 [...rects], // Using spread operator to create a shallow copy
                 [],
-                padding
+                margin
             );
 
             const packer = new BinPacker(C);
