@@ -142,7 +142,7 @@ const ImagePacker: React.FC = () => {
             ) : (
                 <button
                     onClick={reset}
-                    className="px-10 py-2 text-white bg-green-500 rounded w-fit hover:bg-green-600"
+                    className="px-10 py-1 text-white bg-green-500 rounded w-fit hover:bg-green-600"
                 >
                     Reset
                 </button>
@@ -150,7 +150,7 @@ const ImagePacker: React.FC = () => {
             {inResizeMode && (
                 <button
                     onClick={() => startPacking()}
-                    className="px-10 py-2 text-white bg-blue-500 rounded w-fit hover:bg-blue-600"
+                    className="px-10 py-1 text-white bg-blue-500 rounded w-fit hover:bg-blue-600"
                 >
                     Start packing
                 </button>
