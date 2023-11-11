@@ -30,6 +30,8 @@ export const pack = async (
             if (
                 checkIfRectanglesExceedContainer(rects, container_size, margin)
             ) {
+                console.log(rects, container_size, margin);
+
                 resolve({
                     packed_rectangles: [],
                     unpacked_rectangles: rects.map((rect) => {

@@ -201,26 +201,40 @@ export const positionImages = (
     constrainToHalfWidth: boolean = false
 ) => {
     let maxY = 0;
-    let currentX = container.margin.left; // Start from the left margin
+    let currentX = container.margin.left;
     let currentY = container.margin.top; // Start from the top margin
     let shelfHeight = 0;
 
     let localImagesTemp = images.map((img) => {
+        let availableContainerWidth =
+            container.w - container.margin.left - container.margin.right;
+
         // Determine the maximum width for the image based on the constrainToHalfWidth parameter
-        const maxWidth = constrainToHalfWidth ? container.w / 2 : container.w;
+        const maxWidth = constrainToHalfWidth
+            ? availableContainerWidth / 2
+            : availableContainerWidth;
 
         // Calculate the scale factor to maintain aspect ratio while fitting within constraints
-        let scaleFactor = Math.min(
+        let aspectRatio = Math.min(
             maxWidth / img.w, // Constraint for width
             container.h / img.h, // Constraint for height
             1 // Ensure we don't scale up the image
         );
 
-        const scaledWidth = img.w * scaleFactor;
-        const scaledHeight = img.h * scaleFactor;
+        const scaledWidth = img.w * aspectRatio;
+        const scaledHeight = img.h * aspectRatio;
 
         // Move to the next row if the image doesn't fit in the current row
-        if (currentX + scaledWidth + padding > container.w) {
+        if (currentX + scaledWidth > container.w - container.margin.right) {
+            // console.log(
+            //     "shifted",
+            //     aspectRatio,
+            //     currentX,
+            //     scaledWidth,
+            //     padding,
+            //     container.w
+            // );
+
             currentY += shelfHeight + padding; // Add padding for the new row
             currentX = container.margin.left; // Reset X to left margin for the new row
             shelfHeight = scaledHeight;
@@ -291,12 +305,7 @@ export const packBoxes = async ({
             },
             {
                 padding: container.padding,
-                margin: {
-                    top: 50,
-                    right: 50,
-                    bottom: 50,
-                    left: 50,
-                },
+                margin: container.margin,
             }
         );
 

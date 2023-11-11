@@ -36,14 +36,16 @@ export interface ContainerType {
     padding: number;
 }
 
+const defaultContainer: ContainerType = {
+    w: 595 * 2,
+    h: 842 * 2,
+    scaleFactor: 0.5,
+    margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    padding: 5,
+};
+
 const ImagePacker: React.FC = () => {
-    const [container, setContainer] = useState<ContainerType>({
-        w: 595 * 2,
-        h: 842 * 2,
-        scaleFactor: 0.5,
-        margin: { top: 0, right: 0, bottom: 0, left: 0 },
-        padding: 5,
-    });
+    const [container, setContainer] = useState<ContainerType>(defaultContainer);
 
     const [scaleFactor, setScaleFactor] = useState(0.5);
 
@@ -54,6 +56,7 @@ const ImagePacker: React.FC = () => {
     const stageRefs = boxes.map(() => React.createRef<Konva.Stage>());
 
     const [inResizeMode, setInResizeMode] = useState<boolean>(false);
+    const [resizingAgain, setResizingAgain] = useState<boolean>(false);
 
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
 
@@ -121,6 +124,7 @@ const ImagePacker: React.FC = () => {
         setImages([]);
         setImagesLoaded(false);
         setInResizeMode(false);
+        setContainer(defaultContainer);
     };
 
     return (
@@ -185,6 +189,7 @@ const ImagePacker: React.FC = () => {
             {!inResizeMode && boxes?.length > 0 && (
                 <button
                     onClick={() => {
+                        setResizingAgain(true);
                         setInResizeMode(true);
                         setImagesLoaded(false);
                         setBoxes([]);
@@ -201,6 +206,7 @@ const ImagePacker: React.FC = () => {
                     images={images}
                     setImages={setImages}
                     setContainer={setContainer}
+                    startWithMaxHalfWidth={!resizingAgain}
                 />
             )}
 

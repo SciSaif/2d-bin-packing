@@ -17,6 +17,7 @@ interface Props {
     setImages: (images: ImageData[]) => void;
     container: ContainerType;
     setContainer: (container: ContainerType) => void;
+    startWithMaxHalfWidth?: boolean; // if true, the images will initially have at most half the width of the container
 }
 
 const ResizingWindow: React.FC<Props> = ({
@@ -24,39 +25,16 @@ const ResizingWindow: React.FC<Props> = ({
     setImages,
     container,
     setContainer,
+    startWithMaxHalfWidth = true,
 }) => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
-    const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
-
-    useEffect(() => {
-        // set the image urls ( this is done so that we don't have to re-render the images when resizing)
-        if (!images.length) return;
-        const newImageUrls = new Map<string, string>();
-        images.forEach((image) => {
-            if (image.file) {
-                newImageUrls.set(image.id, URL.createObjectURL(image.file));
-            }
-        });
-        setImageUrls(newImageUrls);
-
-        // position the images in the container
-
-        const { _maxY, _localImages } = positionImages(
-            images,
-            container,
-            10,
-            true
-        );
-
-        setMaxY(_maxY);
-        setLocalImages(_localImages);
-    }, []);
 
     const {
         localImages,
         maxY,
         handleMouseDown,
         setLocalImages,
+        imageUrls,
         selectedId,
         setMaxY,
     } = useResizeImage({
@@ -64,6 +42,7 @@ const ResizingWindow: React.FC<Props> = ({
         container,
         setImages,
         containerRef,
+        startWithMaxHalfWidth,
     });
 
     const handleMarginChange = (
@@ -111,12 +90,10 @@ const ResizingWindow: React.FC<Props> = ({
     };
 
     const handleMarginDragEnd = () => {
-        // repositionImages(localImages);
         setIsDraggingMargin(false);
     };
 
     useEffect(() => {
-        // console.log("margin changed", container.margin.left);
         if (!isDraggingMargin) return;
         const { _localImages } = positionImages(localImages, container);
         setLocalImages(_localImages);
@@ -172,6 +149,8 @@ const ResizingWindow: React.FC<Props> = ({
                     <input
                         type="number"
                         value={container.margin.left}
+                        min={0}
+                        max={200}
                         onChange={(e) => handleMarginChange(e, "left")}
                     />
                 </label>

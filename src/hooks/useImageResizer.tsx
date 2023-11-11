@@ -8,6 +8,7 @@ interface UseResizeImageProps {
     container: ContainerType;
     setImages: (images: ImageData[]) => void;
     containerRef: React.RefObject<HTMLDivElement>;
+    startWithMaxHalfWidth?: boolean;
 }
 
 const useResizeImage = ({
@@ -15,11 +16,41 @@ const useResizeImage = ({
     container,
     setImages,
     containerRef,
+    startWithMaxHalfWidth = true,
 }: UseResizeImageProps) => {
     const [localImages, setLocalImages] = useState<ImageData[]>(images);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isResizing, setIsResizing] = useState(false);
     const [maxY, setMaxY] = useState(0);
+    const [startingDistFromRightEdge, setStartingDistFromRightEdge] =
+        useState(0);
+    const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
+
+    useEffect(() => {
+        // set the image urls ( this is done so that we don't have to re-render the images when resizing)
+        if (!images.length) return;
+        const newImageUrls = new Map<string, string>();
+        images.forEach((image) => {
+            if (image.file) {
+                newImageUrls.set(image.id, URL.createObjectURL(image.file));
+            }
+        });
+        setImageUrls(newImageUrls);
+
+        // position the images in the container
+
+        const { _maxY, _localImages } = positionImages(
+            images,
+            container,
+            10,
+            startWithMaxHalfWidth
+        );
+
+        console.log("startWithMaxHalfWidth", startWithMaxHalfWidth);
+
+        setMaxY(_maxY);
+        setLocalImages(_localImages);
+    }, []);
 
     // for preventive page scrolling while resizing in mobile
     useEffect(() => {
@@ -47,35 +78,44 @@ const useResizeImage = ({
         const selectedImage = localImages.find((img) => img.id === selectedId);
         if (selectedImage && containerRef.current) {
             const aspectRatio = selectedImage.w / selectedImage.h;
-            const mouseX = clientX / container.scaleFactor;
-            const mouseY = clientY / container.scaleFactor; // Assuming you want to scale Y as well
+            let mouseX = clientX / container.scaleFactor;
+            let mouseY = clientY / container.scaleFactor; // Assuming you want to scale Y as well
+            // console.log("clientX", clientX);
 
             const rect = containerRef.current.getBoundingClientRect();
 
-            let newWidth = Math.max(
-                50,
-                mouseX - rect.left / container.scaleFactor - selectedImage.x
-            );
-            // calculate distance between mouse and image's right edge
-            const distBetweenMouseAndRightEdge =
-                mouseX -
-                rect.left / container.scaleFactor -
-                selectedImage.x -
-                selectedImage.w;
+            mouseX -= rect.left / container.scaleFactor;
+            // console.log(mouseX, rect.left, selectedImage.x);
+
+            let newWidth = Math.max(50, mouseX - selectedImage.x);
 
             // account for the distance between the mouse (on the handle) and the right edge of the image
-            // newWidth -= distBetweenMouseAndRightEdge + 1;
+            newWidth += startingDistFromRightEdge;
+
+            // console.log(newWidth);
 
             // console.log(mouseX, rect.left, selectedImage.x, newWidth);
             let newHeight = newWidth / aspectRatio;
 
-            // Constrain newWidth and newHeight to not exceed the container's dimensions
-            if (newWidth > container.w) {
-                newWidth = container.w;
+            // Constrain newWidth and newHeight to not exceed the container's dimensions and account for the margin
+            if (
+                newWidth >
+                container.w - container.margin.left - container.margin.right
+            ) {
+                newWidth =
+                    container.w -
+                    container.margin.left -
+                    container.margin.right;
                 newHeight = newWidth / aspectRatio;
             }
-            if (newHeight > container.h) {
-                newHeight = container.h;
+            if (
+                newHeight >
+                container.h - container.margin.top - container.margin.bottom
+            ) {
+                newHeight =
+                    container.h -
+                    container.margin.top -
+                    container.margin.bottom;
                 newWidth = newHeight * aspectRatio;
             }
 
@@ -91,6 +131,8 @@ const useResizeImage = ({
     };
 
     const handleResize = (clientX: number, clientY: number) => {
+        // console.log("handleResize clientX", clientX);
+
         if (isResizing && selectedId) {
             const updatedImages = updateImageSize(clientX, clientY);
             if (updatedImages) {
@@ -105,6 +147,7 @@ const useResizeImage = ({
                     (img) => img.id === selectedId
                 );
 
+                // If the image's y value has changed, it means has changed shelf
                 if (
                     originalImage &&
                     repositionedImage &&
@@ -126,15 +169,33 @@ const useResizeImage = ({
 
     // // Function to handle mouse down event
     const handleMouseDown = (
-        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
+        // e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
+        e: any,
         imgData: ImageData
     ) => {
         if (
             e.target instanceof HTMLElement &&
             e.target.classList.contains("resize-handle")
         ) {
+            const clientX = e.clientX || e.touches[0].clientX;
+
+            let mouseX = clientX / container.scaleFactor;
+
+            const rect = containerRef.current?.getBoundingClientRect();
+
+            if (!rect) return;
+
+            mouseX -= rect.left / container.scaleFactor;
+
+            // calculate the distance between the mouse and the right edge of the image
+            const distBetweenMouseAndRightEdge = imgData.x + imgData.w - mouseX;
+
+            // set the state
+            setStartingDistFromRightEdge(distBetweenMouseAndRightEdge);
+
             setIsResizing(true);
             setSelectedId(imgData.id);
+
             return;
         }
 
@@ -144,6 +205,8 @@ const useResizeImage = ({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+        // console.log("e.clientX", e.clientX);
+
         handleResize(e.clientX, e.clientY);
     };
 
@@ -184,6 +247,7 @@ const useResizeImage = ({
         setSelectedId,
         setIsResizing,
         selectedId,
+        imageUrls,
         setMaxY,
     };
 };
