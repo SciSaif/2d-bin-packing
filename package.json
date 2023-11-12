@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.200",
     "@types/uuid": "^9.0.6",
-    "efficient-rect-packer": "^1.0.0",
+    "efficient-rect-packer": "^1.1.0",
     "jspdf": "^2.5.1",
     "konva": "^9.2.2",
     "lodash": "^4.17.21",

@@ -29,6 +29,12 @@ const ResizingWindow: React.FC<Props> = ({
     startWithMaxHalfWidth = true,
 }) => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
+    const [showMarginControls, setShowMarginControls] = useState(false);
+
+    // Function to toggle the margin controls
+    const toggleMarginControls = () => {
+        setShowMarginControls(!showMarginControls);
+    };
 
     const {
         localImages,
@@ -80,44 +86,52 @@ const ResizingWindow: React.FC<Props> = ({
 
     return (
         <div>
-            <div className="mb-10 border-t border-b">
-                {/* margin controls */}
-                <div>Margin: </div>
-                <label>
-                    Top:
-                    <input
-                        type="number"
-                        value={container.margin.top}
-                        onChange={(e) => handleMarginChange(e, "top")}
-                    />
-                </label>
-                <label>
-                    Right:
-                    <input
-                        type="number"
-                        value={container.margin.right}
-                        onChange={(e) => handleMarginChange(e, "right")}
-                    />
-                </label>
-                <label>
-                    Bottom:
-                    <input
-                        type="number"
-                        value={container.margin.bottom}
-                        onChange={(e) => handleMarginChange(e, "bottom")}
-                    />
-                </label>
-                <label>
-                    Left:
-                    <input
-                        type="number"
-                        value={container.margin.left}
-                        min={0}
-                        max={200}
-                        onChange={(e) => handleMarginChange(e, "left")}
-                    />
-                </label>
-            </div>
+            <button
+                onClick={toggleMarginControls}
+                className="px-2 py-1 mb-5 text-white bg-purple-500 rounded hover:bg-purple-600"
+            >
+                {showMarginControls ? "Remove Margin" : "Add Margin"}
+            </button>
+            {showMarginControls && (
+                <div className="mb-10 border-t border-b">
+                    {/* margin controls */}
+                    <div>Margin: </div>
+                    <label>
+                        Top:
+                        <input
+                            type="number"
+                            value={container.margin.top}
+                            onChange={(e) => handleMarginChange(e, "top")}
+                        />
+                    </label>
+                    <label>
+                        Right:
+                        <input
+                            type="number"
+                            value={container.margin.right}
+                            onChange={(e) => handleMarginChange(e, "right")}
+                        />
+                    </label>
+                    <label>
+                        Bottom:
+                        <input
+                            type="number"
+                            value={container.margin.bottom}
+                            onChange={(e) => handleMarginChange(e, "bottom")}
+                        />
+                    </label>
+                    <label>
+                        Left:
+                        <input
+                            type="number"
+                            value={container.margin.left}
+                            min={0}
+                            max={200}
+                            onChange={(e) => handleMarginChange(e, "left")}
+                        />
+                    </label>
+                </div>
+            )}
             <div
                 ref={containerRef}
                 style={{
@@ -128,54 +142,80 @@ const ResizingWindow: React.FC<Props> = ({
                 }}
                 className="ml-5 bg-white "
             >
-                {/* left margin handle  */}
-                <div
-                    className="absolute w-5 h-5 -translate-x-1/2 bg-blue-500 cursor-pointer -top-5"
-                    style={{
-                        left: container.margin.left * container.scaleFactor,
-                    }}
-                    onMouseDown={(e) => handleMarginDragStart(e, "left")}
-                    onTouchStart={(e) => handleMarginDragStart(e, "left")}
-                ></div>
-                {/* right margin handle  */}
-                <div
-                    className="absolute w-5 h-5 translate-x-1/2 bg-blue-500 cursor-pointer -top-5 "
-                    style={{
-                        right: container.margin.right * container.scaleFactor,
-                    }}
-                    onMouseDown={(e) => handleMarginDragStart(e, "right")}
-                    onTouchStart={(e) => handleMarginDragStart(e, "right")}
-                ></div>
-                {/* top margin handle  */}
-                <div
-                    className="absolute w-5 h-5 -translate-y-1/2 bg-blue-500 cursor-pointer -right-5 "
-                    style={{
-                        top: container.margin.top * container.scaleFactor,
-                    }}
-                    onMouseDown={(e) => handleMarginDragStart(e, "top")}
-                    onTouchStart={(e) => handleMarginDragStart(e, "top")}
-                ></div>
+                {showMarginControls && (
+                    <>
+                        {/* left margin handle  */}
+                        <div
+                            className="absolute w-5 h-5 -translate-x-1/2 bg-blue-500 cursor-pointer -top-5"
+                            style={{
+                                left:
+                                    container.margin.left *
+                                    container.scaleFactor,
+                            }}
+                            onMouseDown={(e) =>
+                                handleMarginDragStart(e, "left")
+                            }
+                            onTouchStart={(e) =>
+                                handleMarginDragStart(e, "left")
+                            }
+                        ></div>
+                        {/* right margin handle  */}
+                        <div
+                            className="absolute w-5 h-5 translate-x-1/2 bg-blue-500 cursor-pointer -top-5 "
+                            style={{
+                                right:
+                                    container.margin.right *
+                                    container.scaleFactor,
+                            }}
+                            onMouseDown={(e) =>
+                                handleMarginDragStart(e, "right")
+                            }
+                            onTouchStart={(e) =>
+                                handleMarginDragStart(e, "right")
+                            }
+                        ></div>
+                        {/* top margin handle  */}
+                        <div
+                            className="absolute w-5 h-5 -translate-y-1/2 bg-blue-500 cursor-pointer -right-5 "
+                            style={{
+                                top:
+                                    container.margin.top *
+                                    container.scaleFactor,
+                            }}
+                            onMouseDown={(e) => handleMarginDragStart(e, "top")}
+                            onTouchStart={(e) =>
+                                handleMarginDragStart(e, "top")
+                            }
+                        ></div>
 
-                {/* margin lines */}
-                <div
-                    className="absolute w-full  top-0 bg-gray-200"
-                    style={{
-                        height: container.margin.top * container.scaleFactor,
-                    }}
-                ></div>
-                <div
-                    className="absolute h-full left-0   bg-gray-200"
-                    style={{
-                        width: container.margin.left * container.scaleFactor,
-                    }}
-                ></div>
+                        {/* margin lines */}
+                        <div
+                            className="absolute top-0 w-full bg-gray-200"
+                            style={{
+                                height:
+                                    container.margin.top *
+                                    container.scaleFactor,
+                            }}
+                        ></div>
+                        <div
+                            className="absolute left-0 h-full bg-gray-200"
+                            style={{
+                                width:
+                                    container.margin.left *
+                                    container.scaleFactor,
+                            }}
+                        ></div>
 
-                <div
-                    className="absolute h-full right-0 bg-gray-200"
-                    style={{
-                        width: container.margin.right * container.scaleFactor,
-                    }}
-                ></div>
+                        <div
+                            className="absolute right-0 h-full bg-gray-200"
+                            style={{
+                                width:
+                                    container.margin.right *
+                                    container.scaleFactor,
+                            }}
+                        ></div>
+                    </>
+                )}
 
                 {localImages.map((imgData, index) => {
                     const imageUrl = imageUrls.get(imgData.id) || "";
