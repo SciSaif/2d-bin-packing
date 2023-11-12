@@ -118,6 +118,7 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
     const iframe = document.createElement("iframe");
     document.body.appendChild(iframe);
     iframe.style.display = "none";
+    console.log("loading iframe");
 
     iframe.onload = function () {
         const doc = iframe.contentWindow?.document;
@@ -125,10 +126,14 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
             doc.open();
             doc.write(iframeContent);
             doc.close();
+            console.log("iframe content written");
+
             setTimeout(() => {
+                console.log("printing iframe content");
+
                 iframe.contentWindow?.print();
                 document.body.removeChild(iframe);
-            }, 500); // Give it half a second to load the images
+            }, 1000); // Give it half a second to load the images
         }
     };
 };
