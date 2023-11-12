@@ -306,6 +306,7 @@ export const packBoxes = async ({
             {
                 padding: container.padding,
                 margin: container.margin,
+                noRotation: false,
             }
         );
 

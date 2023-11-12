@@ -13,18 +13,23 @@ import {
 } from "./util";
 
 export interface Options {
-    padding: number;
-    margin: Margin;
+    padding?: number;
+    margin?: Margin;
+    noRotation?: boolean;
 }
 
 export const pack = async (
     rects: UnpackedRect[],
     container_size: Dimension,
-    { padding, margin }: Options = {
-        padding: 0,
-        margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    }
+    options: Options = {}
 ): Promise<Result> => {
+    // Set default values for options
+    const {
+        padding = 0,
+        margin = { top: 0, right: 0, bottom: 0, left: 0 },
+        noRotation = false,
+    } = options;
+
     return new Promise((resolve) => {
         setTimeout(() => {
             if (
@@ -45,7 +50,7 @@ export const pack = async (
                         };
                     }),
                     isRemaining: true,
-                    error: "Some rectangles exceed container dimensions",
+                    error: "Some rectangles exceed available container width or height",
                 });
             }
 
@@ -59,7 +64,8 @@ export const pack = async (
                 container_size,
                 [...rects], // Using spread operator to create a shallow copy
                 [],
-                margin
+                margin,
+                noRotation
             );
 
             const packer = new BinPacker(C);

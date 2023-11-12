@@ -258,13 +258,13 @@ const ImagePacker: React.FC = () => {
                                         />
                                     )}
 
-                                    <Rect
+                                    {/* <Rect
                                         x={box.x * scaleFactor}
                                         y={box.y * scaleFactor}
                                         width={box.w * scaleFactor}
                                         height={box.h * scaleFactor}
                                         stroke="red"
-                                    />
+                                    /> */}
                                 </React.Fragment>
                             ))}
                         </Layer>

@@ -25,14 +25,16 @@ export default class Configuration {
     L: Rect[] = [];
     concave_corners: [Point, PointType][] = [];
     margin: Margin;
+    noRotation: boolean;
     constructor(
         size: Dimension,
         unpacked_rects: UnpackedRect[],
         packed_rects: Rect[] = [],
-        margin: Margin
+        margin: Margin,
+        noRotation: boolean
     ) {
         this.size = size;
-
+        this.noRotation = noRotation;
         this.unpacked_rects = unpacked_rects;
         this.packed_rects = packed_rects;
         this.margin = margin;
@@ -61,20 +63,37 @@ export default class Configuration {
         const ccoas: Rect[] = [];
         for (let rect of this.unpacked_rects) {
             for (let [corner, type] of this.concave_corners) {
-                for (let rotated of [false, true]) {
+                if (this.noRotation) {
                     const ccoa = new Rect(
                         rect.id,
                         corner,
                         rect.w,
                         rect.h,
                         type,
-                        rotated
+                        false
                     );
                     // 3. Add if it fits
                     if (this.fits(ccoa)) {
                         // console.log("fits");
 
                         ccoas.push(ccoa);
+                    }
+                } else {
+                    for (let rotated of [false, true]) {
+                        const ccoa = new Rect(
+                            rect.id,
+                            corner,
+                            rect.w,
+                            rect.h,
+                            type,
+                            rotated
+                        );
+                        // 3. Add if it fits
+                        if (this.fits(ccoa)) {
+                            // console.log("fits");
+
+                            ccoas.push(ccoa);
+                        }
                     }
                 }
             }
@@ -228,7 +247,8 @@ export default class Configuration {
             this.size,
             [...this.unpacked_rects],
             [...this.packed_rects],
-            this.margin
+            this.margin,
+            this.noRotation
         );
         cloned.L = [...this.L];
         cloned.concave_corners = [...this.concave_corners];
