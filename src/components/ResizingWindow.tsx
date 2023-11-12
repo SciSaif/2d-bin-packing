@@ -2,6 +2,7 @@ import React, { TouchEvent, useEffect, useRef, useState } from "react";
 import { positionImages } from "../pages/imagePacker/utils";
 import { ContainerType, Margin } from "../pages/imagePacker/ImagePacker";
 import useResizeImage from "../hooks/useImageResizer";
+import useMargin from "../hooks/useMargin";
 
 export interface ImageData {
     id: string;
@@ -50,70 +51,32 @@ const ResizingWindow: React.FC<Props> = ({
         side: keyof Margin
     ) => {
         const newMarginValue = parseInt(e.target.value, 10);
-        setContainer({
+        const newContainer = {
             ...container,
             margin: {
                 ...container.margin,
                 [side]: isNaN(newMarginValue) ? 0 : newMarginValue,
             },
-        });
-
-        positionImages(localImages, container);
-    };
-
-    const [isDraggingMargin, setIsDraggingMargin] = useState(false);
-
-    const handleMarginDragStart = (e: any) => {
-        setIsDraggingMargin(true);
-    };
-
-    const handleMarginDrag = (e: any) => {
-        if (!isDraggingMargin || !containerRef.current) return;
-
-        const clientX = e.type.includes("touch")
-            ? e.touches[0].clientX
-            : e.clientX;
-        const rect = containerRef.current.getBoundingClientRect();
-        let newMarginLeft = clientX - rect.left;
-
-        // Constrain the margin value
-        newMarginLeft = Math.max(0, newMarginLeft);
-        newMarginLeft = Math.min(newMarginLeft, container.w - 20); // Assuming a minimum container width
-
-        setContainer({
-            ...container,
-            margin: {
-                ...container.margin,
-                left: newMarginLeft / container.scaleFactor,
-            },
-        });
-    };
-
-    const handleMarginDragEnd = () => {
-        setIsDraggingMargin(false);
-    };
-
-    useEffect(() => {
-        if (!isDraggingMargin) return;
-        const { _localImages } = positionImages(localImages, container);
-        setLocalImages(_localImages);
-    }, [container.margin, isDraggingMargin]);
-
-    useEffect(() => {
-        if (isDraggingMargin) {
-            window.addEventListener("mousemove", handleMarginDrag);
-            window.addEventListener("mouseup", handleMarginDragEnd);
-            window.addEventListener("touchmove", handleMarginDrag);
-            window.addEventListener("touchend", handleMarginDragEnd);
-        }
-
-        return () => {
-            window.removeEventListener("mousemove", handleMarginDrag);
-            window.removeEventListener("mouseup", handleMarginDragEnd);
-            window.removeEventListener("touchmove", handleMarginDrag);
-            window.removeEventListener("touchend", handleMarginDragEnd);
         };
-    }, [isDraggingMargin]);
+
+        setContainer(newContainer);
+
+        const { _localImages, _maxY } = positionImages(
+            localImages,
+            newContainer
+        );
+        setLocalImages(_localImages);
+        setMaxY(_maxY);
+    };
+
+    const { handleMarginDragStart } = useMargin({
+        container,
+        setContainer,
+        localImages,
+        setLocalImages,
+        setMaxY,
+        containerRef,
+    });
 
     return (
         <div>
@@ -171,9 +134,49 @@ const ResizingWindow: React.FC<Props> = ({
                     style={{
                         left: container.margin.left * container.scaleFactor,
                     }}
-                    onMouseDown={handleMarginDragStart}
-                    onTouchStart={handleMarginDragStart}
+                    onMouseDown={(e) => handleMarginDragStart(e, "left")}
+                    onTouchStart={(e) => handleMarginDragStart(e, "left")}
                 ></div>
+                {/* right margin handle  */}
+                <div
+                    className="absolute w-5 h-5 translate-x-1/2 bg-blue-500 cursor-pointer -top-5 "
+                    style={{
+                        right: container.margin.right * container.scaleFactor,
+                    }}
+                    onMouseDown={(e) => handleMarginDragStart(e, "right")}
+                    onTouchStart={(e) => handleMarginDragStart(e, "right")}
+                ></div>
+                {/* top margin handle  */}
+                <div
+                    className="absolute w-5 h-5 -translate-y-1/2 bg-blue-500 cursor-pointer -right-5 "
+                    style={{
+                        top: container.margin.top * container.scaleFactor,
+                    }}
+                    onMouseDown={(e) => handleMarginDragStart(e, "top")}
+                    onTouchStart={(e) => handleMarginDragStart(e, "top")}
+                ></div>
+
+                {/* margin lines */}
+                <div
+                    className="absolute w-full  top-0 bg-gray-200"
+                    style={{
+                        height: container.margin.top * container.scaleFactor,
+                    }}
+                ></div>
+                <div
+                    className="absolute h-full left-0   bg-gray-200"
+                    style={{
+                        width: container.margin.left * container.scaleFactor,
+                    }}
+                ></div>
+
+                <div
+                    className="absolute h-full right-0 bg-gray-200"
+                    style={{
+                        width: container.margin.right * container.scaleFactor,
+                    }}
+                ></div>
+
                 {localImages.map((imgData, index) => {
                     const imageUrl = imageUrls.get(imgData.id) || "";
 

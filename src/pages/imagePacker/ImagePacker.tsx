@@ -40,7 +40,7 @@ const defaultContainer: ContainerType = {
     w: 595 * 2,
     h: 842 * 2,
     scaleFactor: 0.5,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    margin: { top: 50, right: 50, bottom: 50, left: 50 },
     padding: 5,
 };
 
