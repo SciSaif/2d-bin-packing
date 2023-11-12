@@ -4,8 +4,8 @@ import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
 import { ContainerType, ImageBox } from "./ImagePacker";
-import { pack } from "../../binPacking";
 import { ImageData } from "../../components/ResizingWindow";
+import { pack } from "efficient-rect-packer";
 export const handleSaveAsPDF = ({
     boxes,
     container,
@@ -83,6 +83,7 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
         }
         const dataUrl = stage.toDataURL();
         // imagesContent += `<img class="print-page" src="${dataUrl}">`;
+
         imagesContent += `<img class="print-page" src="${dataUrl}" style="page-break-after: always; width: 100%; height: auto; display: block; margin: 0 !important; padding: 0 !important;">`;
     });
 

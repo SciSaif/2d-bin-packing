@@ -47,8 +47,6 @@ const defaultContainer: ContainerType = {
 const ImagePacker: React.FC = () => {
     const [container, setContainer] = useState<ContainerType>(defaultContainer);
 
-    const [scaleFactor, setScaleFactor] = useState(0.5);
-
     const [images, setImages] = useState<ImageBox[]>([]);
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
     const [isPacking, setIsPacking] = useState(false);
@@ -71,8 +69,6 @@ const ImagePacker: React.FC = () => {
 
         boxes.forEach((boxSet) => {
             boxSet.forEach((box) => {
-                console.log(box);
-
                 const correspondingFile = images.find((f) => f.id === box.id);
 
                 if (!correspondingFile) return;
@@ -221,16 +217,16 @@ const ImagePacker: React.FC = () => {
                     <Stage
                         key={index}
                         ref={stageRefs[index]}
-                        width={container.w * scaleFactor}
-                        height={container.h * scaleFactor}
+                        width={container.w * container.scaleFactor}
+                        height={container.h * container.scaleFactor}
                         className="border border-gray-400 shadow w-fit"
                     >
                         <Layer>
                             <Rect
                                 x={0}
                                 y={0}
-                                width={container.w * scaleFactor}
-                                height={container.h * scaleFactor}
+                                width={container.w * container.scaleFactor}
+                                height={container.h * container.scaleFactor}
                                 stroke="black"
                                 fill="white"
                             />
@@ -238,31 +234,32 @@ const ImagePacker: React.FC = () => {
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (
                                         <KonvaImage
-                                            x={box.x * scaleFactor}
-                                            y={box.y * scaleFactor}
+                                            x={box.x * container.scaleFactor}
+                                            y={box.y * container.scaleFactor}
                                             width={
                                                 (box.rotated ? box.h : box.w) *
-                                                scaleFactor
+                                                container.scaleFactor
                                             }
                                             height={
                                                 (box.rotated ? box.w : box.h) *
-                                                scaleFactor
+                                                container.scaleFactor
                                             }
                                             image={box.imageElement}
                                             rotation={box.rotated ? -90 : 0}
                                             offsetX={
                                                 box.rotated
-                                                    ? box.h * scaleFactor
+                                                    ? box.h *
+                                                      container.scaleFactor
                                                     : 0
                                             }
                                         />
                                     )}
 
                                     {/* <Rect
-                                        x={box.x * scaleFactor}
-                                        y={box.y * scaleFactor}
-                                        width={box.w * scaleFactor}
-                                        height={box.h * scaleFactor}
+                                        x={box.x * container.scaleFactor}
+                                        y={box.y * container.scaleFactor}
+                                        width={box.w * container.scaleFactor}
+                                        height={box.h * container.scaleFactor}
                                         stroke="red"
                                     /> */}
                                 </React.Fragment>
