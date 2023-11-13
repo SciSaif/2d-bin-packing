@@ -2,3 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Header.css */
+.letter {
+    display: inline-block;
+    transition: opacity 200ms;
+}
+
+.fade-out {
+    animation: disappear 200ms forwards;
+}
+
+.fade-in {
+    animation: appear 200ms forwards;
+}
+
+@keyframes disappear {
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

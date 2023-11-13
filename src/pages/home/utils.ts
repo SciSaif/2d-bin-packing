@@ -170,15 +170,6 @@ export const positionImages = (
 
         // Move to the next row if the image doesn't fit in the current row
         if (currentX + scaledWidth > container.w - container.margin.right) {
-            // console.log(
-            //     "shifted",
-            //     aspectRatio,
-            //     currentX,
-            //     scaledWidth,
-            //     padding,
-            //     container.w
-            // );
-
             currentY += shelfHeight + padding; // Add padding for the new row
             currentX = container.margin.left; // Reset X to left margin for the new row
             shelfHeight = scaledHeight;

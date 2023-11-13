@@ -1,6 +1,6 @@
 import React, { TouchEvent, useEffect, useRef, useState } from "react";
-import { positionImages } from "../pages/imagePacker/utils";
-import { ContainerType, Margin } from "../pages/imagePacker/ImagePacker";
+import { positionImages } from "../pages/home/utils";
+import { ContainerType, Margin } from "../pages/home/ImagePacker";
 import useResizeImage from "../hooks/useImageResizer";
 import useMargin from "../hooks/useMargin";
 
@@ -85,10 +85,10 @@ const ResizingWindow: React.FC<Props> = ({
     });
 
     return (
-        <div>
+        <div className="flex flex-col justify-center mx-auto w-fit">
             <button
                 onClick={toggleMarginControls}
-                className="px-2 py-1 mb-5 text-white bg-purple-500 rounded hover:bg-purple-600"
+                className="px-2 py-1 mx-auto mb-5 text-white bg-purple-500 rounded w-fit hover:bg-purple-600"
             >
                 {showMarginControls ? "Remove Margin" : "Add Margin"}
             </button>
@@ -140,7 +140,7 @@ const ResizingWindow: React.FC<Props> = ({
                     border: "1px solid black",
                     position: "relative",
                 }}
-                className="ml-5 bg-white "
+                className="bg-white "
             >
                 {showMarginControls && (
                     <>

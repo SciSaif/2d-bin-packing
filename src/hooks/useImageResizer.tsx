@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ContainerType } from "../pages/imagePacker/ImagePacker";
+import { ContainerType } from "../pages/home/ImagePacker";
 import { ImageData } from "../components/ResizingWindow";
-import { positionImages } from "../pages/imagePacker/utils";
+import { positionImages } from "../pages/home/utils";
 
 interface UseResizeImageProps {
     images: ImageData[];

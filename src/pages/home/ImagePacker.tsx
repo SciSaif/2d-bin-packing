@@ -39,7 +39,7 @@ export interface ContainerType {
 const defaultContainer: ContainerType = {
     w: 595 * 2,
     h: 842 * 2,
-    scaleFactor: 0.3,
+    scaleFactor: 0.1,
     margin: { top: 0, right: 0, bottom: 0, left: 0 },
     padding: 5,
 };
@@ -123,15 +123,43 @@ const ImagePacker: React.FC = () => {
         setContainer(defaultContainer);
     };
 
-    return (
-        <div className="flex flex-col gap-2 px-2 py-2">
-            <Link
-                to={"/"}
-                className="pb-2 mb-2 text-3xl font-bold border-b text-cyan-500"
-            >
-                Bin Packing
-            </Link>
+    const containerWrapper = React.useRef<HTMLDivElement>(null);
 
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    useEffect(() => {
+        // Handler to call on window resize
+        function handleResize() {
+            setWindowWidth(window.innerWidth);
+        }
+
+        // Add event listener
+        window.addEventListener("resize", handleResize);
+
+        // Remove event listener on cleanup
+        return () => window.removeEventListener("resize", handleResize);
+    }, []); // Empty array ensures this effect runs only once at mount
+
+    useEffect(() => {
+        if (!containerWrapper.current) return;
+
+        const containerWrapperWidth = containerWrapper.current.clientWidth;
+        const columns = windowWidth >= 768 ? 2 : 1;
+        let gridCellWidth = containerWrapperWidth / columns;
+
+        // Subtract any grid gap if applicable
+        const gap = 10;
+        gridCellWidth -= gap;
+
+        const scaleFactor = gridCellWidth / container.w;
+
+        setContainer((prev) => ({
+            ...prev,
+            scaleFactor,
+        }));
+    }, [containerWrapper, windowWidth]); // Depend on windowWidth
+
+    return (
+        <div className="flex flex-col gap-2 px-2 py-2 mx-auto max-w-[1000px] items-center">
             {images?.length === 0 ? (
                 <input
                     type="file"
@@ -196,23 +224,26 @@ const ImagePacker: React.FC = () => {
                 </button>
             )}
 
-            {inResizeMode && (
-                <ResizingWindow
-                    container={container}
-                    images={images}
-                    setImages={setImages}
-                    setContainer={setContainer}
-                    startWithMaxHalfWidth={!resizingAgain}
-                />
-            )}
-
             {loading && (
                 <div className="py-10 text-2xl text-green-900 ">
                     Packing your images...
                 </div>
             )}
 
-            <div className="flex flex-wrap w-full gap-10">
+            <div
+                ref={containerWrapper}
+                className="grid w-full grid-cols-1  md:grid-cols-1 items-center justify-center  max-w-[1000px] gap-y-10 gap-x-5 "
+            >
+                {inResizeMode && (
+                    <ResizingWindow
+                        container={container}
+                        images={images}
+                        setImages={setImages}
+                        setContainer={setContainer}
+                        startWithMaxHalfWidth={!resizingAgain}
+                    />
+                )}
+
                 {boxes.map((boxSet, index) => (
                     <Stage
                         key={index}
