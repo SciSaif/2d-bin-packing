@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ContainerType, Margin } from "../pages/home/ImagePacker";
-import { positionImages } from "../pages/home/utils";
-import { ImageData } from "../components/ResizingWindow";
+import { ContainerType, Margin } from "../pages/home/Home";
+import { ImageData } from "../pages/home/components/resizingWindow/ResizingWindow";
+import { positionImages } from "../pages/home/components/resizingWindow/utils";
 
 interface UseMarginProps {
     container: ContainerType;

@@ -1,8 +1,9 @@
 import React, { TouchEvent, useEffect, useRef, useState } from "react";
-import { positionImages } from "../pages/home/utils";
-import { ContainerType, Margin } from "../pages/home/ImagePacker";
-import useResizeImage from "../hooks/useImageResizer";
-import useMargin from "../hooks/useMargin";
+import { ContainerType, Margin } from "../../Home";
+import useResizeImage from "../../../../hooks/useImageResizer";
+import useMargin from "../../../../hooks/useMargin";
+import { positionImages } from "./utils";
+import MarginHandles from "./components/MarginHandles";
 
 export interface ImageData {
     id: string;
@@ -19,6 +20,7 @@ interface Props {
     container: ContainerType;
     setContainer: (container: ContainerType) => void;
     startWithMaxHalfWidth?: boolean; // if true, the images will initially have at most half the width of the container
+    filesUpdated: boolean;
 }
 
 const ResizingWindow: React.FC<Props> = ({
@@ -27,6 +29,7 @@ const ResizingWindow: React.FC<Props> = ({
     container,
     setContainer,
     startWithMaxHalfWidth = true,
+    filesUpdated,
 }) => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
@@ -50,6 +53,7 @@ const ResizingWindow: React.FC<Props> = ({
         setImages,
         containerRef,
         startWithMaxHalfWidth,
+        filesUpdated,
     });
 
     const handleMarginChange = (
@@ -143,78 +147,10 @@ const ResizingWindow: React.FC<Props> = ({
                 className="bg-white "
             >
                 {showMarginControls && (
-                    <>
-                        {/* left margin handle  */}
-                        <div
-                            className="absolute w-5 h-5 -translate-x-1/2 bg-blue-500 cursor-pointer -top-5"
-                            style={{
-                                left:
-                                    container.margin.left *
-                                    container.scaleFactor,
-                            }}
-                            onMouseDown={(e) =>
-                                handleMarginDragStart(e, "left")
-                            }
-                            onTouchStart={(e) =>
-                                handleMarginDragStart(e, "left")
-                            }
-                        ></div>
-                        {/* right margin handle  */}
-                        <div
-                            className="absolute w-5 h-5 translate-x-1/2 bg-blue-500 cursor-pointer -top-5 "
-                            style={{
-                                right:
-                                    container.margin.right *
-                                    container.scaleFactor,
-                            }}
-                            onMouseDown={(e) =>
-                                handleMarginDragStart(e, "right")
-                            }
-                            onTouchStart={(e) =>
-                                handleMarginDragStart(e, "right")
-                            }
-                        ></div>
-                        {/* top margin handle  */}
-                        <div
-                            className="absolute w-5 h-5 -translate-y-1/2 bg-blue-500 cursor-pointer -right-5 "
-                            style={{
-                                top:
-                                    container.margin.top *
-                                    container.scaleFactor,
-                            }}
-                            onMouseDown={(e) => handleMarginDragStart(e, "top")}
-                            onTouchStart={(e) =>
-                                handleMarginDragStart(e, "top")
-                            }
-                        ></div>
-
-                        {/* margin lines */}
-                        <div
-                            className="absolute top-0 w-full bg-gray-200"
-                            style={{
-                                height:
-                                    container.margin.top *
-                                    container.scaleFactor,
-                            }}
-                        ></div>
-                        <div
-                            className="absolute left-0 h-full bg-gray-200"
-                            style={{
-                                width:
-                                    container.margin.left *
-                                    container.scaleFactor,
-                            }}
-                        ></div>
-
-                        <div
-                            className="absolute right-0 h-full bg-gray-200"
-                            style={{
-                                width:
-                                    container.margin.right *
-                                    container.scaleFactor,
-                            }}
-                        ></div>
-                    </>
+                    <MarginHandles
+                        handleMarginDragStart={handleMarginDragStart}
+                        container={container}
+                    />
                 )}
 
                 {localImages.map((imgData, index) => {

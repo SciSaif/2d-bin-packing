@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ImagePacker from "./pages/home/ImagePacker";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import Home from "./pages/home/Home";
 
 // wrapper with Header and Footer
 const w = (Component: React.FC) => {
@@ -22,7 +22,7 @@ const App = () => {
         <div className="min-h-screen bg-bg">
             <Router>
                 <Routes>
-                    <Route path="/" element={w(ImagePacker)} />
+                    <Route path="/" element={w(Home)} />
                 </Routes>
             </Router>
         </div>

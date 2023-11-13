@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
 import {
@@ -9,7 +9,9 @@ import {
 } from "./utils";
 import Konva from "konva";
 import { Link } from "react-router-dom";
-import ResizingWindow from "../../components/ResizingWindow";
+import ResizingWindow from "./components/resizingWindow/ResizingWindow";
+import useDragAndDrop from "../../hooks/useDragDrop";
+import { twMerge } from "tailwind-merge";
 
 export interface ImageBox {
     id: string;
@@ -39,12 +41,12 @@ export interface ContainerType {
 const defaultContainer: ContainerType = {
     w: 595 * 2,
     h: 842 * 2,
-    scaleFactor: 0.1,
+    scaleFactor: 0.3,
     margin: { top: 0, right: 0, bottom: 0, left: 0 },
     padding: 5,
 };
 
-const ImagePacker: React.FC = () => {
+const Home: React.FC = () => {
     const [container, setContainer] = useState<ContainerType>(defaultContainer);
 
     const [images, setImages] = useState<ImageBox[]>([]);
@@ -88,16 +90,6 @@ const ImagePacker: React.FC = () => {
         });
     }, [boxes, images]);
 
-    const handleImageUpload = async (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        if (event.target.files) {
-            const newImages = await createImages(event.target.files);
-            setImages([...images, ...newImages]);
-            setInResizeMode(true);
-        }
-    };
-
     const [loading, setLoading] = useState<boolean>(false);
 
     const startPacking = async () => {
@@ -113,14 +105,6 @@ const ImagePacker: React.FC = () => {
         setIsPacking(false);
         setBoxes(packedBoxes);
         setLoading(false);
-    };
-
-    const reset = () => {
-        setBoxes([]);
-        setImages([]);
-        setImagesLoaded(false);
-        setInResizeMode(false);
-        setContainer(defaultContainer);
     };
 
     const containerWrapper = React.useRef<HTMLDivElement>(null);
@@ -139,7 +123,7 @@ const ImagePacker: React.FC = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []); // Empty array ensures this effect runs only once at mount
 
-    useEffect(() => {
+    const updateScaleFactor = () => {
         if (!containerWrapper.current) return;
 
         const containerWrapperWidth = containerWrapper.current.clientWidth;
@@ -156,18 +140,83 @@ const ImagePacker: React.FC = () => {
             ...prev,
             scaleFactor,
         }));
+    };
+
+    useEffect(() => {
+        updateScaleFactor();
     }, [containerWrapper, windowWidth]); // Depend on windowWidth
+
+    const {
+        dragging,
+        files,
+        handleDragOver,
+        handleDrop,
+        mainRef,
+        setFiles,
+        handlePaste,
+        fileInputRef,
+        triggerFileInput,
+        handleFileInputChange,
+    } = useDragAndDrop();
+
+    const [filesUpdated, setFilesUpdated] = useState<boolean>(false);
+
+    // Modify handleImageUpload to handle files from both drag-and-drop and file input
+    const handleImageUpload = async (uploadedFiles: File[]) => {
+        const newImages = await createImages(uploadedFiles);
+        setImages([...images, ...newImages]);
+        setInResizeMode(true);
+        setFilesUpdated((prev) => !prev);
+    };
+
+    // Call handleImageUpload when files state changes
+    useEffect(() => {
+        if (files && files.length > 0) {
+            handleImageUpload(files);
+        }
+    }, [files]);
+
+    const reset = () => {
+        setBoxes([]);
+        setImages([]);
+        setImagesLoaded(false);
+        setInResizeMode(false);
+        setContainer(defaultContainer);
+        setFiles([]);
+        setResizingAgain(false);
+        updateScaleFactor();
+    };
+    const removeImage = (id: any) => {
+        setImages(images.filter((image) => image.id !== id));
+        setFilesUpdated((prev) => !prev);
+    };
+
+    const imagePreviews = useMemo(() => {
+        return images.map((image) => (
+            <div
+                key={image.id}
+                className="inline-flex flex-col items-center p-2"
+            >
+                {image.file && (
+                    <img
+                        src={URL.createObjectURL(image.file)}
+                        alt="Preview"
+                        className="object-cover w-14 h-14"
+                    />
+                )}
+                <button
+                    onClick={() => removeImage(image.id)}
+                    className="text-red-500 hover:text-red-700"
+                >
+                    &#10005; {/* Cross Icon */}
+                </button>
+            </div>
+        ));
+    }, [images, filesUpdated]); // Dependency on images and filesUpdated
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2 mx-auto max-w-[1000px] items-center">
-            {images?.length === 0 ? (
-                <input
-                    type="file"
-                    multiple
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                />
-            ) : (
+            {images?.length > 0 && (
                 <button
                     onClick={reset}
                     className="px-10 py-1 text-white bg-green-500 rounded w-fit hover:bg-green-600"
@@ -175,6 +224,70 @@ const ImagePacker: React.FC = () => {
                     Reset
                 </button>
             )}
+
+            <div
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onPaste={handlePaste}
+                ref={mainRef}
+                className={twMerge(
+                    "w-full border-2 flex flex-col border-tertiary/50 cursor-pointer border-dashed  rounded-xl  bg-gray-100 shadow mt-10   ",
+                    dragging && "border-blue-500 bg-sky-100"
+                )}
+            >
+                <div
+                    onClick={triggerFileInput}
+                    className="flex items-center justify-center flex-grow min-h-[200px] w-full text-xl font-bold text-tertiary/50"
+                >
+                    Drop your images here{" "}
+                </div>
+                {images.length > 0 && (
+                    <div className="mx-2 border-t ">
+                        {/* show preview of images here with option to remove them */}
+                        {images.length > 0 && (
+                            <div className="mx-2 border-t">{imagePreviews}</div>
+                        )}
+                        {/* {images.length > 0 && (
+                            <div className="mx-2 border-t">
+                                {images.map((image) => (
+                                    <div
+                                        key={image.id}
+                                        className="inline-flex flex-col items-center p-2"
+                                    >
+                                        {image.file && (
+                                            <img
+                                                src={URL.createObjectURL(
+                                                    image.file
+                                                )}
+                                                alt="Preview"
+                                                className="object-cover w-14 h-14"
+                                            />
+                                        )}
+                                        <button
+                                            onClick={() =>
+                                                removeImage(image.id)
+                                            }
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            &#10005;
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )} */}
+                    </div>
+                )}
+            </div>
+            {/* Hidden file input */}
+            <input
+                type="file"
+                multiple
+                onChange={handleFileInputChange}
+                ref={fileInputRef}
+                accept="image/*"
+                style={{ display: "none" }}
+            />
+
             {inResizeMode && (
                 <button
                     onClick={() => startPacking()}
@@ -241,6 +354,7 @@ const ImagePacker: React.FC = () => {
                         setImages={setImages}
                         setContainer={setContainer}
                         startWithMaxHalfWidth={!resizingAgain}
+                        filesUpdated={filesUpdated}
                     />
                 )}
 
@@ -304,4 +418,4 @@ const ImagePacker: React.FC = () => {
     );
 };
 
-export default ImagePacker;
+export default Home;

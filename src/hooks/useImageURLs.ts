@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ImageData } from "../components/ResizingWindow";
+import { ImageData } from "../pages/home/components/resizingWindow/ResizingWindow";
 
 const useImageURLs = (images: ImageData[]) => {
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());

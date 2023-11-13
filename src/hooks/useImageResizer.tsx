@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ContainerType } from "../pages/home/ImagePacker";
-import { ImageData } from "../components/ResizingWindow";
-import { positionImages } from "../pages/home/utils";
+import { ContainerType } from "../pages/home/Home";
+import { ImageData } from "../pages/home/components/resizingWindow/ResizingWindow";
+import { positionImages } from "../pages/home/components/resizingWindow/utils";
 
 interface UseResizeImageProps {
     images: ImageData[];
@@ -9,6 +9,7 @@ interface UseResizeImageProps {
     setImages: (images: ImageData[]) => void;
     containerRef: React.RefObject<HTMLDivElement>;
     startWithMaxHalfWidth?: boolean;
+    filesUpdated: boolean;
 }
 
 const useResizeImage = ({
@@ -17,6 +18,7 @@ const useResizeImage = ({
     setImages,
     containerRef,
     startWithMaxHalfWidth = true,
+    filesUpdated,
 }: UseResizeImageProps) => {
     const [localImages, setLocalImages] = useState<ImageData[]>(images);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -46,11 +48,9 @@ const useResizeImage = ({
             startWithMaxHalfWidth
         );
 
-        console.log("startWithMaxHalfWidth", startWithMaxHalfWidth);
-
         setMaxY(_maxY);
         setLocalImages(_localImages);
-    }, []);
+    }, [filesUpdated]);
 
     // for preventive page scrolling while resizing in mobile
     useEffect(() => {
