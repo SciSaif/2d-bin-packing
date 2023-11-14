@@ -97,13 +97,13 @@ const useMargin = ({
         // Constrain the margin value
         newMargin = Math.max(0, newMargin);
         newMargin = Math.min(newMargin, 150); // Assuming a minimum container width
-        newMargin = Math.round(newMargin);
+        newMargin = Math.round(newMargin / container.scaleFactor);
 
         setContainer({
             ...container,
             margin: {
                 ...container.margin,
-                [draggingMargin]: newMargin / container.scaleFactor,
+                [draggingMargin]: newMargin,
             },
         });
     };

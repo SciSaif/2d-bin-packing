@@ -69,6 +69,8 @@ const Home: React.FC = () => {
             0
         );
 
+        console.log(boxes);
+
         boxes.forEach((boxSet) => {
             boxSet.forEach((box) => {
                 const correspondingFile = images.find((f) => f.id === box.id);
@@ -80,6 +82,8 @@ const Home: React.FC = () => {
                     box.imageElement = img;
                     loadedCount++;
                     if (loadedCount === totalImages) {
+                        console.log("all images loaded");
+
                         setImagesLoaded(true);
                     }
                 };
@@ -166,6 +170,8 @@ const Home: React.FC = () => {
         const newImages = await createImages(uploadedFiles);
         setImages([...images, ...newImages]);
         setInResizeMode(true);
+        setBoxes([]);
+        setImagesLoaded(false);
         setFilesUpdated((prev) => !prev);
     };
 
@@ -195,7 +201,7 @@ const Home: React.FC = () => {
         return images.map((image) => (
             <div
                 key={image.id}
-                className="inline-flex flex-col items-center p-2"
+                className="relative inline-flex flex-col items-center p-2"
             >
                 {image.file && (
                     <img
@@ -206,7 +212,7 @@ const Home: React.FC = () => {
                 )}
                 <button
                     onClick={() => removeImage(image.id)}
-                    className="text-red-500 hover:text-red-700"
+                    className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs text-red-500 bg-white border rounded-full shadow hover:text-red-700"
                 >
                     &#10005; {/* Cross Icon */}
                 </button>
@@ -216,15 +222,6 @@ const Home: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2 mx-auto max-w-[1000px] items-center">
-            {images?.length > 0 && (
-                <button
-                    onClick={reset}
-                    className="px-10 py-1 text-white bg-green-500 rounded w-fit hover:bg-green-600"
-                >
-                    Reset
-                </button>
-            )}
-
             <div
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
@@ -247,34 +244,6 @@ const Home: React.FC = () => {
                         {images.length > 0 && (
                             <div className="mx-2 border-t">{imagePreviews}</div>
                         )}
-                        {/* {images.length > 0 && (
-                            <div className="mx-2 border-t">
-                                {images.map((image) => (
-                                    <div
-                                        key={image.id}
-                                        className="inline-flex flex-col items-center p-2"
-                                    >
-                                        {image.file && (
-                                            <img
-                                                src={URL.createObjectURL(
-                                                    image.file
-                                                )}
-                                                alt="Preview"
-                                                className="object-cover w-14 h-14"
-                                            />
-                                        )}
-                                        <button
-                                            onClick={() =>
-                                                removeImage(image.id)
-                                            }
-                                            className="text-red-500 hover:text-red-700"
-                                        >
-                                            &#10005;
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )} */}
                     </div>
                 )}
             </div>
@@ -288,55 +257,65 @@ const Home: React.FC = () => {
                 style={{ display: "none" }}
             />
 
-            {inResizeMode && (
-                <button
-                    onClick={() => startPacking()}
-                    className="px-10 py-1 text-white bg-blue-500 rounded w-fit hover:bg-blue-600"
-                >
-                    Start packing
-                </button>
-            )}
+            <div className="flex flex-wrap gap-2 py-2 mt-5 w-fit ">
+                {inResizeMode && (
+                    <button
+                        onClick={() => startPacking()}
+                        className="px-2 py-2 text-white bg-blue-500 rounded w-fit h-fit hover:bg-blue-600"
+                    >
+                        Start packing
+                    </button>
+                )}
 
-            {boxes.length > 0 && container && (
-                <button
-                    onClick={() =>
-                        handleSaveAsPDF({
-                            boxes,
-                            container,
-                        })
-                    }
-                    className="px-10 py-2 mt-4 text-white bg-green-500 rounded w-fit hover:bg-green-600"
-                >
-                    Save as PDF
-                </button>
-            )}
+                {boxes.length > 0 && container && (
+                    <button
+                        onClick={() =>
+                            handleSaveAsPDF({
+                                boxes,
+                                container,
+                            })
+                        }
+                        className="px-10 py-2 text-white bg-green-500 rounded w-fit hover:bg-green-600"
+                    >
+                        Save as PDF
+                    </button>
+                )}
 
-            {boxes.length > 0 && (
-                <button
-                    onClick={() =>
-                        handlePrintMultipleStages(
-                            stageRefs.map((ref) => ref.current)
-                        )
-                    }
-                    className="px-10 py-2 mt-4 text-white bg-purple-500 rounded w-fit hover:bg-purple-600"
-                >
-                    Print Canvases
-                </button>
-            )}
-            {!inResizeMode && boxes?.length > 0 && (
-                <button
-                    onClick={() => {
-                        setResizingAgain(true);
-                        setInResizeMode(true);
-                        setImagesLoaded(false);
-                        setBoxes([]);
-                    }}
-                    className="px-10 py-2 mt-4 text-white bg-yellow-500 rounded w-fit hover:bg-yellow-600"
-                >
-                    Resize images
-                </button>
-            )}
+                {boxes.length > 0 && (
+                    <button
+                        onClick={() =>
+                            handlePrintMultipleStages(
+                                stageRefs.map((ref) => ref.current)
+                            )
+                        }
+                        className="px-10 py-2 text-white bg-purple-500 rounded w-fit hover:bg-purple-600"
+                    >
+                        Print
+                    </button>
+                )}
+                {!inResizeMode && boxes?.length > 0 && (
+                    <button
+                        onClick={() => {
+                            setResizingAgain(true);
+                            setInResizeMode(true);
+                            setImagesLoaded(false);
+                            setBoxes([]);
+                        }}
+                        className="px-10 py-2 text-white bg-yellow-500 rounded w-fit hover:bg-yellow-600"
+                    >
+                        Resize images
+                    </button>
+                )}
 
+                {images?.length > 0 && (
+                    <button
+                        onClick={reset}
+                        className="px-10 py-2 text-white bg-green-500 rounded h-fit w-fit hover:bg-green-600"
+                    >
+                        Reset
+                    </button>
+                )}
+            </div>
             {loading && (
                 <div className="py-10 text-2xl text-green-900 ">
                     Packing your images...
@@ -399,14 +378,6 @@ const Home: React.FC = () => {
                                             }
                                         />
                                     )}
-
-                                    {/* <Rect
-                                        x={box.x * container.scaleFactor}
-                                        y={box.y * container.scaleFactor}
-                                        width={box.w * container.scaleFactor}
-                                        height={box.h * container.scaleFactor}
-                                        stroke="red"
-                                    /> */}
                                 </React.Fragment>
                             ))}
                         </Layer>

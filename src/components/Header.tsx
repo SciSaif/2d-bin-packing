@@ -26,9 +26,9 @@ const Header = () => {
         setHideLetters(false); // Reset hideACK when not hovering
     };
     return (
-        <div className="flex justify-center py-5 bg-secondary">
+        <div className="flex justify-center py-2 md:py-5 bg-secondary">
             <div
-                className="flex items-center justify-center font-bold text-white cursor-pointer text-7xl gap-x-2"
+                className="flex items-center justify-center text-2xl font-bold text-white cursor-pointer md:text-7xl gap-x-2"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -50,7 +50,7 @@ const Header = () => {
                             {letter}
                         </span>
                     ))}
-                <span className="text-primary text-9xl">4</span>
+                <span className="text-6xl text-primary md:text-9xl">4</span>
                 <span className="letter">P</span>
                 {!hideLetters &&
                     ["r", "i", "n", "t"].map((letter, index) => (
