@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
-import { handlePrintMultipleStages, handleSaveAsPDF, packBoxes } from "./utils";
+import { handlePrintMultipleStages, packBoxes, saveAsPDF } from "./utils";
 import Konva from "konva";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import { useWindowResize } from "../../hooks/useWindowResize";
@@ -16,6 +16,7 @@ import {
     setIsPacking,
     setIsResizingAgain,
 } from "../../redux/features/slices/mainSlice";
+import { ClipLoader } from "react-spinners";
 export interface ImageBox {
     id: string;
     w: number;
@@ -94,8 +95,8 @@ const Home: React.FC = () => {
         if (!containerWrapper.current) return;
 
         const containerWrapperWidth = containerWrapper.current.clientWidth;
-        // const columns = windowWidth >= 768 ? 2 : 1;
-        const columns = 2;
+        const columns = windowWidth >= 768 ? 2 : 1;
+        // const columns = 2;
         let gridCellWidth = containerWrapperWidth / columns;
 
         // Subtract any grid gap if applicable
@@ -118,8 +119,16 @@ const Home: React.FC = () => {
         updateScaleFactor();
     };
 
+    const [loadingPDF, setLoadingPDF] = useState<boolean>(false);
+
+    const handlePdfSave = async () => {
+        setLoadingPDF(true);
+        await saveAsPDF({ boxes, container });
+        setLoadingPDF(false);
+    };
+
     return (
-        <div className="flex flex-col gap-2 px-2 py-2 mx-auto max-w-[1000px] items-center">
+        <div className="flex flex-col gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
             <FileDropArea
                 images={images}
                 setBoxes={setBoxes}
@@ -133,19 +142,21 @@ const Home: React.FC = () => {
                     </Button>
                 )}
 
-                {boxes.length > 0 && container && (
-                    <Button
-                        onClick={() =>
-                            handleSaveAsPDF({
-                                boxes,
-                                container,
-                            })
-                        }
-                        className="bg-green-500 hover:bg-green-600"
-                    >
-                        Save as PDF
-                    </Button>
-                )}
+                {boxes.length > 0 &&
+                    container &&
+                    (loadingPDF ? (
+                        <div className="flex flex-row items-center justify-center gap-2 px-2 py-2 text-white bg-green-500 hover:bg-green-600">
+                            creating PDF
+                            <ClipLoader color="white" size={16} />
+                        </div>
+                    ) : (
+                        <Button
+                            onClick={handlePdfSave}
+                            className="bg-green-500 hover:bg-green-600"
+                        >
+                            Save as PDF
+                        </Button>
+                    ))}
 
                 {boxes.length > 0 && (
                     <Button
@@ -190,14 +201,10 @@ const Home: React.FC = () => {
 
             <div
                 ref={containerWrapper}
-                className="flex flex-wrap w-full items-center justify-center  max-w-[1000px] gap-y-10 gap-x-5 "
+                className="flex flex-wrap w-full items-center justify-center  max-w-[1050px] gap-y-10 gap-x-5 "
             >
                 {inResizeMode && (
-                    <ResizingWindow
-                        startWithMaxHalfWidth={!isResizingAgain}
-                        setImages={setImages}
-                        images={images}
-                    />
+                    <ResizingWindow setImages={setImages} images={images} />
                 )}
 
                 {boxes.map((boxSet, index) => (

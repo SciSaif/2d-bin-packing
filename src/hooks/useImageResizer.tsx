@@ -13,13 +13,15 @@ interface UseResizeImageProps {
 
 const useResizeImage = ({
     containerRef,
-    startWithMaxHalfWidth = true,
     images,
     setImages,
 }: UseResizeImageProps) => {
-    const { container, filesUpdatedFlag } = useAppSelector(
-        (state) => state.main
-    );
+    const {
+        container,
+        filesUpdatedFlag,
+        isResizingAgain,
+        startingMaxWidthFactor,
+    } = useAppSelector((state) => state.main);
 
     const [localImages, setLocalImages] = useState<ImageData[]>(images);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -30,8 +32,6 @@ const useResizeImage = ({
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
     useEffect(() => {
-        console.log("filesUpdatedFlag", filesUpdatedFlag, images.length);
-
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
         if (!images.length) return;
         const newImageUrls = new Map<string, string>();
@@ -47,8 +47,7 @@ const useResizeImage = ({
         const { _maxY, _localImages } = positionImages(
             images,
             container,
-            10,
-            startWithMaxHalfWidth
+            isResizingAgain ? undefined : startingMaxWidthFactor
         );
 
         setMaxY(_maxY);
@@ -74,6 +73,7 @@ const useResizeImage = ({
             );
         };
     }, [isResizing]);
+
     const updateImageSize = (
         clientX: number,
         clientY: number
@@ -133,39 +133,41 @@ const useResizeImage = ({
         return null;
     };
 
+    const repositionImages = (updatedImages: ImageData[]) => {
+        const repositionedImages = positionImages(
+            updatedImages,
+            container
+        )._localImages;
+        const repositionedImage = repositionedImages.find(
+            (img) => img.id === selectedId
+        );
+        const originalImage = localImages.find((img) => img.id === selectedId);
+
+        // If the image's y value has changed, it means has changed shelf
+        if (
+            originalImage &&
+            repositionedImage &&
+            originalImage.y !== repositionedImage.y
+        ) {
+            setIsResizing(false);
+            setSelectedId(null);
+        }
+        setLocalImages(repositionedImages);
+        // Update maxY if needed
+        const newMaxY = repositionedImages.reduce(
+            (acc, img) => Math.max(acc, img.y + img.h),
+            0
+        );
+        setMaxY(newMaxY);
+    };
+
     const handleResize = (clientX: number, clientY: number) => {
         // console.log("handleResize clientX", clientX);
 
         if (isResizing && selectedId) {
             const updatedImages = updateImageSize(clientX, clientY);
             if (updatedImages) {
-                const repositionedImages = positionImages(
-                    updatedImages,
-                    container
-                )._localImages;
-                const repositionedImage = repositionedImages.find(
-                    (img) => img.id === selectedId
-                );
-                const originalImage = localImages.find(
-                    (img) => img.id === selectedId
-                );
-
-                // If the image's y value has changed, it means has changed shelf
-                if (
-                    originalImage &&
-                    repositionedImage &&
-                    originalImage.y !== repositionedImage.y
-                ) {
-                    setIsResizing(false);
-                    setSelectedId(null);
-                }
-                setLocalImages(repositionedImages);
-                // Update maxY if needed
-                const newMaxY = repositionedImages.reduce(
-                    (acc, img) => Math.max(acc, img.y + img.h),
-                    0
-                );
-                setMaxY(newMaxY);
+                repositionImages(updatedImages);
             }
         }
     };
@@ -242,6 +244,29 @@ const useResizeImage = ({
         };
     }, [handleMouseMove, handleMouseUp, handleTouchMove]);
 
+    useEffect(() => {
+        repositionImages(localImages);
+    }, [container]);
+
+    // // function to resize every image that is larger in width than the given width to the given width
+    // const resizeImagesWithMaxWidth = () => {
+    //     // startingMaxWidthFactor
+    //     const updatedImages = localImages.map((img) => {
+    //         if (img.w > container.w * startingMaxWidthFactor) {
+    //             const newHeight =
+    //                 (container.w * startingMaxWidthFactor) / img.w;
+    //             return {
+    //                 ...img,
+    //                 w: container.w * startingMaxWidthFactor,
+    //                 h: newHeight,
+    //             };
+    //         }
+    //         return img;
+    //     });
+
+    //     repositionImages(updatedImages);
+    // };
+
     return {
         localImages,
         maxY,
@@ -252,6 +277,7 @@ const useResizeImage = ({
         selectedId,
         imageUrls,
         setMaxY,
+        // resizeImagesWithMaxWidth,
     };
 };
 

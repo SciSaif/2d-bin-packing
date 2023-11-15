@@ -1,15 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// export interface ImageBox {
-//     id: string;
-//     w: number;
-//     h: number;
-//     x: number;
-//     y: number;
-//     file?: File;
-//     imageElement?: HTMLImageElement;
-//     rotated?: boolean;
-// }
 export interface ContainerType {
     w: number;
     h: number;
@@ -33,25 +23,23 @@ export interface Margin {
 }
 
 interface initialStateProps {
-    // images: ImageBox[];
-    // boxes: ImageBox[][];
     container: ContainerType;
     isPacking: boolean;
     inResizeMode: boolean;
     isResizingAgain: boolean;
     imagesLoaded: boolean;
+    startingMaxWidthFactor: number;
     filesUpdatedFlag?: boolean;
 }
 
 const initialState: initialStateProps = {
-    // images: [],
-    // boxes: [],
     container: defaultContainer,
     isPacking: false,
     inResizeMode: false,
     isResizingAgain: false,
     imagesLoaded: false,
     filesUpdatedFlag: false,
+    startingMaxWidthFactor: 0.4,
 };
 
 export const mainSlice = createSlice({
@@ -76,28 +64,24 @@ export const mainSlice = createSlice({
             state.container = action.payload;
         },
 
+        setStartingMaxWidthFactor: (state, action: PayloadAction<number>) => {
+            state.startingMaxWidthFactor = action.payload;
+        },
+
         filesUpdated: (state) => {
             state.filesUpdatedFlag = !state.filesUpdatedFlag;
         },
-
-        // setImages: (state, action) => {
-        //     state.images = action.payload;
-        // },
-        // setBoxes: (state, action) => {
-        //     state.boxes = action.payload;
-        // },
 
         resetState: () => initialState,
     },
 });
 
 export const {
-    // setImages,
-    // setBoxes,
     setContainer,
     resetState,
     setIsPacking,
     setInResizeMode,
+    setStartingMaxWidthFactor,
     setIsResizingAgain,
     filesUpdated,
     setImagesLoaded,

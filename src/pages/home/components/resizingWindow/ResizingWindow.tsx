@@ -6,9 +6,11 @@ import MarginHandles from "./components/MarginHandles";
 import {
     Margin,
     setContainer,
+    setStartingMaxWidthFactor,
 } from "../../../../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { ImageBox } from "../../Home";
+import LabelInput from "../../../../components/LabelInput";
 
 export interface ImageData {
     id: string;
@@ -20,20 +22,17 @@ export interface ImageData {
 }
 
 interface Props {
-    startWithMaxHalfWidth?: boolean; // if true, the images will initially have at most half the width of the container
     images: ImageBox[];
     setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
 }
 
-const ResizingWindow: React.FC<Props> = ({
-    startWithMaxHalfWidth = true,
-    images,
-    setImages,
-}) => {
+const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
     const dispatch = useAppDispatch();
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
-    const { container } = useAppSelector((state) => state.main);
+    const { container, startingMaxWidthFactor } = useAppSelector(
+        (state) => state.main
+    );
     // Function to toggle the margin controls
     const toggleMarginControls = () => {
         setShowMarginControls(!showMarginControls);
@@ -47,14 +46,12 @@ const ResizingWindow: React.FC<Props> = ({
         imageUrls,
         selectedId,
         setMaxY,
+        // resizeImagesWithMaxWidth,
     } = useResizeImage({
         containerRef,
-        startWithMaxHalfWidth,
         images,
         setImages,
     });
-
-    console.log("localImages", localImages);
 
     const handleMarginChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -87,13 +84,61 @@ const ResizingWindow: React.FC<Props> = ({
     });
 
     return (
-        <div className="flex flex-col justify-center mx-auto w-fit">
-            <button
-                onClick={toggleMarginControls}
-                className="px-2 py-1 mx-auto mb-5 text-white bg-purple-500 rounded w-fit hover:bg-purple-600"
-            >
-                {showMarginControls ? "Remove Margin" : "Add Margin"}
-            </button>
+        <div className="flex flex-col items-center justify-center w-full pt-5 mx-auto border-t">
+            <div className="mb-4">
+                <p className="text-sm text-center text-gray-600">
+                    Click on the image and use the resize handle to resize the
+                    images. Take reference from the A4 paper width below and
+                    decide what size you want each image to be.
+                </p>
+            </div>
+            <div className="flex flex-row items-center justify-center gap-2 mb-4">
+                <button
+                    onClick={toggleMarginControls}
+                    className="px-2 py-2   text-sm w-[150px] text-white bg-purple-500 rounded  hover:bg-purple-600"
+                >
+                    {showMarginControls ? "Hide Margins" : "Show Margins"}
+                </button>
+                <LabelInput
+                    type="number"
+                    label="Padding"
+                    min={0}
+                    max={30}
+                    value={container.padding}
+                    onChange={(e) =>
+                        dispatch(
+                            setContainer({
+                                ...container,
+                                padding: parseInt(e.target.value, 10),
+                            })
+                        )
+                    }
+                />
+                {/* <div className="flex flex-row ">
+                    <LabelInput
+                        type="number"
+                        label="Set max width %"
+                        labelClassName="min-w-[120px]"
+                        wrapperClassName="max-w-[250px]"
+                        min={10}
+                        max={100}
+                        value={startingMaxWidthFactor * 100}
+                        onChange={(e) =>
+                            dispatch(
+                                setStartingMaxWidthFactor(
+                                    e.target.valueAsNumber / 100
+                                )
+                            )
+                        }
+                    />
+                    <button
+                        onClick={resizeImagesWithMaxWidth}
+                        className="px-2 text-sm bg-blue-200 border hover:bg-blue-300"
+                    >
+                        Reset Sizes
+                    </button>
+                </div> */}
+            </div>
             {showMarginControls && (
                 <div className="mb-10 border-t border-b">
                     {/* margin controls */}

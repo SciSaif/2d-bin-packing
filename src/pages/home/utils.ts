@@ -4,75 +4,81 @@ import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
 import { ImageBox } from "./Home";
-import { ImageData } from "./components/resizingWindow/ResizingWindow";
 import { pack } from "efficient-rect-packer";
 import { ContainerType } from "../../redux/features/slices/mainSlice";
-export const handleSaveAsPDF = ({
+
+export const saveAsPDF = async ({
     boxes,
     container,
 }: {
     boxes: ImageBox[][];
     container: ContainerType;
 }) => {
-    const pdf = new jsPDF("p", "pt", "a4");
-    pdf.setTextColor("#000000");
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const pdf = new jsPDF("p", "pt", "a4");
+            pdf.setTextColor("#000000");
 
-    const a4Width = 595; // A4 width in points
-    const a4Height = 842; // A4 height in points
+            const a4Width = 595; // A4 width in points
+            const a4Height = 842; // A4 height in points
 
-    const scaleX = a4Width / container.w;
-    const scaleY = a4Height / container.h;
+            const scaleX = a4Width / container.w;
+            const scaleY = a4Height / container.h;
 
-    boxes.forEach((boxSet, index) => {
-        if (index > 0) {
-            pdf.addPage("a4", "portrait");
-        }
+            boxes.forEach((boxSet, index) => {
+                if (index > 0) {
+                    pdf.addPage("a4", "portrait");
+                }
 
-        const stage = new Konva.Stage({
-            container: "temp-container",
-            width: container.w,
-            height: container.h,
-        });
-
-        const layer = new Konva.Layer();
-        stage.add(layer);
-
-        boxSet.forEach((box) => {
-            if (box.imageElement) {
-                const konvaImage = new Konva.Image({
-                    x: box.x,
-                    y: box.y,
-                    width: box.rotated ? box.h : box.w,
-                    height: box.rotated ? box.w : box.h,
-                    image: box.imageElement,
-                    rotation: box.rotated ? -90 : 0,
-                    offsetX: box.rotated ? box.h : 0,
+                const stage = new Konva.Stage({
+                    container: "temp-container",
+                    width: container.w,
+                    height: container.h,
                 });
-                layer.add(konvaImage);
-            }
 
-            const rect = new Konva.Rect({
-                x: box.x,
-                y: box.y,
-                width: box.w,
-                height: box.h,
-                stroke: "red",
+                const layer = new Konva.Layer();
+                stage.add(layer);
+
+                boxSet.forEach((box) => {
+                    if (box.imageElement) {
+                        const konvaImage = new Konva.Image({
+                            x: box.x,
+                            y: box.y,
+                            width: box.rotated ? box.h : box.w,
+                            height: box.rotated ? box.w : box.h,
+                            image: box.imageElement,
+                            rotation: box.rotated ? -90 : 0,
+                            offsetX: box.rotated ? box.h : 0,
+                        });
+                        layer.add(konvaImage);
+                    }
+
+                    const rect = new Konva.Rect({
+                        x: box.x,
+                        y: box.y,
+                        width: box.w,
+                        height: box.h,
+                        stroke: "red",
+                    });
+                    layer.add(rect);
+                });
+
+                pdf.addImage(
+                    stage.toDataURL({ pixelRatio: 2 }),
+                    0,
+                    0,
+                    container.w * scaleX,
+                    container.h * scaleY
+                );
+
+                stage.destroy();
             });
-            layer.add(rect);
-        });
+            console.log("pdf created");
 
-        pdf.addImage(
-            stage.toDataURL({ pixelRatio: 2 }),
-            0,
-            0,
-            container.w * scaleX,
-            container.h * scaleY
-        );
-
-        stage.destroy();
+            pdf.save("packed-images.pdf");
+            resolve(null);
+        }, 0);
     });
-
-    pdf.save("packed-images.pdf");
 };
 
 export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
@@ -184,7 +190,7 @@ export const packBoxes = async ({
                 h: container.h,
             },
             {
-                padding: container.padding,
+                padding: Math.ceil(container.padding / 2),
                 margin: container.margin,
                 noRotation: false,
             }
