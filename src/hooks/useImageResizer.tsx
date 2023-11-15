@@ -1,25 +1,26 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ContainerType } from "../pages/home/Home";
 import { ImageData } from "../pages/home/components/resizingWindow/ResizingWindow";
 import { positionImages } from "../pages/home/components/resizingWindow/utils";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { ImageBox } from "../pages/home/Home";
 
 interface UseResizeImageProps {
-    images: ImageData[];
-    container: ContainerType;
-    setImages: (images: ImageData[]) => void;
     containerRef: React.RefObject<HTMLDivElement>;
     startWithMaxHalfWidth?: boolean;
-    filesUpdated: boolean;
+    images: ImageBox[];
+    setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
 }
 
 const useResizeImage = ({
-    images,
-    container,
-    setImages,
     containerRef,
     startWithMaxHalfWidth = true,
-    filesUpdated,
+    images,
+    setImages,
 }: UseResizeImageProps) => {
+    const { container, filesUpdatedFlag } = useAppSelector(
+        (state) => state.main
+    );
+
     const [localImages, setLocalImages] = useState<ImageData[]>(images);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isResizing, setIsResizing] = useState(false);
@@ -29,6 +30,8 @@ const useResizeImage = ({
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
     useEffect(() => {
+        console.log("filesUpdatedFlag", filesUpdatedFlag, images.length);
+
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
         if (!images.length) return;
         const newImageUrls = new Map<string, string>();
@@ -50,7 +53,7 @@ const useResizeImage = ({
 
         setMaxY(_maxY);
         setLocalImages(_localImages);
-    }, [filesUpdated]);
+    }, [filesUpdatedFlag]);
 
     // for preventive page scrolling while resizing in mobile
     useEffect(() => {
@@ -222,7 +225,7 @@ const useResizeImage = ({
     const handleMouseUp = useCallback(() => {
         setIsResizing(false);
         setImages(localImages);
-    }, [localImages, setImages]);
+    }, [localImages]);
 
     // Effect for adding event listeners
     useEffect(() => {

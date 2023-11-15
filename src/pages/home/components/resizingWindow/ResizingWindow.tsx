@@ -1,9 +1,14 @@
-import React, { TouchEvent, useEffect, useRef, useState } from "react";
-import { ContainerType, Margin } from "../../Home";
+import React, { useState } from "react";
 import useResizeImage from "../../../../hooks/useImageResizer";
 import useMargin from "../../../../hooks/useMargin";
 import { positionImages } from "./utils";
 import MarginHandles from "./components/MarginHandles";
+import {
+    Margin,
+    setContainer,
+} from "../../../../redux/features/slices/mainSlice";
+import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
+import { ImageBox } from "../../Home";
 
 export interface ImageData {
     id: string;
@@ -15,25 +20,20 @@ export interface ImageData {
 }
 
 interface Props {
-    images: ImageData[];
-    setImages: (images: ImageData[]) => void;
-    container: ContainerType;
-    setContainer: (container: ContainerType) => void;
     startWithMaxHalfWidth?: boolean; // if true, the images will initially have at most half the width of the container
-    filesUpdated: boolean;
+    images: ImageBox[];
+    setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
 }
 
 const ResizingWindow: React.FC<Props> = ({
+    startWithMaxHalfWidth = true,
     images,
     setImages,
-    container,
-    setContainer,
-    startWithMaxHalfWidth = true,
-    filesUpdated,
 }) => {
+    const dispatch = useAppDispatch();
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
-
+    const { container } = useAppSelector((state) => state.main);
     // Function to toggle the margin controls
     const toggleMarginControls = () => {
         setShowMarginControls(!showMarginControls);
@@ -48,13 +48,13 @@ const ResizingWindow: React.FC<Props> = ({
         selectedId,
         setMaxY,
     } = useResizeImage({
-        images,
-        container,
-        setImages,
         containerRef,
         startWithMaxHalfWidth,
-        filesUpdated,
+        images,
+        setImages,
     });
+
+    console.log("localImages", localImages);
 
     const handleMarginChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -69,7 +69,7 @@ const ResizingWindow: React.FC<Props> = ({
             },
         };
 
-        setContainer(newContainer);
+        dispatch(setContainer(newContainer));
 
         const { _localImages, _maxY } = positionImages(
             localImages,
@@ -80,8 +80,6 @@ const ResizingWindow: React.FC<Props> = ({
     };
 
     const { handleMarginDragStart } = useMargin({
-        container,
-        setContainer,
         localImages,
         setLocalImages,
         setMaxY,
@@ -149,7 +147,6 @@ const ResizingWindow: React.FC<Props> = ({
                 {showMarginControls && (
                     <MarginHandles
                         handleMarginDragStart={handleMarginDragStart}
-                        container={container}
                     />
                 )}
 

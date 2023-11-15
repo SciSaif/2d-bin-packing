@@ -1,4 +1,4 @@
-import { ContainerType } from "../../Home";
+import { ContainerType } from "../../../../redux/features/slices/mainSlice";
 import { ImageData } from "./ResizingWindow";
 
 export const positionImages = (

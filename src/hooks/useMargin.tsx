@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { ContainerType, Margin } from "../pages/home/Home";
 import { ImageData } from "../pages/home/components/resizingWindow/ResizingWindow";
 import { positionImages } from "../pages/home/components/resizingWindow/utils";
+import { Margin, setContainer } from "../redux/features/slices/mainSlice";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 
 interface UseMarginProps {
-    container: ContainerType;
-    setContainer: (container: ContainerType) => void;
     containerRef: React.RefObject<HTMLDivElement>;
     localImages: ImageData[];
     setLocalImages: any;
@@ -13,13 +12,13 @@ interface UseMarginProps {
 }
 
 const useMargin = ({
-    container,
-    setContainer,
     containerRef,
     localImages,
     setLocalImages,
     setMaxY,
 }: UseMarginProps) => {
+    const dispatch = useAppDispatch();
+    const { container } = useAppSelector((state) => state.main);
     const [isDraggingMargin, setIsDraggingMargin] = useState(false);
     const [draggingMargin, setDraggingMargin] = useState<keyof Margin | "">("");
 
@@ -28,13 +27,15 @@ const useMargin = ({
         side: keyof Margin
     ) => {
         const newMarginValue = parseInt(e.target.value, 10);
-        setContainer({
-            ...container,
-            margin: {
-                ...container.margin,
-                [side]: isNaN(newMarginValue) ? 0 : newMarginValue,
-            },
-        });
+        dispatch(
+            setContainer({
+                ...container,
+                margin: {
+                    ...container.margin,
+                    [side]: isNaN(newMarginValue) ? 0 : newMarginValue,
+                },
+            })
+        );
     };
 
     // for preventive page scrolling while resizing in mobile
@@ -99,13 +100,15 @@ const useMargin = ({
         newMargin = Math.min(newMargin, 150); // Assuming a minimum container width
         newMargin = Math.round(newMargin / container.scaleFactor);
 
-        setContainer({
-            ...container,
-            margin: {
-                ...container.margin,
-                [draggingMargin]: newMargin,
-            },
-        });
+        dispatch(
+            setContainer({
+                ...container,
+                margin: {
+                    ...container.margin,
+                    [draggingMargin]: newMargin,
+                },
+            })
+        );
     };
 
     const handleMarginDragEnd = () => {

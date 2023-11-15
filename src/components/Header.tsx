@@ -26,7 +26,7 @@ const Header = () => {
         setHideLetters(false); // Reset hideACK when not hovering
     };
     return (
-        <div className="flex justify-center py-2 md:py-5 bg-secondary">
+        <div className="flex justify-center py-2 select-none md:py-5 bg-secondary">
             <div
                 className="flex items-center justify-center text-2xl font-bold text-white cursor-pointer md:text-7xl gap-x-2"
                 onMouseEnter={handleMouseEnter}

@@ -1,9 +1,8 @@
 import React from "react";
-import { ContainerType, Margin } from "../../../Home";
-import useMargin from "../../../../../hooks/useMargin";
+import { Margin } from "../../../../../redux/features/slices/mainSlice";
+import { useAppSelector } from "../../../../../redux/hooks";
 
 interface Props {
-    container: ContainerType;
     handleMarginDragStart: (
         e:
             | React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -12,7 +11,9 @@ interface Props {
     ) => void;
 }
 
-const MarginHandles = ({ container, handleMarginDragStart }: Props) => {
+const MarginHandles = ({ handleMarginDragStart }: Props) => {
+    const { container } = useAppSelector((state) => state.main);
+
     return (
         <>
             {/* left margin handle  */}

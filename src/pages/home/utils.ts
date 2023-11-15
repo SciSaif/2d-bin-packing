@@ -3,9 +3,10 @@ import jsPDF from "jspdf";
 import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
-import { ContainerType, ImageBox } from "./Home";
+import { ImageBox } from "./Home";
 import { ImageData } from "./components/resizingWindow/ResizingWindow";
 import { pack } from "efficient-rect-packer";
+import { ContainerType } from "../../redux/features/slices/mainSlice";
 export const handleSaveAsPDF = ({
     boxes,
     container,

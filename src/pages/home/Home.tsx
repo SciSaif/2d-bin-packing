@@ -1,18 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
-import {
-    createImages,
-    handlePrintMultipleStages,
-    handleSaveAsPDF,
-    packBoxes,
-} from "./utils";
+import { handlePrintMultipleStages, handleSaveAsPDF, packBoxes } from "./utils";
 import Konva from "konva";
-import { Link } from "react-router-dom";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
-import useDragAndDrop from "../../hooks/useDragDrop";
-import { twMerge } from "tailwind-merge";
-
+import { useWindowResize } from "../../hooks/useWindowResize";
+import Button from "../../components/Button";
+import FileDropArea from "./components/FileDropArea";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import {
+    resetState,
+    setContainer,
+    setImagesLoaded,
+    setInResizeMode,
+    setIsPacking,
+    setIsResizingAgain,
+} from "../../redux/features/slices/mainSlice";
 export interface ImageBox {
     id: string;
     w: number;
@@ -23,42 +26,16 @@ export interface ImageBox {
     imageElement?: HTMLImageElement;
     rotated?: boolean;
 }
-export interface Margin {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-}
-
-export interface ContainerType {
-    w: number;
-    h: number;
-    scaleFactor: number;
-    margin: Margin;
-    padding: number;
-}
-
-const defaultContainer: ContainerType = {
-    w: 595 * 2,
-    h: 842 * 2,
-    scaleFactor: 0.3,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    padding: 5,
-};
-
 const Home: React.FC = () => {
-    const [container, setContainer] = useState<ContainerType>(defaultContainer);
+    const dispatch = useAppDispatch();
 
-    const [images, setImages] = useState<ImageBox[]>([]);
+    const { container, isResizingAgain, inResizeMode, imagesLoaded } =
+        useAppSelector((state) => state.main);
+
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
-    const [isPacking, setIsPacking] = useState(false);
+    const [images, setImages] = useState<ImageBox[]>([]);
 
     const stageRefs = boxes.map(() => React.createRef<Konva.Stage>());
-
-    const [inResizeMode, setInResizeMode] = useState<boolean>(false);
-    const [resizingAgain, setResizingAgain] = useState<boolean>(false);
-
-    const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         if (!boxes || boxes.length === 0) return;
@@ -68,8 +45,6 @@ const Home: React.FC = () => {
             (acc, boxSet) => acc + boxSet.length,
             0
         );
-
-        console.log(boxes);
 
         boxes.forEach((boxSet) => {
             boxSet.forEach((box) => {
@@ -84,7 +59,7 @@ const Home: React.FC = () => {
                     if (loadedCount === totalImages) {
                         console.log("all images loaded");
 
-                        setImagesLoaded(true);
+                        dispatch(setImagesLoaded(true));
                     }
                 };
 
@@ -97,9 +72,9 @@ const Home: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     const startPacking = async () => {
-        setIsPacking(true);
+        dispatch(setIsPacking(true));
         setLoading(true);
-        setInResizeMode(false);
+        dispatch(setInResizeMode(false));
 
         const packedBoxes = await packBoxes({
             images,
@@ -113,207 +88,98 @@ const Home: React.FC = () => {
 
     const containerWrapper = React.useRef<HTMLDivElement>(null);
 
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    useEffect(() => {
-        // Handler to call on window resize
-        function handleResize() {
-            setWindowWidth(window.innerWidth);
-        }
-
-        // Add event listener
-        window.addEventListener("resize", handleResize);
-
-        // Remove event listener on cleanup
-        return () => window.removeEventListener("resize", handleResize);
-    }, []); // Empty array ensures this effect runs only once at mount
+    const windowWidth = useWindowResize();
 
     const updateScaleFactor = () => {
         if (!containerWrapper.current) return;
 
         const containerWrapperWidth = containerWrapper.current.clientWidth;
-        const columns = windowWidth >= 768 ? 2 : 1;
+        // const columns = windowWidth >= 768 ? 2 : 1;
+        const columns = 2;
         let gridCellWidth = containerWrapperWidth / columns;
 
         // Subtract any grid gap if applicable
-        const gap = 10;
+        const gap = 20;
         gridCellWidth -= gap;
 
         const scaleFactor = gridCellWidth / container.w;
 
-        setContainer((prev) => ({
-            ...prev,
-            scaleFactor,
-        }));
+        dispatch(setContainer({ ...container, scaleFactor }));
     };
 
     useEffect(() => {
         updateScaleFactor();
     }, [containerWrapper, windowWidth]); // Depend on windowWidth
 
-    const {
-        dragging,
-        files,
-        handleDragOver,
-        handleDrop,
-        mainRef,
-        setFiles,
-        handlePaste,
-        fileInputRef,
-        triggerFileInput,
-        handleFileInputChange,
-    } = useDragAndDrop();
-
-    const [filesUpdated, setFilesUpdated] = useState<boolean>(false);
-
-    // Modify handleImageUpload to handle files from both drag-and-drop and file input
-    const handleImageUpload = async (uploadedFiles: File[]) => {
-        const newImages = await createImages(uploadedFiles);
-        setImages([...images, ...newImages]);
-        setInResizeMode(true);
-        setBoxes([]);
-        setImagesLoaded(false);
-        setFilesUpdated((prev) => !prev);
-    };
-
-    // Call handleImageUpload when files state changes
-    useEffect(() => {
-        if (files && files.length > 0) {
-            handleImageUpload(files);
-        }
-    }, [files]);
-
     const reset = () => {
-        setBoxes([]);
         setImages([]);
-        setImagesLoaded(false);
-        setInResizeMode(false);
-        setContainer(defaultContainer);
-        setFiles([]);
-        setResizingAgain(false);
+        setBoxes([]);
+        dispatch(resetState());
         updateScaleFactor();
     };
-    const removeImage = (id: any) => {
-        setImages(images.filter((image) => image.id !== id));
-        setFilesUpdated((prev) => !prev);
-    };
-
-    const imagePreviews = useMemo(() => {
-        return images.map((image) => (
-            <div
-                key={image.id}
-                className="relative inline-flex flex-col items-center p-2"
-            >
-                {image.file && (
-                    <img
-                        src={URL.createObjectURL(image.file)}
-                        alt="Preview"
-                        className="object-cover w-14 h-14"
-                    />
-                )}
-                <button
-                    onClick={() => removeImage(image.id)}
-                    className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs text-red-500 bg-white border rounded-full shadow hover:text-red-700"
-                >
-                    &#10005; {/* Cross Icon */}
-                </button>
-            </div>
-        ));
-    }, [images, filesUpdated]); // Dependency on images and filesUpdated
 
     return (
         <div className="flex flex-col gap-2 px-2 py-2 mx-auto max-w-[1000px] items-center">
-            <div
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onPaste={handlePaste}
-                ref={mainRef}
-                className={twMerge(
-                    "w-full border-2 flex flex-col border-tertiary/50 cursor-pointer border-dashed  rounded-xl  bg-gray-100 shadow mt-10   ",
-                    dragging && "border-blue-500 bg-sky-100"
-                )}
-            >
-                <div
-                    onClick={triggerFileInput}
-                    className="flex items-center justify-center flex-grow min-h-[200px] w-full text-xl font-bold text-tertiary/50"
-                >
-                    Drop your images here{" "}
-                </div>
-                {images.length > 0 && (
-                    <div className="mx-2 border-t ">
-                        {/* show preview of images here with option to remove them */}
-                        {images.length > 0 && (
-                            <div className="mx-2 border-t">{imagePreviews}</div>
-                        )}
-                    </div>
-                )}
-            </div>
-            {/* Hidden file input */}
-            <input
-                type="file"
-                multiple
-                onChange={handleFileInputChange}
-                ref={fileInputRef}
-                accept="image/*"
-                style={{ display: "none" }}
+            <FileDropArea
+                images={images}
+                setBoxes={setBoxes}
+                setImages={setImages}
             />
 
             <div className="flex flex-wrap gap-2 py-2 mt-5 w-fit ">
                 {inResizeMode && (
-                    <button
-                        onClick={() => startPacking()}
-                        className="px-2 py-2 text-white bg-blue-500 rounded w-fit h-fit hover:bg-blue-600"
-                    >
+                    <Button onClick={() => startPacking()} className="">
                         Start packing
-                    </button>
+                    </Button>
                 )}
 
                 {boxes.length > 0 && container && (
-                    <button
+                    <Button
                         onClick={() =>
                             handleSaveAsPDF({
                                 boxes,
                                 container,
                             })
                         }
-                        className="px-10 py-2 text-white bg-green-500 rounded w-fit hover:bg-green-600"
+                        className="bg-green-500 hover:bg-green-600"
                     >
                         Save as PDF
-                    </button>
+                    </Button>
                 )}
 
                 {boxes.length > 0 && (
-                    <button
+                    <Button
                         onClick={() =>
                             handlePrintMultipleStages(
                                 stageRefs.map((ref) => ref.current)
                             )
                         }
-                        className="px-10 py-2 text-white bg-purple-500 rounded w-fit hover:bg-purple-600"
+                        className="bg-purple-500 hover:bg-purple-600"
                     >
                         Print
-                    </button>
+                    </Button>
                 )}
                 {!inResizeMode && boxes?.length > 0 && (
-                    <button
+                    <Button
                         onClick={() => {
-                            setResizingAgain(true);
-                            setInResizeMode(true);
-                            setImagesLoaded(false);
+                            dispatch(setIsResizingAgain(true));
+                            dispatch(setInResizeMode(true));
+                            dispatch(setImagesLoaded(false));
                             setBoxes([]);
                         }}
-                        className="px-10 py-2 text-white bg-yellow-500 rounded w-fit hover:bg-yellow-600"
+                        className="bg-yellow-500 hover:bg-yellow-600"
                     >
                         Resize images
-                    </button>
+                    </Button>
                 )}
 
                 {images?.length > 0 && (
-                    <button
+                    <Button
                         onClick={reset}
-                        className="px-10 py-2 text-white bg-green-500 rounded h-fit w-fit hover:bg-green-600"
+                        className="bg-green-500 hover:bg-green-600"
                     >
                         Reset
-                    </button>
+                    </Button>
                 )}
             </div>
             {loading && (
@@ -324,16 +190,13 @@ const Home: React.FC = () => {
 
             <div
                 ref={containerWrapper}
-                className="grid w-full grid-cols-1  md:grid-cols-1 items-center justify-center  max-w-[1000px] gap-y-10 gap-x-5 "
+                className="flex flex-wrap w-full items-center justify-center  max-w-[1000px] gap-y-10 gap-x-5 "
             >
                 {inResizeMode && (
                     <ResizingWindow
-                        container={container}
-                        images={images}
+                        startWithMaxHalfWidth={!isResizingAgain}
                         setImages={setImages}
-                        setContainer={setContainer}
-                        startWithMaxHalfWidth={!resizingAgain}
-                        filesUpdated={filesUpdated}
+                        images={images}
                     />
                 )}
 
