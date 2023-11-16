@@ -52,19 +52,10 @@ export const saveAsPDF = async ({
                         });
                         layer.add(konvaImage);
                     }
-
-                    // const rect = new Konva.Rect({
-                    //     x: box.x,
-                    //     y: box.y,
-                    //     width: box.w,
-                    //     height: box.h,
-                    //     stroke: "red",
-                    // });
-                    // layer.add(rect);
                 });
 
                 pdf.addImage(
-                    stage.toDataURL({ pixelRatio: 2 }),
+                    stage.toDataURL({ pixelRatio: 0.8 }),
                     0,
                     0,
                     container.w * scaleX,
@@ -81,74 +72,10 @@ export const saveAsPDF = async ({
     });
 };
 
-// export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
-//     let imagesContent = "";
-
-//     stages.forEach((stage) => {
-//         if (!stage) {
-//             return;
-//         }
-//         const dataUrl = stage.toDataURL();
-//         // imagesContent += `<img class="print-page" src="${dataUrl}">`;
-
-//         imagesContent += `<img class="print-page" src="${dataUrl}" style="page-break-after: always; width: 100%; height: auto; display: block; margin: 0 !important; padding: 0 !important;">`;
-//     });
-
-//     const iframeContent = `
-//             <html>
-//                 <head>
-//                     <title>Print canvas</title>
-//                     <style>
-//                         body {
-//                             margin: 0;
-//                             padding: 0;
-//                         }
-//                         .print-page {
-//                             page-break-after: always;
-//                             width: 100%;
-//                             height: auto;
-//                             display: block;
-//                         }
-//                         @media print {
-//                             body {
-//                                 margin: 0;
-//                                 padding: 0;
-//                             }
-//                         }
-//                     </style>
-//                 </head>
-//                 <body style="margin: 0 !important; padding: 0 !important;">
-//                     ${imagesContent}
-//                 </body>
-//             </html>`;
-
-//     const iframe = document.createElement("iframe");
-//     document.body.appendChild(iframe);
-//     iframe.style.display = "none";
-//     console.log("loading iframe");
-
-//     iframe.onload = function () {
-//         const doc = iframe.contentWindow?.document;
-//         if (doc) {
-//             doc.open();
-//             doc.write(iframeContent);
-//             doc.close();
-//             console.log("iframe content written");
-
-//             setTimeout(() => {
-//                 console.log("printing iframe content");
-
-//                 iframe.contentWindow?.print();
-//                 document.body.removeChild(iframe);
-//             }, 1000); // Give it half a second to load the images
-//         }
-//     };
-// };
-
 export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
     let imagesContent = "";
 
-    stages.forEach((stage) => {
+    stages.forEach((stage, index) => {
         if (!stage) {
             return;
         }
@@ -169,7 +96,7 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
                         width: 100%;
                         height: auto;
                         display: block;
-                        page-break-after: always;
+                        page-break-before: always;
                     }
                     @media print {
                         body {
@@ -180,7 +107,7 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
                             width: 100%;
                             height: auto;
                             display: block;
-                            page-break-after: always;
+                            page-break-before: always;
                         }
                     }
                 </style>
@@ -204,6 +131,66 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
         };
     }
 };
+
+// export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
+//     let imagesContent = "";
+
+//     stages.forEach((stage) => {
+//         if (!stage) {
+//             return;
+//         }
+//         const dataUrl = stage.toDataURL();
+//         imagesContent += `<img class="print-page" src="${dataUrl}">`;
+//     });
+
+//     const printContent = `
+//         <html>
+//             <head>
+//                 <title>Print canvas</title>
+//                 <style>
+//                     body {
+//                         margin: 0;
+//                         padding: 0;
+//                     }
+//                     .print-page {
+//                         width: 100%;
+//                         height: auto;
+//                         display: block;
+//                         page-break-after: always;
+//                     }
+//                     @media print {
+//                         body {
+//                             margin: 0;
+//                             padding: 0;
+//                         }
+//                         .print-page {
+//                             width: 100%;
+//                             height: auto;
+//                             display: block;
+//                             page-break-after: always;
+//                         }
+//                     }
+//                 </style>
+//             </head>
+//             <body>
+//                 ${imagesContent}
+//             </body>
+//         </html>`;
+
+//     const printWindow = window.open("", "_blank");
+//     if (printWindow) {
+//         printWindow.document.open();
+//         printWindow.document.write(printContent);
+//         printWindow.document.close();
+
+//         printWindow.onload = function () {
+//             printWindow.print();
+//             printWindow.onafterprint = function () {
+//                 printWindow.close();
+//             };
+//         };
+//     }
+// };
 
 // function to create the images from files
 export const createImages = async (files: File[]) => {

@@ -132,7 +132,7 @@ const Home: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
+        <div className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
             <FileDropArea
                 images={images}
                 setBoxes={setBoxes}
