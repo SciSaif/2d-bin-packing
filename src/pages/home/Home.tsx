@@ -206,6 +206,7 @@ const Home: React.FC = () => {
             <div
                 ref={containerWrapper}
                 className="flex flex-wrap w-full items-center justify-center  max-w-[1050px] gap-y-10 gap-x-5 "
+                style={{ overscrollBehavior: "auto" }}
             >
                 {inResizeMode && (
                     <ResizingWindow setImages={setImages} images={images} />
@@ -218,16 +219,10 @@ const Home: React.FC = () => {
                         width={container.w * container.scaleFactor}
                         height={container.h * container.scaleFactor}
                         className="border border-gray-400 shadow w-fit"
+                        style={{ touchAction: "auto" }}
+                        onTouchStart={(e) => e.evt.preventDefault()}
                     >
                         <Layer>
-                            {/* <Rect
-                                x={0}
-                                y={0}
-                                width={container.w * container.scaleFactor}
-                                height={container.h * container.scaleFactor}
-                                stroke="black"
-                                fill="white"
-                            /> */}
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (

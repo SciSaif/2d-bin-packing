@@ -213,13 +213,12 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                         >
                             {selectedId === imgData.id && (
                                 <div
-                                    className="resize-handle" // Add this class
+                                    className="resize-handle w-[25px] h-[25px] md:w-[16px] md:h-[16px]"
                                     style={{
                                         position: "absolute",
                                         right: 0,
                                         bottom: 0,
-                                        width: 16,
-                                        height: 16,
+
                                         backgroundColor: "white",
                                         cursor: "se-resize",
                                         border: "1px solid blue",
