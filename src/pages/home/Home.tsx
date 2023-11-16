@@ -26,6 +26,7 @@ export interface ImageBox {
     file?: File;
     imageElement?: HTMLImageElement;
     rotated?: boolean;
+    new?: boolean;
 }
 const Home: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -140,7 +141,7 @@ const Home: React.FC = () => {
             />
 
             <div className="flex flex-wrap gap-2 py-2 mt-5 w-fit ">
-                {inResizeMode && (
+                {inResizeMode && images.length > 0 && (
                     <Button onClick={() => startPacking()} className="">
                         Start packing
                     </Button>

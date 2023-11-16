@@ -208,6 +208,7 @@ export const createImages = async (files: File[]) => {
                         x: 0,
                         y: 0,
                         file,
+                        new: true,
                     });
                 };
                 img.src = URL.createObjectURL(file);

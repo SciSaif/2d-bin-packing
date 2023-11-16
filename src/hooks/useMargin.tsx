@@ -119,7 +119,7 @@ const useMargin = ({
         if (!isDraggingMargin) return;
         const { _localImages, _maxY } = positionImages(localImages, container);
         setLocalImages(_localImages);
-        setMaxY(_maxY);
+        setMaxY(Math.max(_maxY, container.h));
     }, [container.margin, isDraggingMargin]);
 
     useEffect(() => {

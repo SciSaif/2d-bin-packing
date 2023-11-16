@@ -11,6 +11,8 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { ImageBox } from "../../Home";
 import LabelInput from "../../../../components/LabelInput";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import { parse } from "uuid";
 
 export interface ImageData {
     id: string;
@@ -19,6 +21,7 @@ export interface ImageData {
     x: number;
     y: number;
     file?: File;
+    new?: boolean;
 }
 
 interface Props {
@@ -73,7 +76,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
             newContainer
         );
         setLocalImages(_localImages);
-        setMaxY(_maxY);
+        setMaxY(Math.max(container.h, _maxY));
     };
 
     const { handleMarginDragStart } = useMargin({
@@ -92,7 +95,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     decide what size you want each image to be.
                 </p>
             </div>
-            <div className="flex flex-row items-center justify-center gap-2 mb-4">
+            <div className="flex flex-col items-center justify-center gap-2 mb-4 sm:flex-row">
                 <button
                     onClick={toggleMarginControls}
                     className="px-2 py-2   text-sm w-[150px] text-white bg-purple-500 rounded  hover:bg-purple-600"
@@ -116,6 +119,28 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                         );
                     }}
                 />
+                <div data-tooltip-id="my-tooltip-1">
+                    <LabelInput
+                        type="number"
+                        label="Set initial max width %"
+                        labelClassName="min-w-[150px]"
+                        wrapperClassName="max-w-[250px]"
+                        min={10}
+                        max={100}
+                        value={startingMaxWidthFactor * 100}
+                        onChange={(e) => {
+                            let value = parseInt(e.target.value, 10);
+                            if (isNaN(value)) value = 0;
+
+                            dispatch(setStartingMaxWidthFactor(value / 100));
+                        }}
+                    />
+                </div>
+                {/* <ReactTooltip
+                    id="my-tooltip-1"
+                    place="top"
+                    content="Initially, the image will have a maximum width set at x% of the container. Users can then manually adjust the width by modifying the image size."
+                /> */}
             </div>
             {showMarginControls && (
                 <div className="mb-10 border-t border-b">

@@ -16,9 +16,10 @@ export const positionImages = (
             container.w - container.margin.left - container.margin.right;
 
         // Determine the maximum width for the image based on the constrainToHalfWidth parameter
-        const maxWidth = constrainWidthFactor
-            ? availableContainerWidth * constrainWidthFactor
-            : availableContainerWidth;
+        const maxWidth =
+            constrainWidthFactor && img.new
+                ? availableContainerWidth * constrainWidthFactor
+                : availableContainerWidth;
 
         // Calculate the scale factor to maintain aspect ratio while fitting within constraints
         let aspectRatio = Math.min(
@@ -45,6 +46,7 @@ export const positionImages = (
             h: scaledHeight,
             x: currentX,
             y: currentY,
+            new: false,
         };
 
         currentX += scaledWidth + container.padding; // Add padding between images

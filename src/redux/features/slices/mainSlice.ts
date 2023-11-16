@@ -35,7 +35,7 @@ interface initialStateProps {
 const initialState: initialStateProps = {
     container: defaultContainer,
     isPacking: false,
-    inResizeMode: false,
+    inResizeMode: true,
     isResizingAgain: false,
     imagesLoaded: false,
     filesUpdatedFlag: false,

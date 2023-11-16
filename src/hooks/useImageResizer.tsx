@@ -26,7 +26,7 @@ const useResizeImage = ({
     const [localImages, setLocalImages] = useState<ImageData[]>(images);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isResizing, setIsResizing] = useState(false);
-    const [maxY, setMaxY] = useState(0);
+    const [maxY, setMaxY] = useState(container.h);
     const [startingDistFromRightEdge, setStartingDistFromRightEdge] =
         useState(0);
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
@@ -50,7 +50,7 @@ const useResizeImage = ({
             isResizingAgain ? undefined : startingMaxWidthFactor
         );
 
-        setMaxY(_maxY);
+        setMaxY(Math.max(container.h, _maxY));
         setLocalImages(_localImages);
     }, [filesUpdatedFlag]);
 
@@ -158,7 +158,7 @@ const useResizeImage = ({
             (acc, img) => Math.max(acc, img.y + img.h),
             0
         );
-        setMaxY(newMaxY);
+        setMaxY(Math.max(container.h, newMaxY));
     };
 
     const handleResize = (clientX: number, clientY: number) => {
