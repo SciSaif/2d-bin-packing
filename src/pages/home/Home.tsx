@@ -220,14 +220,14 @@ const Home: React.FC = () => {
                         className="border border-gray-400 shadow w-fit"
                     >
                         <Layer>
-                            <Rect
+                            {/* <Rect
                                 x={0}
                                 y={0}
                                 width={container.w * container.scaleFactor}
                                 height={container.h * container.scaleFactor}
                                 stroke="black"
                                 fill="white"
-                            />
+                            /> */}
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (

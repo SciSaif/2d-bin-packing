@@ -53,14 +53,14 @@ export const saveAsPDF = async ({
                         layer.add(konvaImage);
                     }
 
-                    const rect = new Konva.Rect({
-                        x: box.x,
-                        y: box.y,
-                        width: box.w,
-                        height: box.h,
-                        stroke: "red",
-                    });
-                    layer.add(rect);
+                    // const rect = new Konva.Rect({
+                    //     x: box.x,
+                    //     y: box.y,
+                    //     width: box.w,
+                    //     height: box.h,
+                    //     stroke: "red",
+                    // });
+                    // layer.add(rect);
                 });
 
                 pdf.addImage(
