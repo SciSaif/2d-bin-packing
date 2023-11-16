@@ -116,30 +116,6 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                         );
                     }}
                 />
-                {/* <div className="flex flex-row ">
-                    <LabelInput
-                        type="number"
-                        label="Set max width %"
-                        labelClassName="min-w-[120px]"
-                        wrapperClassName="max-w-[250px]"
-                        min={10}
-                        max={100}
-                        value={startingMaxWidthFactor * 100}
-                        onChange={(e) =>
-                            dispatch(
-                                setStartingMaxWidthFactor(
-                                    e.target.valueAsNumber / 100
-                                )
-                            )
-                        }
-                    />
-                    <button
-                        onClick={resizeImagesWithMaxWidth}
-                        className="px-2 text-sm bg-blue-200 border hover:bg-blue-300"
-                    >
-                        Reset Sizes
-                    </button>
-                </div> */}
             </div>
             {showMarginControls && (
                 <div className="mb-10 border-t border-b">
@@ -195,6 +171,20 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     <MarginHandles
                         handleMarginDragStart={handleMarginDragStart}
                     />
+                )}
+
+                {maxY > container.h * container.scaleFactor && (
+                    <div
+                        className="absolute w-full bg-gray-300 "
+                        style={{
+                            top: container.h * container.scaleFactor,
+                            height: 1,
+                        }}
+                    >
+                        <p className="absolute text-[8px] opacity-50 -top-3 right-1">
+                            Page End
+                        </p>
+                    </div>
                 )}
 
                 {localImages.map((imgData, index) => {
