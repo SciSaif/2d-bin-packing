@@ -105,14 +105,16 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     min={0}
                     max={30}
                     value={container.padding}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                        let padding = parseInt(e.target.value, 10);
+                        if (isNaN(padding)) padding = 0;
                         dispatch(
                             setContainer({
                                 ...container,
-                                padding: parseInt(e.target.value, 10),
+                                padding,
                             })
-                        )
-                    }
+                        );
+                    }}
                 />
                 {/* <div className="flex flex-row ">
                     <LabelInput

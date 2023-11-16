@@ -123,7 +123,11 @@ const Home: React.FC = () => {
 
     const handlePdfSave = async () => {
         setLoadingPDF(true);
+        console.log("saving pdf");
+
         await saveAsPDF({ boxes, container });
+        console.log("pdf saved3");
+
         setLoadingPDF(false);
     };
 
