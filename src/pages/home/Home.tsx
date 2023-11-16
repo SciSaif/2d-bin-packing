@@ -220,13 +220,14 @@ const Home: React.FC = () => {
                         height={container.h * container.scaleFactor}
                         className="border border-gray-400 shadow w-fit"
                         style={{ touchAction: "auto" }}
-                        onTouchStart={(e) => e.evt.preventDefault()}
+                        preventDefault={false}
                     >
-                        <Layer>
+                        <Layer preventDefault={false}>
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (
                                         <KonvaImage
+                                            preventDefault={false}
                                             x={box.x * container.scaleFactor}
                                             y={box.y * container.scaleFactor}
                                             width={
