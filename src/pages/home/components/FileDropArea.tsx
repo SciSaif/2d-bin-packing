@@ -20,13 +20,19 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
     const dispatch = useAppDispatch();
 
     const removeImage = (id: any) => {
+        console.log("in remove image");
+
         setImages(images.filter((image) => image.id !== id));
         // dispatch(filesUpdated());
         // execute after 50ms to allow the state to update
         setTimeout(() => {
+            console.log("in remove image timeout");
+
             dispatch(filesUpdated());
         }, 50);
     };
+
+    console.log("images", images);
 
     const {
         dragging,

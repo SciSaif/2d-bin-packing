@@ -33,7 +33,9 @@ const useResizeImage = ({
 
     useEffect(() => {
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
-        if (!images.length) return;
+        if (!images.length) {
+            setLocalImages([]);
+        }
         const newImageUrls = new Map<string, string>();
         images.forEach((image) => {
             if (image.file) {
@@ -52,6 +54,7 @@ const useResizeImage = ({
 
         setMaxY(Math.max(container.h, _maxY));
         setLocalImages(_localImages);
+        console.log("updated", _localImages);
     }, [filesUpdatedFlag]);
 
     // for preventive page scrolling while resizing in mobile
