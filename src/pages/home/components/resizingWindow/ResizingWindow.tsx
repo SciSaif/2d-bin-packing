@@ -14,7 +14,12 @@ import LabelInput from "../../../../components/LabelInput";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { parse } from "uuid";
 
-import { ArrowSmallDownIcon } from "@heroicons/react/24/outline";
+import {
+    ArrowSmallDownIcon,
+    InformationCircleIcon,
+} from "@heroicons/react/24/outline";
+import LabelSelectInput from "../../../../components/LabelSelect";
+import { paperSizes } from "../../../../data/paperSizes";
 
 export interface ImageData {
     id: string;
@@ -121,23 +126,78 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                         );
                     }}
                 />
-                <div data-tooltip-id="my-tooltip-1">
-                    <LabelInput
-                        type="number"
-                        label="Set initial max width %"
-                        labelClassName="min-w-[150px]"
-                        wrapperClassName="max-w-[250px]"
-                        min={10}
-                        max={100}
-                        value={startingMaxWidthFactor * 100}
-                        onChange={(e) => {
-                            let value = parseInt(e.target.value, 10);
-                            if (isNaN(value)) value = 0;
+                <LabelInput
+                    type="number"
+                    label="Set initial max width %"
+                    labelClassName="min-w-[150px]"
+                    wrapperClassName="max-w-[250px]"
+                    min={10}
+                    max={100}
+                    value={startingMaxWidthFactor * 100}
+                    onChange={(e) => {
+                        let value = parseInt(e.target.value, 10);
+                        if (isNaN(value)) value = 0;
 
-                            dispatch(setStartingMaxWidthFactor(value / 100));
-                        }}
-                    />
-                </div>
+                        dispatch(setStartingMaxWidthFactor(value / 100));
+                    }}
+                />
+                {/* <LabelSelectInput
+                    label="Set initial max width %"
+                    labelClassName="min-w-[150px]"
+                    wrapperClassName="max-w-[250px]"
+                    options={[
+                        {
+                            label: "A4",
+                            value: "A4",
+                        },
+                        {
+                            label: "Letter",
+                            value: "Letter",
+                        },
+                        {
+                            label: "A3",
+                            value: "A3",
+                        },
+                    ]}
+                    value={container.paperSize.name}
+                    onChange={(e) => {
+                        const paperSize = e.target.value;
+                        const newContainer = {
+                            ...container,
+                            paperSize: {
+                                name: paperSize,
+                                w: 0,
+                                h: 0,
+                            },
+                        };
+                        dispatch(setContainer(newContainer));
+                    }}
+                /> */}
+                <LabelSelectInput
+                    label="Paper"
+                    options={Object.values(paperSizes).map(({ name }) => ({
+                        value: name,
+                        label: name,
+                    }))}
+                    value={container.paperSize.name}
+                    onChange={(e) => {
+                        const selectedPaperSizeName = e.target.value;
+                        const selectedPaperSize =
+                            paperSizes[selectedPaperSizeName];
+
+                        if (selectedPaperSize) {
+                            const newContainer = {
+                                ...container,
+                                paperSize: selectedPaperSize,
+                                w: selectedPaperSize.width * 2,
+                                h: selectedPaperSize.height * 2,
+                            };
+
+                            dispatch(setContainer(newContainer));
+                        }
+                    }}
+                />
+
                 {/* <ReactTooltip
                     id="my-tooltip-1"
                     place="top"
@@ -147,6 +207,15 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
             {showMarginControls && (
                 <div className="flex flex-col items-center justify-center w-full mb-10 border-t border-b gap-y-2 max-w-[450px]">
                     {/* margin controls */}
+                    <div className="flex flex-row text-sm text-center text-gray-500 gap-x-2">
+                        <InformationCircleIcon className="w-10 h-10 mr-1" />
+                        <p>
+                            Most browser's print feature also allows you to set
+                            custom margins. You can leave the margins at 0 if
+                            you want.
+                        </p>
+                    </div>
+
                     <div className="mr-1">Margin: </div>
                     <div className="grid w-full grid-cols-2 gap-1 md:grid-cols-4">
                         <LabelInput

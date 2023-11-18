@@ -55,7 +55,7 @@ export const saveAsPDF = async ({
                 });
 
                 pdf.addImage(
-                    stage.toDataURL({ pixelRatio: 0.8 }),
+                    stage.toDataURL({ pixelRatio: 0.9 }),
                     0,
                     0,
                     container.w * scaleX,
