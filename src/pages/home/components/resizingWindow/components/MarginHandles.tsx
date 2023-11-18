@@ -1,6 +1,8 @@
 import React from "react";
 import { Margin } from "../../../../../redux/features/slices/mainSlice";
 import { useAppSelector } from "../../../../../redux/hooks";
+import { ChevronDoubleDownIcon } from "@heroicons/react/24/outline";
+import MarginHandleIcon from "../../../../../assets/MarginHandleIcon";
 
 interface Props {
     handleMarginDragStart: (
@@ -18,31 +20,37 @@ const MarginHandles = ({ handleMarginDragStart }: Props) => {
         <>
             {/* left margin handle  */}
             <div
-                className="absolute w-5 h-5 -translate-x-1/2 bg-blue-500 cursor-pointer -top-5"
+                className="absolute w-5 h-5 -translate-x-1/2 cursor-pointer -top-6"
                 style={{
                     left: container.margin.left * container.scaleFactor,
                 }}
                 onMouseDown={(e) => handleMarginDragStart(e, "left")}
                 onTouchStart={(e) => handleMarginDragStart(e, "left")}
-            ></div>
+            >
+                <MarginHandleIcon />
+            </div>
             {/* right margin handle  */}
             <div
-                className="absolute w-5 h-5 translate-x-1/2 bg-blue-500 cursor-pointer -top-5 "
+                className="absolute w-5 h-5 translate-x-1/2 cursor-pointer -top-6 "
                 style={{
                     right: container.margin.right * container.scaleFactor,
                 }}
                 onMouseDown={(e) => handleMarginDragStart(e, "right")}
                 onTouchStart={(e) => handleMarginDragStart(e, "right")}
-            ></div>
+            >
+                <MarginHandleIcon />
+            </div>
             {/* top margin handle  */}
             <div
-                className="absolute w-5 h-5 -translate-y-1/2 bg-blue-500 cursor-pointer -right-5 "
+                className="absolute w-5 h-5 -translate-y-1/2 cursor-pointer -right-5 "
                 style={{
                     top: container.margin.top * container.scaleFactor,
                 }}
                 onMouseDown={(e) => handleMarginDragStart(e, "top")}
                 onTouchStart={(e) => handleMarginDragStart(e, "top")}
-            ></div>
+            >
+                <MarginHandleIcon className="rotate-90" />
+            </div>
 
             {/* margin lines */}
             <div

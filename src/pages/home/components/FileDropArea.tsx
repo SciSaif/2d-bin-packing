@@ -95,9 +95,9 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
             >
                 <div
                     onClick={triggerFileInput}
-                    className="flex items-center justify-center flex-grow min-h-[200px] w-full text-xl font-bold text-tertiary/50"
+                    className="flex items-center select-none justify-center flex-grow min-h-[200px] w-full text-xl font-bold text-tertiary/50"
                 >
-                    Drop your images here{" "}
+                    Drop Files or Click to Upload
                 </div>
                 {images.length > 0 && (
                     <div className="mx-2 border-t ">

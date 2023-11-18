@@ -206,7 +206,7 @@ const Home: React.FC = () => {
 
             <div
                 ref={containerWrapper}
-                className="flex flex-wrap w-full items-center justify-center  max-w-[1050px] gap-y-10 gap-x-5 "
+                className="flex flex-wrap w-full items-center justify-center   max-w-[1050px] gap-y-10 gap-x-5 "
                 style={{ overscrollBehavior: "auto" }}
             >
                 {inResizeMode && (
@@ -219,7 +219,7 @@ const Home: React.FC = () => {
                         ref={stageRefs[index]}
                         width={container.w * container.scaleFactor}
                         height={container.h * container.scaleFactor}
-                        className="border border-gray-400 shadow w-fit"
+                        className="bg-white border border-gray-400 shadow w-fit"
                         style={{ touchAction: "auto" }}
                         preventDefault={false}
                     >

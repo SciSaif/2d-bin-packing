@@ -26,13 +26,13 @@ function LabelInput(
     return (
         <label
             className={twMerge(
-                "flex flex-row justify-center items-center  pl-2 bg-slate-100 text-black text-sm border rounded cursor-pointer gap-x-2",
+                "flex flex-row justify-center items-center  pl-2 bg-slate-100 text-black text-sm border rounded cursor-pointer ",
                 wrapperClassName
             )}
         >
             <span
                 className={twMerge(
-                    "flex items-center h-full pr-2 text-sm border-r w-full",
+                    "flex items-center h-full pr-2 text-sm border-r ",
                     labelClassName
                 )}
             >

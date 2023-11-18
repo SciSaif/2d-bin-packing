@@ -14,6 +14,8 @@ import LabelInput from "../../../../components/LabelInput";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { parse } from "uuid";
 
+import { ArrowSmallDownIcon } from "@heroicons/react/24/outline";
+
 export interface ImageData {
     id: string;
     w: number;
@@ -143,43 +145,36 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                 /> */}
             </div>
             {showMarginControls && (
-                <div className="mb-10 border-t border-b">
+                <div className="flex flex-col items-center justify-center w-full mb-10 border-t border-b gap-y-2 max-w-[450px]">
                     {/* margin controls */}
-                    <div>Margin: </div>
-                    <label>
-                        Top:
-                        <input
+                    <div className="mr-1">Margin: </div>
+                    <div className="grid w-full grid-cols-2 gap-1 md:grid-cols-4">
+                        <LabelInput
                             type="number"
+                            label="top"
                             value={container.margin.top}
                             onChange={(e) => handleMarginChange(e, "top")}
                         />
-                    </label>
-                    <label>
-                        Right:
-                        <input
+                        <LabelInput
                             type="number"
+                            label="left"
+                            value={container.margin.left}
+                            onChange={(e) => handleMarginChange(e, "left")}
+                        />
+                        <LabelInput
+                            type="number"
+                            label="right"
                             value={container.margin.right}
                             onChange={(e) => handleMarginChange(e, "right")}
                         />
-                    </label>
-                    <label>
-                        Bottom:
-                        <input
+
+                        <LabelInput
                             type="number"
+                            label="bottom"
                             value={container.margin.bottom}
                             onChange={(e) => handleMarginChange(e, "bottom")}
                         />
-                    </label>
-                    <label>
-                        Left:
-                        <input
-                            type="number"
-                            value={container.margin.left}
-                            min={0}
-                            max={200}
-                            onChange={(e) => handleMarginChange(e, "left")}
-                        />
-                    </label>
+                    </div>
                 </div>
             )}
             <div
@@ -190,8 +185,20 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     border: "1px solid black",
                     position: "relative",
                 }}
-                className="bg-white "
+                className="mt-10 bg-white"
             >
+                <div className="absolute flex flex-row items-center w-full h-10 -top-12 ">
+                    <div className="w-full h-[1px] bg-gray-500 relative ">
+                        <div className="w-[10px] h-[1px] rotate-90 bg-gray-500 absolute -left-[6px]"></div>
+                    </div>
+                    <div className="px-2 text-sm text-center whitespace-nowrap ">
+                        A4 Paper Width
+                    </div>
+                    <div className="w-full h-[1px] bg-gray-500 relative">
+                        <div className="w-[10px] h-[1px] rotate-90 bg-gray-500 absolute -right-[6px]"></div>
+                    </div>
+                </div>
+
                 {showMarginControls && (
                     <MarginHandles
                         handleMarginDragStart={handleMarginDragStart}
@@ -238,7 +245,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                         >
                             {selectedId === imgData.id && (
                                 <div
-                                    className="resize-handle w-[25px] h-[25px] md:w-[16px] md:h-[16px]"
+                                    className="resize-handle w-[25px] h-[25px] text-blue-700  md:w-[16px] md:h-[16px] "
                                     style={{
                                         position: "absolute",
                                         right: 0,
@@ -248,7 +255,18 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                                         cursor: "se-resize",
                                         border: "1px solid blue",
                                     }}
-                                ></div>
+                                >
+                                    <div className="relative h-full pointer-events-none ">
+                                        <ArrowSmallDownIcon
+                                            strokeWidth={2}
+                                            className="rotate-[135deg] w-[16px] md:w-[10px] absolute top-[-1px] left-[-1px] "
+                                        />
+                                        <ArrowSmallDownIcon
+                                            strokeWidth={2}
+                                            className="rotate-[-45deg] w-[16px] md:w-[10px] right-[-2px] bottom-[-2px] absolute  "
+                                        />
+                                    </div>
+                                </div>
                             )}
                         </div>
                     );
