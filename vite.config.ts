@@ -42,7 +42,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
                 purpose: "any",
             },
         ],
-        theme_color: "#14b8a6",
+        theme_color: "#134e4a",
         background_color: "#1e293b",
         display: "standalone",
     },
