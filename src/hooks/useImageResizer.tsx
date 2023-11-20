@@ -54,7 +54,6 @@ const useResizeImage = ({
 
         setMaxY(Math.max(container.h, _maxY));
         setLocalImages(_localImages);
-        console.log("updated", _localImages);
     }, [filesUpdatedFlag]);
 
     // for preventive page scrolling while resizing in mobile

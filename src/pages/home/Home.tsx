@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
+import { Stage, Layer, Image as KonvaImage, Rect } from "react-konva";
 import { handlePrintMultipleStages, packBoxes, saveAsPDF } from "./utils";
 import Konva from "konva";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
@@ -16,7 +16,7 @@ import {
     setIsPacking,
     setIsResizingAgain,
 } from "../../redux/features/slices/mainSlice";
-import { ClipLoader } from "react-spinners";
+import { ClimbingBoxLoader, ClipLoader } from "react-spinners";
 export interface ImageBox {
     id: string;
     w: number;
@@ -31,7 +31,7 @@ export interface ImageBox {
 const Home: React.FC = () => {
     const dispatch = useAppDispatch();
 
-    const { container, isResizingAgain, inResizeMode, imagesLoaded } =
+    const { container, inResizeMode, imagesLoaded, showBorder } =
         useAppSelector((state) => state.main);
 
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
@@ -126,7 +126,7 @@ const Home: React.FC = () => {
         setLoadingPDF(true);
         console.log("saving pdf");
 
-        await saveAsPDF({ boxes, container });
+        await saveAsPDF({ boxes, container, showBorder });
         console.log("pdf saved3");
 
         setLoadingPDF(false);
@@ -189,7 +189,7 @@ const Home: React.FC = () => {
                     </Button>
                 )}
 
-                {images?.length > 0 && (
+                {images?.length > 0 && !loading && (
                     <Button
                         onClick={reset}
                         className="bg-green-500 hover:bg-green-600"
@@ -199,8 +199,12 @@ const Home: React.FC = () => {
                 )}
             </div>
             {loading && (
-                <div className="py-10 text-2xl text-green-900 ">
-                    Packing your images...
+                <div className="flex flex-col items-center justify-center py-10 text-green-900 gap-y-2">
+                    {/* Packing your images... */}
+                    <ClipLoader color="#134e4a" size={50} />
+                    <p className="text-2xl font-semibold">
+                        Packing your images
+                    </p>
                 </div>
             )}
 
@@ -227,27 +231,76 @@ const Home: React.FC = () => {
                             {boxSet.map((box) => (
                                 <React.Fragment key={box.id}>
                                     {imagesLoaded && (
-                                        <KonvaImage
-                                            preventDefault={false}
-                                            x={box.x * container.scaleFactor}
-                                            y={box.y * container.scaleFactor}
-                                            width={
-                                                (box.rotated ? box.h : box.w) *
-                                                container.scaleFactor
-                                            }
-                                            height={
-                                                (box.rotated ? box.w : box.h) *
-                                                container.scaleFactor
-                                            }
-                                            image={box.imageElement}
-                                            rotation={box.rotated ? -90 : 0}
-                                            offsetX={
-                                                box.rotated
-                                                    ? box.h *
-                                                      container.scaleFactor
-                                                    : 0
-                                            }
-                                        />
+                                        <>
+                                            <KonvaImage
+                                                preventDefault={false}
+                                                x={
+                                                    box.x *
+                                                    container.scaleFactor
+                                                }
+                                                y={
+                                                    box.y *
+                                                    container.scaleFactor
+                                                }
+                                                width={
+                                                    (box.rotated
+                                                        ? box.h
+                                                        : box.w) *
+                                                    container.scaleFactor
+                                                }
+                                                height={
+                                                    (box.rotated
+                                                        ? box.w
+                                                        : box.h) *
+                                                    container.scaleFactor
+                                                }
+                                                image={box.imageElement}
+                                                rotation={box.rotated ? -90 : 0}
+                                                offsetX={
+                                                    box.rotated
+                                                        ? box.h *
+                                                          container.scaleFactor
+                                                        : 0
+                                                }
+                                            />
+                                            {/* show border if showBorder is true */}
+                                            {showBorder && (
+                                                <Rect
+                                                    preventDefault={false}
+                                                    x={
+                                                        box.x *
+                                                        container.scaleFactor
+                                                    }
+                                                    y={
+                                                        box.y *
+                                                        container.scaleFactor
+                                                    }
+                                                    width={
+                                                        (box.rotated
+                                                            ? box.h
+                                                            : box.w) *
+                                                        container.scaleFactor
+                                                    }
+                                                    height={
+                                                        (box.rotated
+                                                            ? box.w
+                                                            : box.h) *
+                                                        container.scaleFactor
+                                                    }
+                                                    stroke="black"
+                                                    strokeWidth={1}
+                                                    rotation={
+                                                        box.rotated ? -90 : 0
+                                                    }
+                                                    offsetX={
+                                                        box.rotated
+                                                            ? box.h *
+                                                              container.scaleFactor
+                                                            : 0
+                                                    }
+                                                />
+                                            )}
+                                        </>
                                     )}
                                 </React.Fragment>
                             ))}

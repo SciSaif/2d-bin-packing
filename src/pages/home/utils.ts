@@ -10,9 +10,11 @@ import { ContainerType } from "../../redux/features/slices/mainSlice";
 export const saveAsPDF = async ({
     boxes,
     container,
+    showBorder,
 }: {
     boxes: ImageBox[][];
     container: ContainerType;
+    showBorder: boolean;
 }) => {
     return new Promise((resolve) => {
         setTimeout(() => {
@@ -41,6 +43,20 @@ export const saveAsPDF = async ({
 
                 boxSet.forEach((box) => {
                     if (box.imageElement) {
+                        if (showBorder) {
+                            const border = new Konva.Rect({
+                                x: box.x - 1,
+                                y: box.y - 1,
+                                width: box.rotated ? box.h + 2 : box.w + 2,
+                                height: box.rotated ? box.w + 2 : box.h + 2,
+                                stroke: "#000000",
+                                strokeWidth: 1,
+                                rotation: box.rotated ? -90 : 0,
+                                offsetX: box.rotated ? box.h : 0,
+                            });
+                            layer.add(border);
+                        }
+
                         const konvaImage = new Konva.Image({
                             x: box.x,
                             y: box.y,
@@ -74,6 +90,7 @@ export const saveAsPDF = async ({
 
 export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
     let imagesContent = "";
+    console.log("stages", stages.length);
 
     stages.forEach((stage, index) => {
         if (!stage) {
@@ -96,7 +113,7 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
                         width: 100%;
                         height: auto;
                         display: block;
-                        page-break-before: always;
+                        page-break-before: auto;
                     }
                     @media print {
                         body {
@@ -107,7 +124,7 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
                             width: 100%;
                             height: auto;
                             display: block;
-                            page-break-before: always;
+                            page-break-before: auto;
                         }
                     }
                 </style>
@@ -131,66 +148,6 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
         };
     }
 };
-
-// export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
-//     let imagesContent = "";
-
-//     stages.forEach((stage) => {
-//         if (!stage) {
-//             return;
-//         }
-//         const dataUrl = stage.toDataURL();
-//         imagesContent += `<img class="print-page" src="${dataUrl}">`;
-//     });
-
-//     const printContent = `
-//         <html>
-//             <head>
-//                 <title>Print canvas</title>
-//                 <style>
-//                     body {
-//                         margin: 0;
-//                         padding: 0;
-//                     }
-//                     .print-page {
-//                         width: 100%;
-//                         height: auto;
-//                         display: block;
-//                         page-break-after: always;
-//                     }
-//                     @media print {
-//                         body {
-//                             margin: 0;
-//                             padding: 0;
-//                         }
-//                         .print-page {
-//                             width: 100%;
-//                             height: auto;
-//                             display: block;
-//                             page-break-after: always;
-//                         }
-//                     }
-//                 </style>
-//             </head>
-//             <body>
-//                 ${imagesContent}
-//             </body>
-//         </html>`;
-
-//     const printWindow = window.open("", "_blank");
-//     if (printWindow) {
-//         printWindow.document.open();
-//         printWindow.document.write(printContent);
-//         printWindow.document.close();
-
-//         printWindow.onload = function () {
-//             printWindow.print();
-//             printWindow.onafterprint = function () {
-//                 printWindow.close();
-//             };
-//         };
-//     }
-// };
 
 // function to create the images from files
 export const createImages = async (files: File[]) => {

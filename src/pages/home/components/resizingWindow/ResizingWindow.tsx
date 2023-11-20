@@ -6,20 +6,17 @@ import MarginHandles from "./components/MarginHandles";
 import {
     Margin,
     setContainer,
+    setShowBorder,
     setStartingMaxWidthFactor,
 } from "../../../../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { ImageBox } from "../../Home";
 import LabelInput from "../../../../components/LabelInput";
-import { Tooltip as ReactTooltip } from "react-tooltip";
-import { parse } from "uuid";
 
-import {
-    ArrowSmallDownIcon,
-    InformationCircleIcon,
-} from "@heroicons/react/24/outline";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import LabelSelectInput from "../../../../components/LabelSelect";
 import { paperSizes } from "../../../../data/paperSizes";
+import ResizeAnchor from "./components/ResizeAnchor";
 
 export interface ImageData {
     id: string;
@@ -40,7 +37,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
     const dispatch = useAppDispatch();
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
-    const { container, startingMaxWidthFactor } = useAppSelector(
+    const { container, startingMaxWidthFactor, showBorder } = useAppSelector(
         (state) => state.main
     );
     // Function to toggle the margin controls
@@ -56,7 +53,6 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
         imageUrls,
         selectedId,
         setMaxY,
-        // resizeImagesWithMaxWidth,
     } = useResizeImage({
         containerRef,
         images,
@@ -90,6 +86,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
         localImages,
         setLocalImages,
         setMaxY,
+
         containerRef,
     });
 
@@ -141,38 +138,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                         dispatch(setStartingMaxWidthFactor(value / 100));
                     }}
                 />
-                {/* <LabelSelectInput
-                    label="Set initial max width %"
-                    labelClassName="min-w-[150px]"
-                    wrapperClassName="max-w-[250px]"
-                    options={[
-                        {
-                            label: "A4",
-                            value: "A4",
-                        },
-                        {
-                            label: "Letter",
-                            value: "Letter",
-                        },
-                        {
-                            label: "A3",
-                            value: "A3",
-                        },
-                    ]}
-                    value={container.paperSize.name}
-                    onChange={(e) => {
-                        const paperSize = e.target.value;
-                        const newContainer = {
-                            ...container,
-                            paperSize: {
-                                name: paperSize,
-                                w: 0,
-                                h: 0,
-                            },
-                        };
-                        dispatch(setContainer(newContainer));
-                    }}
-                /> */}
+
                 <LabelSelectInput
                     label="Paper"
                     options={Object.values(paperSizes).map(({ name }) => ({
@@ -198,11 +164,17 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     }}
                 />
 
-                {/* <ReactTooltip
-                    id="my-tooltip-1"
-                    place="top"
-                    content="Initially, the image will have a maximum width set at x% of the container. Users can then manually adjust the width by modifying the image size."
-                /> */}
+                {/* show border checkBox */}
+                <div className="flex flex-row items-center gap-x-2">
+                    <input
+                        type="checkbox"
+                        checked={showBorder}
+                        onChange={(e) => {
+                            dispatch(setShowBorder(e.target.checked));
+                        }}
+                    />
+                    <p className="text-sm">Add Border</p>
+                </div>
             </div>
             {showMarginControls && (
                 <div className="flex flex-col items-center justify-center w-full mb-10 border-t border-b gap-y-2 max-w-[450px]">
@@ -261,7 +233,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                         <div className="w-[10px] h-[1px] rotate-90 bg-gray-500 absolute -left-[6px]"></div>
                     </div>
                     <div className="px-2 text-sm text-center whitespace-nowrap ">
-                        A4 Paper Width
+                        {container.paperSize.name} Paper Width
                     </div>
                     <div className="w-full h-[1px] bg-gray-500 relative">
                         <div className="w-[10px] h-[1px] rotate-90 bg-gray-500 absolute -right-[6px]"></div>
@@ -306,37 +278,15 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                                 border:
                                     selectedId === imgData.id
                                         ? "2px solid blue"
+                                        : showBorder
+                                        ? "1px solid black"
                                         : "none",
                                 // overflow: "hidden",
                             }}
                             onMouseDown={(e) => handleMouseDown(e, imgData)}
                             onTouchStart={(e) => handleMouseDown(e, imgData)}
                         >
-                            {selectedId === imgData.id && (
-                                <div
-                                    className="resize-handle w-[25px] h-[25px] text-blue-700  md:w-[16px] md:h-[16px] "
-                                    style={{
-                                        position: "absolute",
-                                        right: 0,
-                                        bottom: 0,
-
-                                        backgroundColor: "white",
-                                        cursor: "se-resize",
-                                        border: "1px solid blue",
-                                    }}
-                                >
-                                    <div className="relative h-full pointer-events-none ">
-                                        <ArrowSmallDownIcon
-                                            strokeWidth={2}
-                                            className="rotate-[135deg] w-[16px] md:w-[10px] absolute top-[-1px] left-[-1px] "
-                                        />
-                                        <ArrowSmallDownIcon
-                                            strokeWidth={2}
-                                            className="rotate-[-45deg] w-[16px] md:w-[10px] right-[-2px] bottom-[-2px] absolute  "
-                                        />
-                                    </div>
-                                </div>
-                            )}
+                            {selectedId === imgData.id && <ResizeAnchor />}
                         </div>
                     );
                 })}
