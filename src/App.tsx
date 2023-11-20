@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Home from "./pages/home/Home";
+import About from "./pages/about/About";
 
 // wrapper with Header and Footer
 const w = (Component: React.FC) => {
@@ -23,6 +24,7 @@ const App = () => {
             <Router>
                 <Routes>
                     <Route path="/" element={w(Home)} />
+                    <Route path="/about" element={w(About)} />
                 </Routes>
             </Router>
         </div>

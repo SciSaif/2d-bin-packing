@@ -17,6 +17,7 @@ import {
     setIsResizingAgain,
 } from "../../redux/features/slices/mainSlice";
 import { ClimbingBoxLoader, ClipLoader } from "react-spinners";
+import { Link } from "react-router-dom";
 export interface ImageBox {
     id: string;
     w: number;
@@ -133,7 +134,28 @@ const Home: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
+        <main className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
+            <div className="flex flex-col justify-center mt-10 text-center">
+                <h1 className="mb-2 text-xl font-semibold">
+                    Smart Image Printing Simplified: Introducing pack4print!
+                </h1>
+                <p>
+                    Effortlessly optimize your image printing with pack4print!
+                    Upload, customize, and let our powerful algorithm
+                    intelligently pack your images onto paper, minimizing waste
+                    and maximizing efficiency. Create, download, and print with
+                    ease. Try it now for a seamless printing experience!
+                </p>
+                <div>
+                    <Link
+                        to={"/about"}
+                        className="font-semibold text-secondary-800 hover:text-secondary-700 hover:underline"
+                    >
+                        Click here
+                    </Link>{" "}
+                    for Instructions
+                </div>
+            </div>
             <FileDropArea
                 images={images}
                 setBoxes={setBoxes}
@@ -309,7 +331,7 @@ const Home: React.FC = () => {
                 ))}
             </div>
             <div id="temp-container" style={{ display: "none" }}></div>
-        </div>
+        </main>
     );
 };
 

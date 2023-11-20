@@ -33,6 +33,7 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
         files,
         handleDragOver,
         handleDrop,
+        mainRef,
         handlePaste,
         fileInputRef,
         triggerFileInput,
@@ -85,11 +86,12 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
     return (
         <>
             <div
+                ref={mainRef}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 onPaste={handlePaste}
                 className={twMerge(
-                    "w-full border-2 flex flex-col border-tertiary/50 cursor-pointer border-dashed rounded-xl bg-gray-100 shadow mt-10",
+                    "w-full border-2 flex flex-col border-tertiary/50 cursor-pointer border-dashed rounded-xl bg-slate-100 shadow mt-10",
                     dragging && "border-blue-500 bg-sky-100"
                 )}
             >

@@ -23,13 +23,6 @@ const useDragAndDrop = () => {
         }
     };
 
-    // const handleFileInputChange = (event) => {
-    //     if (event.target.files) {
-    //         const newFiles = Array.from(event.target.files);
-    //         handleImageUpload(newFiles);
-    //     }
-    // };
-
     const filterImageFiles = (files: File[]): File[] => {
         return files.filter((file) => file.type.startsWith("image/"));
     };
@@ -55,7 +48,9 @@ const useDragAndDrop = () => {
         const mainElement = mainRef.current;
 
         const handleDragEnterCapture = (e: any) => {
+            console.log("drag enter capture");
             e.stopPropagation();
+
             setDragging(true);
         };
 
@@ -93,6 +88,7 @@ const useDragAndDrop = () => {
             }
         };
     }, []);
+
     const handlePaste = (e: React.ClipboardEvent) => {
         const items = e.clipboardData.items;
         const files = [];
