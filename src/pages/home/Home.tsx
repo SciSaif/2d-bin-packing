@@ -9,6 +9,7 @@ import Button from "../../components/Button";
 import FileDropArea from "./components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
+    filesUpdated,
     resetState,
     setContainer,
     setImagesLoaded,
@@ -29,10 +30,11 @@ export interface ImageBox {
     rotated?: boolean;
     new?: boolean;
 }
+
 const Home: React.FC = () => {
     const dispatch = useAppDispatch();
 
-    const { container, inResizeMode, imagesLoaded, showBorder } =
+    const { container, inResizeMode, imagesLoaded, showBorder, isPacking } =
         useAppSelector((state) => state.main);
 
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
@@ -132,6 +134,7 @@ const Home: React.FC = () => {
 
         setLoadingPDF(false);
     };
+    console.log(images, boxes);
 
     return (
         <main className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
@@ -156,11 +159,13 @@ const Home: React.FC = () => {
                     for Instructions
                 </div>
             </div>
-            <FileDropArea
-                images={images}
-                setBoxes={setBoxes}
-                setImages={setImages}
-            />
+            {!isPacking && (
+                <FileDropArea
+                    images={images}
+                    setBoxes={setBoxes}
+                    setImages={setImages}
+                />
+            )}
 
             <div className="flex flex-wrap gap-2 py-2 mt-5 w-fit ">
                 {inResizeMode && images.length > 0 && (
@@ -235,59 +240,27 @@ const Home: React.FC = () => {
                 className="flex flex-wrap w-full items-center justify-center   max-w-[1050px] gap-y-10 gap-x-5 "
                 style={{ overscrollBehavior: "auto" }}
             >
-                {inResizeMode && (
+                {inResizeMode && images?.length > 0 && (
                     <ResizingWindow setImages={setImages} images={images} />
                 )}
 
-                {boxes.map((boxSet, index) => (
-                    <Stage
-                        key={index}
-                        ref={stageRefs[index]}
-                        width={container.w * container.scaleFactor}
-                        height={container.h * container.scaleFactor}
-                        className="bg-white border border-gray-400 shadow w-fit"
-                        style={{ touchAction: "auto" }}
-                        preventDefault={false}
-                    >
-                        <Layer preventDefault={false}>
-                            {boxSet.map((box) => (
-                                <React.Fragment key={box.id}>
-                                    {imagesLoaded && (
-                                        <>
-                                            <KonvaImage
-                                                preventDefault={false}
-                                                x={
-                                                    box.x *
-                                                    container.scaleFactor
-                                                }
-                                                y={
-                                                    box.y *
-                                                    container.scaleFactor
-                                                }
-                                                width={
-                                                    (box.rotated
-                                                        ? box.h
-                                                        : box.w) *
-                                                    container.scaleFactor
-                                                }
-                                                height={
-                                                    (box.rotated
-                                                        ? box.w
-                                                        : box.h) *
-                                                    container.scaleFactor
-                                                }
-                                                image={box.imageElement}
-                                                rotation={box.rotated ? -90 : 0}
-                                                offsetX={
-                                                    box.rotated
-                                                        ? box.h *
-                                                          container.scaleFactor
-                                                        : 0
-                                                }
-                                            />
-                                            {/* show border if showBorder is true */}
-                                            {showBorder && (
-                                                <Rect
+                {boxes &&
+                    boxes.map((boxSet, index) => (
+                        <Stage
+                            key={index}
+                            ref={stageRefs[index]}
+                            width={container.w * container.scaleFactor}
+                            height={container.h * container.scaleFactor}
+                            className="bg-white border border-gray-400 shadow w-fit"
+                            style={{ touchAction: "auto" }}
+                            preventDefault={false}
+                        >
+                            <Layer preventDefault={false}>
+                                {boxSet.map((box) => (
+                                    <React.Fragment key={box.id}>
+                                        {imagesLoaded && (
+                                            <>
+                                                <KonvaImage
                                                     preventDefault={false}
                                                     x={
                                                         box.x *
@@ -309,8 +282,7 @@ const Home: React.FC = () => {
                                                             : box.h) *
                                                         container.scaleFactor
                                                     }
-                                                    stroke="black"
-                                                    strokeWidth={1}
+                                                    image={box.imageElement}
                                                     rotation={
                                                         box.rotated ? -90 : 0
                                                     }
@@ -321,14 +293,52 @@ const Home: React.FC = () => {
                                                             : 0
                                                     }
                                                 />
-                                            )}
-                                        </>
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </Layer>
-                    </Stage>
-                ))}
+                                                {/* show border if showBorder is true */}
+                                                {showBorder && (
+                                                    <Rect
+                                                        preventDefault={false}
+                                                        x={
+                                                            box.x *
+                                                            container.scaleFactor
+                                                        }
+                                                        y={
+                                                            box.y *
+                                                            container.scaleFactor
+                                                        }
+                                                        width={
+                                                            (box.rotated
+                                                                ? box.h
+                                                                : box.w) *
+                                                            container.scaleFactor
+                                                        }
+                                                        height={
+                                                            (box.rotated
+                                                                ? box.w
+                                                                : box.h) *
+                                                            container.scaleFactor
+                                                        }
+                                                        stroke="black"
+                                                        strokeWidth={1}
+                                                        rotation={
+                                                            box.rotated
+                                                                ? -90
+                                                                : 0
+                                                        }
+                                                        offsetX={
+                                                            box.rotated
+                                                                ? box.h *
+                                                                  container.scaleFactor
+                                                                : 0
+                                                        }
+                                                    />
+                                                )}
+                                            </>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                            </Layer>
+                        </Stage>
+                    ))}
             </div>
             <div id="temp-container" style={{ display: "none" }}></div>
         </main>
