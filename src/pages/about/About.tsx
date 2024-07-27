@@ -1,28 +1,3 @@
-// import React from "react";
-
-// const About = () => {
-//     return (
-//         <main className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px]  mt-10">
-//             <h1 className="text-3xl font-semibold ">About pack4print</h1>
-//             <p className="">
-//                 Welcome to pack4print – your go-to solution for efficient image
-//                 packing onto paper! We understand the importance of optimizing
-//                 resources and minimizing waste, and that's exactly what
-//                 pack4print aims to achieve. Our app utilizes a powerful bin
-//                 packing algorithm to intelligently arrange your images on paper,
-//                 ensuring the minimum number of pages required for printing.
-//             </p>
-
-//             <h2 className="mt-5 text-xl font-semibold">
-//                 How to Use pack4print:
-//             </h2>
-//         </main>
-//     );
-// };
-
-// export default About;
-import React from "react";
-
 const About = () => {
     return (
         <main className="flex flex-col pb-10 gap-2 px-4 py-4 mx-auto max-w-[800px] mt-10">
