@@ -146,10 +146,10 @@ const Home: React.FC = () => {
     return (
         <main className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
             <div className="flex flex-col justify-center mt-10 text-center">
-                <h1 className="mb-2 text-3xl font-bold text-green-900">
+                <h1 className="mb-2 text-xl font-bold text-green-900 sm:text-2xl">
                     Smart Image Printing Simplified: Introducing pack4print!
                 </h1>
-                <p className="text-xl">
+                <p className="text-lg">
                     Effortlessly optimize your image printing with pack4print!
                     Upload, customize, and let our powerful algorithm
                     intelligently pack your images onto paper, minimizing waste

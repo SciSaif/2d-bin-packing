@@ -44,10 +44,10 @@ const Header = () => {
     };
 
     return (
-        <header className="flex justify-center py-2 select-none md:py-5 bg-secondary">
+        <header className="flex justify-center py-2 select-none md:pt-4 md:pb-5 bg-secondary">
             <Link
                 to={"/"}
-                className="flex items-center justify-center text-2xl font-bold text-white cursor-pointer md:text-7xl gap-x-2"
+                className="flex items-center justify-center text-2xl font-bold text-white cursor-pointer md:text-5xl gap-x-2"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >
@@ -69,7 +69,7 @@ const Header = () => {
                             {letter}
                         </span>
                     ))}
-                <span className="text-6xl text-primary md:text-9xl">4</span>
+                <span className="text-6xl text-primary md:text-8xl">4</span>
                 <span className="letter">P</span>
                 {!hideLetters &&
                     ["r", "i", "n", "t"].map((letter, index) => (
