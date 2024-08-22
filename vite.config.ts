@@ -52,6 +52,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
 export default defineConfig({
     plugins: [comlink(), react(), VitePWA(manifestForPlugin)],
     worker: {
+        format: "es",
         plugins: () => [comlink()],
     },
     // build: {
