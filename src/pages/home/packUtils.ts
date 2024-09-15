@@ -81,24 +81,25 @@ async function callPackFunction({
     }
 }
 
-export const packBoxes = async ({
-    images,
-    container,
-    options = {},
-}: {
+export type PackBoxesProps = {
     images: ImageBox[];
     container: ContainerType;
     options?: {
         packingFactor?: number;
         useApi?: boolean;
     };
-}): Promise<ImageBox[][]> => {
+};
+
+export const packBoxes = async ({
+    images,
+    container,
+    options = {},
+}: PackBoxesProps): Promise<ImageBox[][]> => {
     let remainingImages = [...images];
     const allPackedBoxes: ImageBox[][] = [];
     const imageMap = new Map(images.map((img) => [img.id, img]));
 
-    const { packingFactor = 0.9, useApi = false } = options;
-
+    const { packingFactor = 3, useApi = false } = options;
     const containerArea = container.w * container.h;
     const targetArea = containerArea * packingFactor;
 
