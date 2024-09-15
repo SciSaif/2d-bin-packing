@@ -143,6 +143,17 @@ const Pack = () => {
     // console.log(images, boxes);
     return (
         <div className="flex flex-col px-2 py-10 sm:px-10">
+            <div className="flex flex-col items-center justify-center mt-10 text-center">
+                <h1 className="mb-2 text-xl font-bold text-secondary-900 sm:text-2xl">
+                    Welcome to Pack4Print
+                </h1>
+
+                <p className="sm:text-lg">
+                    {images.length === 0
+                        ? "To get started, drop the images you want to print in the area below."
+                        : "Scroll down to the resizing area where you can resize each image with respect to the paper size"}
+                </p>
+            </div>
             {!isPacking && (
                 <FileDropArea
                     images={images}
@@ -151,7 +162,7 @@ const Pack = () => {
                 />
             )}
 
-            <div className="flex flex-wrap gap-2 py-2 mt-5 w-fit ">
+            <div className="flex flex-wrap justify-center w-full gap-2 py-2 mt-5 ">
                 {inResizeMode && images.length > 0 && (
                     <Button onClick={() => startPacking()} className="">
                         Start packing
