@@ -31,7 +31,7 @@ const defaultContainer: ContainerType = {
     h: 842 * 2,
     scaleFactor: 0.3,
     margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    padding: 5,
+    padding: 3,
     paperSize: A4,
 };
 

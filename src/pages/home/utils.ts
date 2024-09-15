@@ -4,7 +4,6 @@ import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
 import { ImageBox } from "./Home";
-import { pack } from "efficient-rect-packer";
 import { ContainerType } from "../../redux/features/slices/mainSlice";
 
 export const saveAsPDF = async ({
@@ -174,41 +173,4 @@ export const createImages = async (files: File[]) => {
     );
 
     return newImages;
-};
-
-// function to pack the images into the container
-export const packBoxes = async ({
-    images,
-    container,
-}: {
-    images: ImageBox[];
-    container: ContainerType;
-}) => {
-    let remainingImages = [...images]; // Copy the images array to manipulate
-    const allPackedBoxes: ImageBox[][] = [];
-
-    while (remainingImages.length > 0) {
-        const { packed_rectangles, unpacked_rectangles, error } = await pack(
-            remainingImages,
-            {
-                w: container.w,
-                h: container.h,
-            },
-            {
-                padding: Math.ceil(container.padding / 2),
-                margin: container.margin,
-                noRotation: false,
-            }
-        );
-
-        if (error && error.length > 0) {
-            console.error("Packing error:", error);
-            break;
-        }
-
-        allPackedBoxes.push(packed_rectangles);
-        remainingImages = unpacked_rectangles;
-    }
-
-    return allPackedBoxes;
 };
