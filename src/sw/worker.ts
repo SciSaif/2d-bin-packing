@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { ImageBox } from "../pages/home/Home";
-import { packBoxes } from "../pages/home/utils";
+import { packBoxes } from "../pages/home/packUtils";
 import { ContainerType } from "../redux/features/slices/mainSlice";
 
 export const packBoxesInWorker = async (data: {
