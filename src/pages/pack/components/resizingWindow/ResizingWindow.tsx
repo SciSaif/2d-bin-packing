@@ -177,7 +177,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                 </div>
             </div>
             {showMarginControls && (
-                <div className="flex flex-col items-center justify-center w-full mb-10 border-t border-b gap-y-2 max-w-[450px]">
+                <div className="flex flex-col items-center justify-center w-full mb-10 border-t  border-b gap-y-2 max-w-[450px]">
                     {/* margin controls */}
                     <div className="flex flex-row text-sm text-center text-gray-500 gap-x-2">
                         <InformationCircleIcon className="w-10 h-10 mr-1" />
@@ -226,7 +226,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     border: "1px solid black",
                     position: "relative",
                 }}
-                className="mt-10 bg-white"
+                className="mt-10 bg-white shadow-xl"
             >
                 <div className="absolute flex flex-row items-center w-full h-10 -top-12 ">
                     <div className="w-full h-[1px] bg-gray-500 relative ">
