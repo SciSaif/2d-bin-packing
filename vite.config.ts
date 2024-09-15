@@ -50,8 +50,25 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
 };
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [react(), VitePWA(manifestForPlugin), comlink()],
+    plugins: [comlink(), react(), VitePWA(manifestForPlugin)],
     worker: {
-        plugins: [comlink()],
+        format: "es",
+        plugins: () => [comlink()],
     },
+    // build: {
+    //     rollupOptions: {
+    //         output: {
+    //             manualChunks(id) {
+    //                 if (id.includes("jszip") || id.includes("pako")) {
+    //                     return "jszip";
+    //                 }
+    //                 if (id.includes("node_modules")) {
+    //                     return "vendor";
+    //                 }
+
+    //                 return "index";
+    //             },
+    //         },
+    //     },
+    // },
 });
