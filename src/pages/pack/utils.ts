@@ -3,8 +3,8 @@ import jsPDF from "jspdf";
 import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 
-import { ImageBox } from "./Home";
 import { ContainerType } from "../../redux/features/slices/mainSlice";
+import { ImageBox } from "./Pack";
 
 export const saveAsPDF = async ({
     boxes,

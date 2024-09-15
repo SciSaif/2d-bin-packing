@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 declare const self: DedicatedWorkerGlobalScope;
 
-import { packBoxes as pack, PackBoxesProps } from "../pages/home/packUtils";
+import { packBoxes as pack, PackBoxesProps } from "../pages/pack/packUtils";
 
 export const packBoxes = async ({
     images,

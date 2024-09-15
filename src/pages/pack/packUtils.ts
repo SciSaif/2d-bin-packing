@@ -1,6 +1,6 @@
 import { pack, UnpackedRect, Rectangle } from "efficient-rect-packer";
-import { ImageBox } from "./Home";
 import { ContainerType } from "../../redux/features/slices/mainSlice";
+import { ImageBox } from "./Pack";
 
 function toUnpackedRect(image: ImageBox): UnpackedRect {
     return {

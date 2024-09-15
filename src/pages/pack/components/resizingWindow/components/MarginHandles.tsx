@@ -1,7 +1,6 @@
 import React from "react";
 import { Margin } from "../../../../../redux/features/slices/mainSlice";
 import { useAppSelector } from "../../../../../redux/hooks";
-import { ChevronDoubleDownIcon } from "@heroicons/react/24/outline";
 import MarginHandleIcon from "../../../../../assets/MarginHandleIcon";
 
 interface Props {

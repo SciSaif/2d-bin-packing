@@ -8,7 +8,7 @@ import {
     setInResizeMode,
 } from "../../../redux/features/slices/mainSlice";
 import { useAppDispatch } from "../../../redux/hooks";
-import { ImageBox } from "../Home";
+import { ImageBox } from "../Pack";
 
 interface Props {
     images: ImageBox[];

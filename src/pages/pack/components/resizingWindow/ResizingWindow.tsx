@@ -10,13 +10,13 @@ import {
     setStartingMaxWidthFactor,
 } from "../../../../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
-import { ImageBox } from "../../Home";
 import LabelInput from "../../../../components/LabelInput";
 
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import LabelSelectInput from "../../../../components/LabelSelect";
 import { paperSizes } from "../../../../data/paperSizes";
 import ResizeAnchor from "./components/ResizeAnchor";
+import { ImageBox } from "../../Pack";
 
 export interface ImageData {
     id: string;

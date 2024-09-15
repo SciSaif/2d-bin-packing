@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { ImageData } from "../pages/home/components/resizingWindow/ResizingWindow";
-import { positionImages } from "../pages/home/components/resizingWindow/utils";
 import { Margin, setContainer } from "../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { ImageData } from "../pages/pack/components/resizingWindow/ResizingWindow";
+import { positionImages } from "../pages/pack/components/resizingWindow/utils";
 
 interface UseMarginProps {
     containerRef: React.RefObject<HTMLDivElement>;
