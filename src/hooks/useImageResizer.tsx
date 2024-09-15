@@ -86,21 +86,14 @@ const useResizeImage = ({
             const aspectRatio = selectedImage.w / selectedImage.h;
             let mouseX = clientX / container.scaleFactor;
             let mouseY = clientY / container.scaleFactor; // Assuming you want to scale Y as well
-            // console.log("clientX", clientX);
 
             const rect = containerRef.current.getBoundingClientRect();
 
             mouseX -= rect.left / container.scaleFactor;
-            // console.log(mouseX, rect.left, selectedImage.x);
-
             let newWidth = Math.max(50, mouseX - selectedImage.x);
 
             // account for the distance between the mouse (on the handle) and the right edge of the image
             newWidth += startingDistFromRightEdge;
-
-            // console.log(newWidth);
-
-            // console.log(mouseX, rect.left, selectedImage.x, newWidth);
             let newHeight = newWidth / aspectRatio;
 
             // Constrain newWidth and newHeight to not exceed the container's dimensions and account for the margin
@@ -165,8 +158,6 @@ const useResizeImage = ({
     };
 
     const handleResize = (clientX: number, clientY: number) => {
-        // console.log("handleResize clientX", clientX);
-
         if (isResizing && selectedId) {
             const updatedImages = updateImageSize(clientX, clientY);
             if (updatedImages) {
@@ -213,8 +204,6 @@ const useResizeImage = ({
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-        // console.log("e.clientX", e.clientX);
-
         handleResize(e.clientX, e.clientY);
     };
 

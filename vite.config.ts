@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa";
-import { comlink } from "vite-plugin-comlink";
 const manifestForPlugin: Partial<VitePWAOptions> = {
     // registerType: "prompt",
     // includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
@@ -50,25 +49,5 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
 };
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [comlink(), react(), VitePWA(manifestForPlugin)],
-    worker: {
-        format: "es",
-        plugins: () => [comlink()],
-    },
-    // build: {
-    //     rollupOptions: {
-    //         output: {
-    //             manualChunks(id) {
-    //                 if (id.includes("jszip") || id.includes("pako")) {
-    //                     return "jszip";
-    //                 }
-    //                 if (id.includes("node_modules")) {
-    //                     return "vendor";
-    //                 }
-
-    //                 return "index";
-    //             },
-    //         },
-    //     },
-    // },
+    plugins: [react(), VitePWA(manifestForPlugin)],
 });
