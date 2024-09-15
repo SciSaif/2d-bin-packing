@@ -32,7 +32,6 @@ const useResizeImage = ({
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
     useEffect(() => {
-        console.log("reached", images.length);
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
         if (!images.length) {
             setLocalImages([]);

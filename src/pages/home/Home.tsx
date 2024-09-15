@@ -141,7 +141,6 @@ const Home: React.FC = () => {
         setLoadingPDF(false);
     };
     // console.log(images, boxes);
-    console.log("new here");
 
     return (
         <main className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">
