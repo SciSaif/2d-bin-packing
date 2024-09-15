@@ -10,6 +10,8 @@ import {
 import { useAppDispatch } from "../../../redux/hooks";
 import { ImageBox } from "../Pack";
 
+const MAX_IMAGES_TO_SHOW = 20;
+
 interface Props {
     images: ImageBox[];
     setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
@@ -18,6 +20,7 @@ interface Props {
 
 const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
     const dispatch = useAppDispatch();
+    const [showAllImages, setShowAllImages] = useState(false);
 
     const removeImage = (id: any) => {
         setImages(images.filter((image) => image.id !== id));
@@ -61,7 +64,11 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
     }, [files]);
 
     const imagePreviews = useMemo(() => {
-        return images.map((image) => (
+        const imagesToShow = showAllImages
+            ? images
+            : images.slice(0, MAX_IMAGES_TO_SHOW);
+
+        return imagesToShow.map((image) => (
             <div
                 key={image.id}
                 className="relative inline-flex flex-col items-center p-2"
@@ -81,7 +88,7 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
                 </button>
             </div>
         ));
-    }, [images, filesUpdated]); // Dependency on images and filesUpdated
+    }, [images, filesUpdated, showAllImages]); // Dependency on images and filesUpdated
 
     return (
         <>
@@ -106,6 +113,18 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
                         {/* show preview of images here with option to remove them */}
                         {images.length > 0 && (
                             <div className="mx-2 border-t">{imagePreviews}</div>
+                        )}
+                        {images.length > MAX_IMAGES_TO_SHOW && (
+                            <button
+                                onClick={() => setShowAllImages(!showAllImages)}
+                                className="w-full py-2 mt-2 text-sm font-medium underline text-secondary-600 hover:text-secondary-800"
+                            >
+                                {showAllImages
+                                    ? "Hide"
+                                    : `Show ${
+                                          images.length - MAX_IMAGES_TO_SHOW
+                                      } more images`}
+                            </button>
                         )}
                     </div>
                 )}
