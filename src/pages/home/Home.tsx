@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Stage, Layer, Image as KonvaImage, Rect } from "react-konva";
 import { handlePrintMultipleStages, saveAsPDF } from "./utils";
@@ -9,7 +9,6 @@ import Button from "../../components/Button";
 import FileDropArea from "./components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
-    filesUpdated,
     resetState,
     setContainer,
     setImagesLoaded,
@@ -19,7 +18,7 @@ import {
 } from "../../redux/features/slices/mainSlice";
 import { ClipLoader } from "react-spinners";
 import { Link } from "react-router-dom";
-import { packBoxes } from "./packUtils";
+import { workerInstance } from "../../workerUtils";
 
 export interface ImageBox {
     id: string;
@@ -84,10 +83,11 @@ const Home: React.FC = () => {
         dispatch(setInResizeMode(false));
         let packedBoxes: ImageBox[][] = [];
         try {
-            packedBoxes = await packBoxes({
-                images,
-                container,
-            });
+            // packedBoxes = await packBoxes({
+            //     images,
+            //     container,
+            // });
+            packedBoxes = await workerInstance.packBoxes({ images, container });
         } catch (error) {
             console.error(error);
         }
@@ -141,7 +141,6 @@ const Home: React.FC = () => {
         setLoadingPDF(false);
     };
     // console.log(images, boxes);
-    console.log("new here");
 
     return (
         <main className="flex flex-col pb-10 gap-2 px-2 py-2 mx-auto max-w-[1050px] items-center">

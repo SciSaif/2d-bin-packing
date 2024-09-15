@@ -1,22 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { A3, A4, PaperSize } from "../../../data/paperSizes";
 
-// export interface ContainerType {
-//     w: number;
-//     h: number;
-//     scaleFactor: number;
-//     margin: Margin;
-//     padding: number;
-// }
-
-// const defaultContainer: ContainerType = {
-//     w: 595 * 2,
-//     h: 842 * 2,
-//     scaleFactor: 0.3,
-//     margin: { top: 0, right: 0, bottom: 0, left: 0 },
-//     padding: 5,
-// };
-
 export interface ContainerType {
     w: number;
     h: number;
