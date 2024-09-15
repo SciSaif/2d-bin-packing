@@ -4,6 +4,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Home from "./pages/home/Home";
 import About from "./pages/about/About";
+import Pack from "./pages/pack/Pack";
 
 // wrapper with Header and Footer
 const w = (Component: React.FC) => {
@@ -20,11 +21,12 @@ const w = (Component: React.FC) => {
 
 const App = () => {
     return (
-        <div className="min-h-screen bg-bg">
+        <div className="w-full min-h-screen   bg-yellow-50/20   bg-grid-small-black/[0.2] ">
             <Router>
                 <Routes>
                     <Route path="/" element={w(Home)} />
                     <Route path="/about" element={w(About)} />
+                    <Route path="/pack" element={w(Pack)} />
                 </Routes>
             </Router>
         </div>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ImageData } from "../pages/home/components/resizingWindow/ResizingWindow";
-import { positionImages } from "../pages/home/components/resizingWindow/utils";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { ImageBox } from "../pages/home/Home";
+import { useAppSelector } from "../redux/hooks";
+import { ImageBox } from "../pages/pack/Pack";
+import { ImageData } from "../pages/pack/components/resizingWindow/ResizingWindow";
+import { positionImages } from "../pages/pack/components/resizingWindow/utils";
 
 interface UseResizeImageProps {
     containerRef: React.RefObject<HTMLDivElement>;
