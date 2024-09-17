@@ -20,6 +20,7 @@ import { handlePrintMultipleStages, saveAsPDF } from "./utils";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import Content from "./components/Content";
 import SaveAsPdfButton from "./components/SaveAsPDFButton";
+import PrintButton from "./components/PrintButton";
 
 export interface ImageBox {
     id: string;
@@ -147,19 +148,8 @@ const Pack = () => {
                 )}
 
                 <SaveAsPdfButton boxes={boxes} />
+                <PrintButton stageRefs={stageRefs} />
 
-                {boxes.length > 0 && (
-                    <Button
-                        onClick={() =>
-                            handlePrintMultipleStages(
-                                stageRefs.map((ref) => ref.current)
-                            )
-                        }
-                        className="bg-purple-500 hover:bg-purple-600"
-                    >
-                        Print
-                    </Button>
-                )}
                 {!inResizeMode && boxes?.length > 0 && (
                     <Button
                         onClick={() => {
