@@ -6,15 +6,17 @@ import { v4 as uuidv4 } from "uuid";
 import { ContainerType } from "../../redux/features/slices/mainSlice";
 import { ImageBox } from "./Pack";
 
+export type SaveAsPDFProps = {
+    boxes: ImageBox[][];
+    container: ContainerType;
+    showBorder: boolean;
+};
+
 export const saveAsPDF = async ({
     boxes,
     container,
     showBorder,
-}: {
-    boxes: ImageBox[][];
-    container: ContainerType;
-    showBorder: boolean;
-}) => {
+}: SaveAsPDFProps) => {
     return new Promise((resolve) => {
         setTimeout(() => {
             const pdf = new jsPDF("p", "pt", "a4");

@@ -15,10 +15,11 @@ import {
     setIsResizingAgain,
 } from "../../redux/features/slices/mainSlice";
 import { ClipLoader } from "react-spinners";
-import { Link } from "react-router-dom";
 import { workerInstance } from "../../workerUtils";
 import { handlePrintMultipleStages, saveAsPDF } from "./utils";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
+import Content from "./components/Content";
+import SaveAsPdfButton from "./components/SaveAsPDFButton";
 
 export interface ImageBox {
     id: string;
@@ -83,16 +84,12 @@ const Pack = () => {
         dispatch(setInResizeMode(false));
         let packedBoxes: ImageBox[][] = [];
         try {
-            // packedBoxes = await packBoxes({
-            //     images,
-            //     container,
-            // });
             packedBoxes = await workerInstance.packBoxes({ images, container });
         } catch (error) {
             console.error(error);
         }
 
-        console.log("packedBoxes", packedBoxes);
+        // console.log("packedBoxes", packedBoxes);
 
         setIsPacking(false);
         setBoxes(packedBoxes);
@@ -131,29 +128,9 @@ const Pack = () => {
         updateScaleFactor();
     };
 
-    const [loadingPDF, setLoadingPDF] = useState<boolean>(false);
-
-    const handlePdfSave = async () => {
-        setLoadingPDF(true);
-
-        await saveAsPDF({ boxes, container, showBorder });
-
-        setLoadingPDF(false);
-    };
-    // console.log(images, boxes);
     return (
         <div className="flex flex-col px-2 py-10 sm:px-10">
-            <div className="flex flex-col items-center justify-center mt-10 text-center">
-                <h1 className="mb-2 text-xl font-bold text-secondary-900 sm:text-2xl">
-                    Welcome to Pack4Print
-                </h1>
-
-                <p className="sm:text-lg">
-                    {images.length === 0
-                        ? "To get started, drop the images you want to print in the area below."
-                        : "Scroll down to the resizing area where you can resize each image with respect to the paper size"}
-                </p>
-            </div>
+            <Content noImagesUploaded={images.length === 0} />
             {!isPacking && (
                 <FileDropArea
                     images={images}
@@ -169,21 +146,7 @@ const Pack = () => {
                     </Button>
                 )}
 
-                {boxes.length > 0 &&
-                    container &&
-                    (loadingPDF ? (
-                        <div className="flex flex-row items-center justify-center gap-2 px-2 py-2 text-white bg-green-500 hover:bg-green-600">
-                            creating PDF
-                            <ClipLoader color="white" size={16} />
-                        </div>
-                    ) : (
-                        <Button
-                            onClick={handlePdfSave}
-                            className="bg-green-500 hover:bg-green-600"
-                        >
-                            Save as PDF
-                        </Button>
-                    ))}
+                <SaveAsPdfButton boxes={boxes} />
 
                 {boxes.length > 0 && (
                     <Button
