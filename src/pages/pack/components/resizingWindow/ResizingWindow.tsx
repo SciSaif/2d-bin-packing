@@ -97,7 +97,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
             <div className="flex flex-col items-center justify-center gap-2 mb-4 sm:flex-row">
                 <button
                     onClick={toggleMarginControls}
-                    className="px-2 py-2   text-sm w-[150px] text-white bg-purple-500 rounded  hover:bg-purple-600"
+                    className="px-2 py-2   text-sm w-[150px] text-black bg-slate-100 rounded  hover:bg-slate-200 shadow"
                 >
                     {showMarginControls ? "Hide Margins" : "Show Margins"}
                 </button>
@@ -119,17 +119,15 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     }}
                 />
 
-                {/* show border checkBox */}
-                <div className="flex flex-row items-center gap-x-2">
-                    <input
-                        type="checkbox"
-                        checked={showBorder}
-                        onChange={(e) => {
-                            dispatch(setShowBorder(e.target.checked));
-                        }}
-                    />
-                    <p className="text-sm">Add Border</p>
-                </div>
+                {/* show border button*/}
+                <button
+                    onClick={() => {
+                        dispatch(setShowBorder(!showBorder));
+                    }}
+                    className="px-2 py-2   text-sm w-[150px] text-black bg-slate-100 rounded  hover:bg-slate-200 shadow"
+                >
+                    {showBorder ? "Hide Border" : "Show Border"}
+                </button>
             </div>
             {showMarginControls && (
                 <div className="flex flex-col items-center justify-center w-full mb-10 border-t  border-b gap-y-2 max-w-[450px]">
