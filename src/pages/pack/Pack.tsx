@@ -16,6 +16,7 @@ import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import Content from "./components/Content";
 
 import ActionButtons from "./components/ActionButtons";
+import { useScaleFactor } from "../../hooks/useScaleFactor";
 
 export interface ImageBox {
     id: string;
@@ -74,28 +75,7 @@ const Pack = () => {
 
     const containerWrapper = React.useRef<HTMLDivElement>(null);
 
-    const windowWidth = useWindowResize();
-
-    const updateScaleFactor = () => {
-        if (!containerWrapper.current) return;
-
-        const containerWrapperWidth = containerWrapper.current.clientWidth;
-        const columns = windowWidth >= 768 ? 2 : 1;
-        // const columns = 2;
-        let gridCellWidth = containerWrapperWidth / columns;
-
-        // Subtract any grid gap if applicable
-        const gap = 20;
-        gridCellWidth -= gap;
-
-        const scaleFactor = gridCellWidth / container.w;
-
-        dispatch(setContainer({ ...container, scaleFactor }));
-    };
-
-    useEffect(() => {
-        updateScaleFactor();
-    }, [containerWrapper, windowWidth]); // Depend on windowWidth
+    const updateScaleFactor = useScaleFactor(containerWrapper);
 
     console.log("isPacking", isPacking);
 
