@@ -99,7 +99,7 @@ export const packBoxes = async ({
     const allPackedBoxes: ImageBox[][] = [];
     const imageMap = new Map(images.map((img) => [img.id, img]));
 
-    const { packingFactor = 3, useApi = false } = options;
+    const { packingFactor = 1, useApi = false } = options;
     const containerArea = container.w * container.h;
     const targetArea = containerArea * packingFactor;
 

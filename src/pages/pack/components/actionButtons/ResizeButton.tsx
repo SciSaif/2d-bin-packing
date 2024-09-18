@@ -1,12 +1,12 @@
 import React from "react";
-import Button from "../../../components/Button";
-import { useAppDispatch } from "../../../redux/hooks";
+import { ImageBox } from "../../Pack";
+import { useAppDispatch } from "../../../../redux/hooks";
+import Button from "../../../../components/Button";
 import {
     setImagesLoaded,
     setInResizeMode,
     setIsResizingAgain,
-} from "../../../redux/features/slices/mainSlice";
-import { ImageBox } from "../Pack";
+} from "../../../../redux/features/slices/mainSlice";
 
 type ResizeButtonProps = {
     setBoxes: React.Dispatch<React.SetStateAction<ImageBox[][]>>;

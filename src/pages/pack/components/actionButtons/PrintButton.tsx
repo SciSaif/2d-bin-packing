@@ -1,7 +1,6 @@
-import Konva from "konva";
-import Button from "../../../components/Button";
-import { handlePrintMultipleStages } from "../utils";
 import { Stage } from "konva/lib/Stage";
+import Button from "../../../../components/Button";
+import { handlePrintMultipleStages } from "../../utils";
 
 type PrintButtonProps = {
     stageRefs: React.RefObject<Stage>[];

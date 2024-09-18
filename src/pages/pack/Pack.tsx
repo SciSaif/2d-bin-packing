@@ -1,27 +1,21 @@
 import React, { useEffect, useState } from "react";
-
 import { Stage, Layer, Image as KonvaImage, Rect } from "react-konva";
 import Konva from "konva";
 import { useWindowResize } from "../../hooks/useWindowResize";
-import Button from "../../components/Button";
 import FileDropArea from "./components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
-    resetState,
     setContainer,
     setImagesLoaded,
     setInResizeMode,
     setIsPacking,
-    setIsResizingAgain,
 } from "../../redux/features/slices/mainSlice";
 import { ClipLoader } from "react-spinners";
 import { workerInstance } from "../../workerUtils";
-import { handlePrintMultipleStages, saveAsPDF } from "./utils";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import Content from "./components/Content";
-import SaveAsPdfButton from "./components/SaveAsPDFButton";
-import PrintButton from "./components/PrintButton";
-import ResizeButton from "./components/ResizeButton";
+
+import ActionButtons from "./components/ActionButtons";
 
 export interface ImageBox {
     id: string;
@@ -78,26 +72,6 @@ const Pack = () => {
         });
     }, [boxes, images]);
 
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const startPacking = async () => {
-        dispatch(setIsPacking(true));
-        setLoading(true);
-        dispatch(setInResizeMode(false));
-        let packedBoxes: ImageBox[][] = [];
-        try {
-            packedBoxes = await workerInstance.packBoxes({ images, container });
-        } catch (error) {
-            console.error(error);
-        }
-
-        // console.log("packedBoxes", packedBoxes);
-
-        setIsPacking(false);
-        setBoxes(packedBoxes);
-        setLoading(false);
-    };
-
     const containerWrapper = React.useRef<HTMLDivElement>(null);
 
     const windowWidth = useWindowResize();
@@ -123,17 +97,12 @@ const Pack = () => {
         updateScaleFactor();
     }, [containerWrapper, windowWidth]); // Depend on windowWidth
 
-    const reset = () => {
-        setImages([]);
-        setBoxes([]);
-        dispatch(resetState());
-        updateScaleFactor();
-    };
+    console.log("isPacking", isPacking);
 
     return (
         <div className="flex flex-col px-2 py-10 sm:px-10">
             <Content noImagesUploaded={images.length === 0} />
-            {!isPacking && (
+            {!isPacking && boxes.length === 0 && (
                 <FileDropArea
                     images={images}
                     setBoxes={setBoxes}
@@ -141,33 +110,17 @@ const Pack = () => {
                 />
             )}
 
-            <div className="flex flex-wrap justify-center w-full gap-2 py-2 mt-5 ">
-                {inResizeMode && images.length > 0 && (
-                    <Button onClick={() => startPacking()} className="">
-                        Start packing
-                    </Button>
-                )}
+            <ActionButtons
+                boxes={boxes}
+                setBoxes={setBoxes}
+                images={images}
+                setImages={setImages}
+                stageRefs={stageRefs}
+                updateScaleFactor={updateScaleFactor}
+            />
 
-                {boxes?.length > 0 && (
-                    <>
-                        <SaveAsPdfButton boxes={boxes} />
-                        <PrintButton stageRefs={stageRefs} />
-                        <ResizeButton setBoxes={setBoxes} />
-                    </>
-                )}
-
-                {images?.length > 0 && !loading && (
-                    <Button
-                        onClick={reset}
-                        className="bg-green-500 hover:bg-green-600"
-                    >
-                        Reset
-                    </Button>
-                )}
-            </div>
-            {loading && (
+            {isPacking && (
                 <div className="flex flex-col items-center justify-center py-10 text-green-900 gap-y-2">
-                    {/* Packing your images... */}
                     <ClipLoader color="#134e4a" size={50} />
                     <p className="text-2xl font-semibold">
                         Packing your images
