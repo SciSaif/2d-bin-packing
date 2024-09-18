@@ -10,6 +10,7 @@ import Content from "./components/Content";
 import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
 import PageStage from "./components/PageStage";
+import SettingsPanel from "./components/SettingsPanel";
 
 export interface ImageBox {
     id: string;
@@ -80,6 +81,8 @@ const Pack = () => {
                 />
             )}
 
+            <SettingsPanel />
+
             <ActionButtons
                 boxes={boxes}
                 setBoxes={setBoxes}
@@ -100,7 +103,7 @@ const Pack = () => {
 
             <div
                 ref={containerWrapper}
-                className="flex flex-wrap w-full items-center justify-center   max-w-[1050px] gap-y-10 gap-x-5 "
+                className="flex flex-wrap w-full items-center justify-center mx-auto   max-w-[1050px] gap-y-10 gap-x-5 "
                 style={{ overscrollBehavior: "auto" }}
             >
                 {inResizeMode && images?.length > 0 && (

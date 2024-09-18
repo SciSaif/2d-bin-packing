@@ -7,14 +7,11 @@ import {
     Margin,
     setContainer,
     setShowBorder,
-    setStartingMaxWidthFactor,
 } from "../../../../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import LabelInput from "../../../../components/LabelInput";
 
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
-import LabelSelectInput from "../../../../components/LabelSelect";
-import { paperSizes } from "../../../../data/paperSizes";
 import ResizeAnchor from "./components/ResizeAnchor";
 import { ImageBox } from "../../Pack";
 
@@ -37,9 +34,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
     const dispatch = useAppDispatch();
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
-    const { container, startingMaxWidthFactor, showBorder } = useAppSelector(
-        (state) => state.main
-    );
+    const { container, showBorder } = useAppSelector((state) => state.main);
     // Function to toggle the margin controls
     const toggleMarginControls = () => {
         setShowMarginControls(!showMarginControls);
@@ -91,7 +86,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
     });
 
     return (
-        <div className="flex flex-col items-center justify-center w-full pt-5 mx-auto border-t">
+        <div className="flex flex-col items-center justify-center w-full pt-5 border-t">
             <div className="mb-4">
                 <p className="text-sm text-center text-gray-600">
                     Click on the image and use the resize handle to resize the
@@ -121,46 +116,6 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                                 padding,
                             })
                         );
-                    }}
-                />
-                <LabelInput
-                    type="number"
-                    label="Set initial max width %"
-                    labelClassName="min-w-[150px]"
-                    wrapperClassName="max-w-[250px]"
-                    min={10}
-                    max={100}
-                    value={startingMaxWidthFactor * 100}
-                    onChange={(e) => {
-                        let value = parseInt(e.target.value, 10);
-                        if (isNaN(value)) value = 0;
-
-                        dispatch(setStartingMaxWidthFactor(value / 100));
-                    }}
-                />
-
-                <LabelSelectInput
-                    label="Paper"
-                    options={Object.values(paperSizes).map(({ name }) => ({
-                        value: name,
-                        label: name,
-                    }))}
-                    value={container.paperSize.name}
-                    onChange={(e) => {
-                        const selectedPaperSizeName = e.target.value;
-                        const selectedPaperSize =
-                            paperSizes[selectedPaperSizeName];
-
-                        if (selectedPaperSize) {
-                            const newContainer = {
-                                ...container,
-                                paperSize: selectedPaperSize,
-                                w: selectedPaperSize.width * 2,
-                                h: selectedPaperSize.height * 2,
-                            };
-
-                            dispatch(setContainer(newContainer));
-                        }
                     }}
                 />
 

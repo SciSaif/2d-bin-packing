@@ -22,6 +22,7 @@
     "jspdf": "^2.5.1",
     "konva": "^9.2.2",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.441.0",
     "mini-svg-data-uri": "^1.4.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

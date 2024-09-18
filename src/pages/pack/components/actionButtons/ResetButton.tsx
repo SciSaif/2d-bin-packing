@@ -1,3 +1,4 @@
+import { RefreshCw } from "lucide-react";
 import Button from "../../../../components/Button";
 import { resetState } from "../../../../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
@@ -26,8 +27,11 @@ const ResetButton = ({
     };
 
     return (
-        <Button onClick={reset} className="bg-green-500 hover:bg-green-600">
-            Reset
+        <Button
+            onClick={reset}
+            className="transition-all bg-transparent text-slate-700 hover:bg-transparent hover:rotate-180"
+        >
+            <RefreshCw size={24} />
         </Button>
     );
 };

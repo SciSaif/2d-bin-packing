@@ -31,7 +31,10 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
         setBoxes(packedBoxes);
     };
     return (
-        <Button onClick={() => startPacking()} className="">
+        <Button
+            onClick={() => startPacking()}
+            className="px-8 py-2 font-bold text-white transition duration-200 border-2 border-transparent rounded-md bg-secondary-700 w-fit hover:bg-white hover:text-secondary-700 hover:border-secondary-700"
+        >
             Start packing
         </Button>
     );
