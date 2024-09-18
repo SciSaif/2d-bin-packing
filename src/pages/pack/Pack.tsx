@@ -21,6 +21,7 @@ import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import Content from "./components/Content";
 import SaveAsPdfButton from "./components/SaveAsPDFButton";
 import PrintButton from "./components/PrintButton";
+import ResizeButton from "./components/ResizeButton";
 
 export interface ImageBox {
     id: string;
@@ -147,21 +148,12 @@ const Pack = () => {
                     </Button>
                 )}
 
-                <SaveAsPdfButton boxes={boxes} />
-                <PrintButton stageRefs={stageRefs} />
-
-                {!inResizeMode && boxes?.length > 0 && (
-                    <Button
-                        onClick={() => {
-                            dispatch(setIsResizingAgain(true));
-                            dispatch(setInResizeMode(true));
-                            dispatch(setImagesLoaded(false));
-                            setBoxes([]);
-                        }}
-                        className="bg-yellow-500 hover:bg-yellow-600"
-                    >
-                        Resize images
-                    </Button>
+                {boxes?.length > 0 && (
+                    <>
+                        <SaveAsPdfButton boxes={boxes} />
+                        <PrintButton stageRefs={stageRefs} />
+                        <ResizeButton setBoxes={setBoxes} />
+                    </>
                 )}
 
                 {images?.length > 0 && !loading && (

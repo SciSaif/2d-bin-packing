@@ -6,14 +6,12 @@ import { ImageBox } from "../Pack";
 import { useAppSelector } from "../../../redux/hooks";
 
 interface SaveAsPdfButtonProps {
-    boxes?: ImageBox[][];
+    boxes: ImageBox[][];
 }
 
 const SaveAsPdfButton = ({ boxes }: SaveAsPdfButtonProps) => {
     const [loadingPDF, setLoadingPDF] = useState(false);
     const { container, showBorder } = useAppSelector((state) => state.main);
-
-    if (!boxes || boxes.length === 0) return null;
 
     const handlePdfSave = async () => {
         setLoadingPDF(true);
