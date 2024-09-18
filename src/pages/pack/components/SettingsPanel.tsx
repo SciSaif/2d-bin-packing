@@ -9,9 +9,11 @@ import { paperSizes } from "../../../data/paperSizes";
 
 const SettingsPanel = () => {
     const dispatch = useAppDispatch();
-    const { startingMaxWidthFactor, container } = useAppSelector(
+    const { startingMaxWidthFactor, container, inResizeMode } = useAppSelector(
         (state) => state.main
     );
+
+    if (!inResizeMode) return null;
 
     return (
         <div className="flex justify-center gap-2">

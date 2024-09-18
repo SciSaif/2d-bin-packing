@@ -7,6 +7,7 @@ import {
 } from "../../../../redux/features/slices/mainSlice";
 import { ImageBox } from "../../Pack";
 import { workerInstance } from "../../../../workerUtils";
+import { releaseProxy } from "comlink";
 
 type StartPackingButtonsProps = {
     setBoxes: React.Dispatch<React.SetStateAction<ImageBox[][]>>;
@@ -21,6 +22,11 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
         dispatch(setIsPacking(true));
         dispatch(setInResizeMode(false));
         let packedBoxes: ImageBox[][] = [];
+
+        // terminate worker after 5 seconds
+        setTimeout(() => {
+            workerInstance[releaseProxy]();
+        }, 5000);
         try {
             packedBoxes = await workerInstance.packBoxes({ images, container });
         } catch (error) {
