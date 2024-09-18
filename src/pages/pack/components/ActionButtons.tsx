@@ -27,7 +27,7 @@ const ActionButtons = ({
     const { inResizeMode, isPacking } = useAppSelector((state) => state.main);
 
     return (
-        <div className="flex flex-wrap justify-center w-full gap-2 py-2 mt-5 ">
+        <div className="flex flex-wrap justify-center w-full gap-2 py-2 mt-5 mb-5 ">
             {boxes.length > 0 && (
                 <>
                     <SaveAsPdfButton boxes={boxes} />

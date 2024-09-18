@@ -17,6 +17,7 @@ import Content from "./components/Content";
 
 import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
+import PageStage from "./components/PageStage";
 
 export interface ImageBox {
     id: string;
@@ -77,8 +78,6 @@ const Pack = () => {
 
     const updateScaleFactor = useScaleFactor(containerWrapper);
 
-    console.log("isPacking", isPacking);
-
     return (
         <div className="flex flex-col px-2 py-10 sm:px-10">
             <Content noImagesUploaded={images.length === 0} />
@@ -119,98 +118,12 @@ const Pack = () => {
 
                 {boxes &&
                     boxes.map((boxSet, index) => (
-                        <Stage
+                        <PageStage
                             key={index}
-                            ref={stageRefs[index]}
-                            width={container.w * container.scaleFactor}
-                            height={container.h * container.scaleFactor}
-                            className="bg-white border border-gray-400 shadow w-fit"
-                            style={{ touchAction: "auto" }}
-                            preventDefault={false}
-                        >
-                            <Layer preventDefault={false}>
-                                {boxSet.map((box) => (
-                                    <React.Fragment key={box.id}>
-                                        {imagesLoaded && (
-                                            <>
-                                                <KonvaImage
-                                                    preventDefault={false}
-                                                    x={
-                                                        box.x *
-                                                        container.scaleFactor
-                                                    }
-                                                    y={
-                                                        box.y *
-                                                        container.scaleFactor
-                                                    }
-                                                    width={
-                                                        (box.rotated
-                                                            ? box.h
-                                                            : box.w) *
-                                                        container.scaleFactor
-                                                    }
-                                                    height={
-                                                        (box.rotated
-                                                            ? box.w
-                                                            : box.h) *
-                                                        container.scaleFactor
-                                                    }
-                                                    image={box.imageElement}
-                                                    rotation={
-                                                        box.rotated ? -90 : 0
-                                                    }
-                                                    offsetX={
-                                                        box.rotated
-                                                            ? box.h *
-                                                              container.scaleFactor
-                                                            : 0
-                                                    }
-                                                />
-                                                {/* show border if showBorder is true */}
-                                                {showBorder && (
-                                                    <Rect
-                                                        preventDefault={false}
-                                                        x={
-                                                            box.x *
-                                                            container.scaleFactor
-                                                        }
-                                                        y={
-                                                            box.y *
-                                                            container.scaleFactor
-                                                        }
-                                                        width={
-                                                            (box.rotated
-                                                                ? box.h
-                                                                : box.w) *
-                                                            container.scaleFactor
-                                                        }
-                                                        height={
-                                                            (box.rotated
-                                                                ? box.w
-                                                                : box.h) *
-                                                            container.scaleFactor
-                                                        }
-                                                        stroke="black"
-                                                        strokeWidth={1}
-                                                        rotation={
-                                                            box.rotated
-                                                                ? -90
-                                                                : 0
-                                                        }
-                                                        offsetX={
-                                                            box.rotated
-                                                                ? box.h *
-                                                                  container.scaleFactor
-                                                                : 0
-                                                        }
-                                                    />
-                                                )}
-                                            </>
-                                        )}
-                                    </React.Fragment>
-                                ))}
-                            </Layer>
-                        </Stage>
+                            boxSet={boxSet}
+                            stageRef={stageRefs}
+                            index={index}
+                        />
                     ))}
             </div>
             <div id="temp-container" style={{ display: "none" }}></div>
