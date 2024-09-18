@@ -9,6 +9,7 @@ import {
 } from "../../../redux/features/slices/mainSlice";
 import { useAppDispatch } from "../../../redux/hooks";
 import { ImageBox } from "../Pack";
+import { clearFileInput } from "../../../utils";
 
 const MAX_IMAGES_TO_SHOW = 20;
 
@@ -21,9 +22,16 @@ interface Props {
 const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
     const dispatch = useAppDispatch();
     const [showAllImages, setShowAllImages] = useState(false);
+    console.log("images", images);
 
     const removeImage = (id: any) => {
         setImages(images.filter((image) => image.id !== id));
+
+        // if all images are removed, reset the state
+        if (images.length === 1) {
+            clearFileInput();
+        }
+
         // dispatch(filesUpdated());
         // execute after 50ms to allow the state to update
         setTimeout(() => {
@@ -131,6 +139,7 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
             </div>
             {/* Hidden file input */}
             <input
+                id="fileInput"
                 type="file"
                 multiple
                 onChange={handleFileInputChange}

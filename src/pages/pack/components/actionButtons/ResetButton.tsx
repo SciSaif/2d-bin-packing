@@ -1,6 +1,7 @@
 import Button from "../../../../components/Button";
 import { resetState } from "../../../../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
+import { clearFileInput } from "../../../../utils";
 import { ImageBox } from "../../Pack";
 
 type ResetButtonProps = {
@@ -21,6 +22,7 @@ const ResetButton = ({
         setBoxes([]);
         dispatch(resetState());
         updateScaleFactor();
+        clearFileInput();
     };
 
     return (

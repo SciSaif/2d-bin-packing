@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Stage, Layer, Image as KonvaImage, Rect } from "react-konva";
 import Konva from "konva";
-import { useWindowResize } from "../../hooks/useWindowResize";
 import FileDropArea from "./components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import {
-    setContainer,
-    setImagesLoaded,
-    setInResizeMode,
-    setIsPacking,
-} from "../../redux/features/slices/mainSlice";
+import { setImagesLoaded } from "../../redux/features/slices/mainSlice";
 import { ClipLoader } from "react-spinners";
-import { workerInstance } from "../../workerUtils";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import Content from "./components/Content";
 
@@ -34,8 +26,7 @@ export interface ImageBox {
 const Pack = () => {
     const dispatch = useAppDispatch();
 
-    const { container, inResizeMode, imagesLoaded, showBorder, isPacking } =
-        useAppSelector((state) => state.main);
+    const { inResizeMode, isPacking } = useAppSelector((state) => state.main);
 
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
     const [images, setImages] = useState<ImageBox[]>([]);
