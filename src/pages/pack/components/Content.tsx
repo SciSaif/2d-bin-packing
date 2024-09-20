@@ -16,7 +16,7 @@ const Content = ({ noImagesUploaded }: ContentProps) => {
     }
     if (isPacking) {
         content =
-            "Packing your images. If it is taking too long, try reducing packing factor.";
+            "Packing your images. If it is taking too long, try reducing packing efficiency.";
     } else if (!inResizeMode) {
         content =
             "You can now save as PDF or click on the resize button to go back and resize the images. The print button is not working properly at the moment.";

@@ -6,6 +6,7 @@ import {
     setImagesLoaded,
     setInResizeMode,
     setIsPacking,
+    setPackingProgress,
 } from "../../redux/features/slices/mainSlice";
 import { ClipLoader } from "react-spinners";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
@@ -118,6 +119,7 @@ const Pack = () => {
                         terminateWorkerInstance();
                         dispatch(setIsPacking(false));
                         dispatch(setInResizeMode(true));
+                        dispatch(setPackingProgress(0));
                     }}
                     className="px-2 py-0 mx-auto text-sm text-black underline bg-transparent hover:bg-transparent hover:text-red-500 "
                 >
