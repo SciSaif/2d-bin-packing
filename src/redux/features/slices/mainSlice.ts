@@ -34,6 +34,7 @@ interface initialStateProps {
     imagesLoaded: boolean;
     startingMaxWidthFactor: number;
     showBorder: boolean;
+    packingFactor: number;
     filesUpdatedFlag?: boolean;
 }
 
@@ -43,9 +44,10 @@ const initialState: initialStateProps = {
     inResizeMode: true,
     isResizingAgain: false,
     imagesLoaded: false,
-    filesUpdatedFlag: false,
     startingMaxWidthFactor: 0.4,
     showBorder: false,
+    packingFactor: 3,
+    filesUpdatedFlag: false,
 };
 
 export const mainSlice = createSlice({
@@ -81,9 +83,12 @@ export const mainSlice = createSlice({
         setShowBorder: (state, action: PayloadAction<boolean>) => {
             state.showBorder = action.payload;
         },
+        setPackingFactor: (state, action: PayloadAction<number>) => {
+            state.packingFactor = action.payload;
+        },
         resetState: () => initialState,
     },
-});
+}); 
 
 export const {
     setContainer,
@@ -95,5 +100,6 @@ export const {
     filesUpdated,
     setImagesLoaded,
     setShowBorder,
+    setPackingFactor,
 } = mainSlice.actions;
 export default mainSlice.reducer;

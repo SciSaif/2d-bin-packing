@@ -20,9 +20,11 @@ function LabelSelectInput({
     wrapperClassName,
     className,
     options,
+    value,
     ...rest
 }: Props) {
     const id = useId();
+    const selectedLabel = options.find((option) => option.value === value)?.label;
 
     return (
         <label
@@ -42,6 +44,7 @@ function LabelSelectInput({
             <select
                 id={id}
                 disabled={disabled}
+                value={value}
                 {...rest}
                 className={twMerge(
                     `w-full
@@ -58,6 +61,7 @@ function LabelSelectInput({
                     </option>
                 ))}
             </select>
+          
         </label>
     );
 }

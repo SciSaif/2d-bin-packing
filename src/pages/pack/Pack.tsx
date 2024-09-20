@@ -15,7 +15,7 @@ import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
 import PageStage from "./components/PageStage";
 import SettingsPanel from "./components/SettingsPanel";
-import { terminateWorkerInstance } from "../../workerUtils";
+import {  terminateWorkerInstance } from "../../workerUtils";
 import Button from "../../components/Button";
 
 export interface ImageBox {
@@ -76,6 +76,8 @@ const Pack = () => {
 
     const updateScaleFactor = useScaleFactor(containerWrapper);
 
+ 
+
     return (
         <div className="flex flex-col px-2 py-10 sm:px-10">
             <Content noImagesUploaded={images.length === 0} />
@@ -106,6 +108,8 @@ const Pack = () => {
                     </p>
                 </div>
             )}
+
+
             {isPacking && (
                 // stop button
                 <Button

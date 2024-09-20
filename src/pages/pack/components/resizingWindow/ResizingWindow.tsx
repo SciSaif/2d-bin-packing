@@ -94,7 +94,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                     decide what size you want each image to be.
                 </p>
             </div>
-            <div className="flex flex-col items-center justify-center gap-2 mb-4 sm:flex-row">
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-4 wrap ">
                 <button
                     onClick={toggleMarginControls}
                     className="px-2 py-2   text-sm w-[150px] text-black bg-slate-100 rounded  hover:bg-slate-200 shadow"

@@ -2,21 +2,22 @@ import LabelInput from "../../../components/LabelInput";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import {
     setContainer,
+    setPackingFactor,
     setStartingMaxWidthFactor,
 } from "../../../redux/features/slices/mainSlice";
 import LabelSelectInput from "../../../components/LabelSelect";
 import { paperSizes } from "../../../data/paperSizes";
+import { packingFactors } from "../../../data/packingFactors";
 
 const SettingsPanel = () => {
     const dispatch = useAppDispatch();
-    const { startingMaxWidthFactor, container, inResizeMode } = useAppSelector(
-        (state) => state.main
-    );
+    const { startingMaxWidthFactor, container, inResizeMode, packingFactor } =
+        useAppSelector((state) => state.main);
 
     if (!inResizeMode) return null;
 
     return (
-        <div className="flex justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
             <LabelInput
                 type="number"
                 label="Initial max width %"
@@ -31,6 +32,24 @@ const SettingsPanel = () => {
 
                     dispatch(setStartingMaxWidthFactor(value / 100));
                 }}
+            />
+
+            <LabelSelectInput
+                label="Packing Efficiency"
+                options={packingFactors.map(
+                    ({ name, value }) => ({
+                        label: name,
+                        value,
+                    })
+                )}
+                 labelClassName="min-w-[150px]"
+                wrapperClassName="max-w-[250px]"
+                className="w-[50px]"
+                value={packingFactor}
+                onChange={(e) => {
+                    const selectedPackingFactor = e.target.value;
+                    dispatch(setPackingFactor(Number(selectedPackingFactor)));
+                }} 
             />
 
             <LabelSelectInput

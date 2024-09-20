@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Button from "../../../../components/Button";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import {
@@ -7,6 +7,8 @@ import {
 } from "../../../../redux/features/slices/mainSlice";
 import { ImageBox } from "../../Pack";
 import { createWorkerInstance } from "../../../../workerUtils";
+import { endpointSymbol } from "vite-plugin-comlink/symbol";
+
 
 type StartPackingButtonsProps = {
     setBoxes: React.Dispatch<React.SetStateAction<ImageBox[][]>>;
@@ -15,7 +17,7 @@ type StartPackingButtonsProps = {
 
 const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
     const dispatch = useAppDispatch();
-    const { container } = useAppSelector((state) => state.main);
+    const { container, packingFactor } = useAppSelector((state) => state.main);
 
     const startPacking = async () => {
         // if (!workerInstance) return;
@@ -25,11 +27,12 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
 
         try {
             const workerInstance = createWorkerInstance();
-            packedBoxes = await workerInstance.packBoxes({ images, container });
+            packedBoxes = await workerInstance.packBoxes({ images, container, options:{
+                packingFactor
+            }});
         } catch (error) {
             console.error(error);
         }
-        console.log("reached here ", packedBoxes);
         dispatch(setIsPacking(false));
         setBoxes(packedBoxes);
     };
