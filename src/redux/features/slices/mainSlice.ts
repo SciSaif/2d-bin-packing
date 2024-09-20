@@ -35,6 +35,7 @@ interface initialStateProps {
     startingMaxWidthFactor: number;
     showBorder: boolean;
     packingFactor: number;
+    packingProgress: number;
     filesUpdatedFlag?: boolean;
 }
 
@@ -47,6 +48,7 @@ const initialState: initialStateProps = {
     startingMaxWidthFactor: 0.4,
     showBorder: false,
     packingFactor: 3,
+    packingProgress: 0,
     filesUpdatedFlag: false,
 };
 
@@ -86,6 +88,9 @@ export const mainSlice = createSlice({
         setPackingFactor: (state, action: PayloadAction<number>) => {
             state.packingFactor = action.payload;
         },
+        setPackingProgress: (state, action: PayloadAction<number>) => {
+            state.packingProgress = action.payload;
+        },
         resetState: () => initialState,
     },
 }); 
@@ -101,5 +106,6 @@ export const {
     setImagesLoaded,
     setShowBorder,
     setPackingFactor,
+    setPackingProgress,
 } = mainSlice.actions;
 export default mainSlice.reducer;

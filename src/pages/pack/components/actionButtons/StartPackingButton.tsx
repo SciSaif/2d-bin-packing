@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import {
     setInResizeMode,
     setIsPacking,
+    setPackingProgress,
 } from "../../../../redux/features/slices/mainSlice";
 import { ImageBox } from "../../Pack";
 import { createWorkerInstance } from "../../../../workerUtils";
@@ -23,18 +24,36 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
         // if (!workerInstance) return;
         dispatch(setIsPacking(true));
         dispatch(setInResizeMode(false));
-        let packedBoxes: ImageBox[][] = [];
 
         try {
             const workerInstance = createWorkerInstance();
-            packedBoxes = await workerInstance.packBoxes({ images, container, options:{
-                packingFactor
-            }});
+            // packedBoxes = await workerInstance.packBoxes({ images, container, options:{
+            //     packingFactor
+            // }});
+            // Set up a message handler for the worker
+            workerInstance.addEventListener('message', (event) => {
+                console.log('e2');
+                if (event.data.type === 'progress') {
+                    console.log(event.data.progress);
+                    dispatch(setPackingProgress(Number(event.data.progress)));
+                    
+                } else if (event.data.type === 'complete') {
+                    const packedBoxes = event.data.result;
+                    setBoxes(packedBoxes);
+                    dispatch(setIsPacking(false));
+                    dispatch(setPackingProgress(0));
+                } else if (event.data.type === 'error') {
+                    console.error(event.data.error);
+                    dispatch(setIsPacking(false));
+                }
+            });
+
+            // Start the packing process
+            workerInstance.postMessage({ type: 'start', payload: { images, container } });
         } catch (error) {
             console.error(error);
         }
-        dispatch(setIsPacking(false));
-        setBoxes(packedBoxes);
+
     };
     return (
         <Button

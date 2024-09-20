@@ -33,7 +33,7 @@ export interface ImageBox {
 const Pack = () => {
     const dispatch = useAppDispatch();
 
-    const { inResizeMode, isPacking } = useAppSelector((state) => state.main);
+    const { inResizeMode, isPacking, packingProgress } = useAppSelector((state) => state.main);
 
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
     const [images, setImages] = useState<ImageBox[]>([]);
@@ -104,7 +104,7 @@ const Pack = () => {
                 <div className="flex flex-col items-center justify-center py-10 text-green-900 gap-y-2">
                     <ClipLoader color="#134e4a" size={50} />
                     <p className="text-2xl font-semibold">
-                        Packing your images
+                        Packing your images {Math.ceil(packingProgress*100)}%
                     </p>
                 </div>
             )}
@@ -119,7 +119,7 @@ const Pack = () => {
                         dispatch(setIsPacking(false));
                         dispatch(setInResizeMode(true));
                     }}
-                    className="px-2 py-0 underline mx-auto   text-sm  text-black bg-transparent hover:bg-transparent hover:text-red-500 "
+                    className="px-2 py-0 mx-auto text-sm text-black underline bg-transparent hover:bg-transparent hover:text-red-500 "
                 >
                     Stop packing
                 </Button>

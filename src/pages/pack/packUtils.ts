@@ -95,6 +95,7 @@ export const packBoxes = async ({
     container,
     options = {},
 }: PackBoxesProps): Promise<ImageBox[][]> => {
+    const totalImages = images.length;
     let remainingImages = [...images];
     const allPackedBoxes: ImageBox[][] = [];
     const imageMap = new Map(images.map((img) => [img.id, img]));
@@ -150,6 +151,11 @@ export const packBoxes = async ({
             0
         );
         console.log("Batch efficiency:", (packedArea / containerArea) * 100);
+           // Send progress update
+           self.postMessage({
+            type: 'progress',
+            progress: (totalImages - remainingImages.length) / totalImages,
+        });
     }
 
     // Log overall efficiency
