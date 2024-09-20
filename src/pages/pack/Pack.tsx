@@ -75,7 +75,7 @@ const Pack = () => {
     const containerWrapper = React.useRef<HTMLDivElement>(null);
 
     const updateScaleFactor = useScaleFactor(containerWrapper);
-
+    const progressPercentage = Math.ceil(packingProgress * 100);
  
 
     return (
@@ -104,7 +104,7 @@ const Pack = () => {
                 <div className="flex flex-col items-center justify-center py-10 text-green-900 gap-y-2">
                     <ClipLoader color="#134e4a" size={50} />
                     <p className="text-2xl font-semibold">
-                        Packing your images {Math.ceil(packingProgress*100)}%
+                        Packing your images {progressPercentage === 0 ? "" : `${progressPercentage}%`}
                     </p>
                 </div>
             )}
