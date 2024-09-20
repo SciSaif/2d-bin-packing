@@ -49,7 +49,9 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
             });
 
             // Start the packing process
-            workerInstance.postMessage({ type: 'start', payload: { images, container } });
+            workerInstance.postMessage({ type: 'start', payload: { images, container, options: {
+                packingFactor
+            } } });
         } catch (error) {
             console.error(error);
         }
