@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import Konva from "konva";
 import FileDropArea from "./components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { setImagesLoaded } from "../../redux/features/slices/mainSlice";
+import {
+    setImagesLoaded,
+    setInResizeMode,
+    setIsPacking,
+} from "../../redux/features/slices/mainSlice";
 import { ClipLoader } from "react-spinners";
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import Content from "./components/Content";
@@ -11,6 +15,8 @@ import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
 import PageStage from "./components/PageStage";
 import SettingsPanel from "./components/SettingsPanel";
+import { terminateWorkerInstance } from "../../workerUtils";
+import Button from "../../components/Button";
 
 export interface ImageBox {
     id: string;
@@ -99,6 +105,20 @@ const Pack = () => {
                         Packing your images
                     </p>
                 </div>
+            )}
+            {isPacking && (
+                // stop button
+                <Button
+                    onClick={() => {
+                        console.log("terminating worker");
+                        terminateWorkerInstance();
+                        dispatch(setIsPacking(false));
+                        dispatch(setInResizeMode(true));
+                    }}
+                    className="px-2 py-0 underline mx-auto   text-sm  text-black bg-transparent hover:bg-transparent hover:text-red-500 "
+                >
+                    Stop packing
+                </Button>
             )}
 
             <div

@@ -22,7 +22,6 @@ interface Props {
 const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
     const dispatch = useAppDispatch();
     const [showAllImages, setShowAllImages] = useState(false);
-    console.log("images", images);
 
     const removeImage = (id: any) => {
         setImages(images.filter((image) => image.id !== id));
@@ -106,13 +105,13 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
                 onDrop={handleDrop}
                 onPaste={handlePaste}
                 className={twMerge(
-                    "w-full border-2 flex flex-col border-tertiary/50 cursor-pointer border-dashed rounded-xl bg-slate-100 shadow mt-10",
+                    "w-full border-2 flex flex-col border-tertiary/50  border-dashed rounded-xl bg-slate-100 shadow mt-10",
                     dragging && "border-blue-500 bg-sky-100"
                 )}
             >
                 <div
                     onClick={triggerFileInput}
-                    className="flex items-center select-none justify-center flex-grow min-h-[200px] w-full text-xl font-bold text-tertiary/50"
+                    className="flex items-center cursor-pointer select-none justify-center flex-grow min-h-[200px] w-full text-xl font-bold text-tertiary/50"
                 >
                     Drop Files or Click to Upload
                 </div>
