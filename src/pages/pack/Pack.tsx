@@ -4,11 +4,8 @@ import FileDropArea from "./components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
     setImagesLoaded,
-    setInResizeMode,
-    setIsPacking,
-    setPackingProgress,
 } from "../../redux/features/slices/mainSlice";
-import { ClipLoader } from "react-spinners";
+
 import ResizingWindow from "./components/resizingWindow/ResizingWindow";
 import Content from "./components/Content";
 
@@ -16,8 +13,7 @@ import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
 import PageStage from "./components/PageStage";
 import SettingsPanel from "./components/SettingsPanel";
-import { terminateWorkerInstance } from "../../workerUtils";
-import Button from "../../components/Button";
+
 import Loading from "./components/Loading";
 
 export interface ImageBox {
@@ -35,7 +31,7 @@ export interface ImageBox {
 const Pack = () => {
     const dispatch = useAppDispatch();
 
-    const { inResizeMode, isPacking, packingProgress } = useAppSelector((state) => state.main);
+    const { inResizeMode, isPacking } = useAppSelector((state) => state.main);
 
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
     const [images, setImages] = useState<ImageBox[]>([]);
@@ -56,9 +52,7 @@ const Pack = () => {
                     box.imageElement = img;
                     loadedCount++;
                     if (loadedCount === totalImages) {
-                        console.log("all images loaded");
-
-                        dispatch(setImagesLoaded(true));
+                    dispatch(setImagesLoaded(true));
                     }
                 };
 

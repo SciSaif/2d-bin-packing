@@ -26,14 +26,13 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
 
         try {
             const workerInstance = createWorkerInstance();
-           
+
             // Set up a message handler for the worker
             workerInstance.addEventListener('message', (event) => {
-                console.log('e2');
                 if (event.data.type === 'progress') {
                     console.log(event.data.progress);
                     dispatch(setPackingProgress(Number(event.data.progress)));
-                    
+
                 } else if (event.data.type === 'complete') {
                     const packedBoxes = event.data.result;
                     setBoxes(packedBoxes);
@@ -46,9 +45,13 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
             });
 
             // Start the packing process
-            workerInstance.postMessage({ type: 'start', payload: { images, container, options: {
-                packingFactor
-            } } });
+            workerInstance.postMessage({
+                type: 'start', payload: {
+                    images, container, options: {
+                        packingFactor
+                    }
+                }
+            });
         } catch (error) {
             console.error(error);
         }

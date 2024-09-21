@@ -69,7 +69,6 @@ async function callPackFunction({
         return await response.json();
     } else {
         // Local packing
-        console.log("packing images locally");
         return await pack(
             rectangles,
             {
@@ -151,9 +150,9 @@ export const packBoxes = async ({
             0
         );
         console.log("Batch efficiency:", (packedArea / containerArea) * 100);
-           // Send progress update
-           self.postMessage({
-            type: 'progress',
+        // Send progress update
+        self.postMessage({
+            type: "progress",
             progress: (totalImages - remainingImages.length) / totalImages,
         });
     }

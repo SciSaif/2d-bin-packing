@@ -15,7 +15,7 @@ export const positionImages = (
         let availableContainerWidth =
             container.w - container.margin.left - container.margin.right;
 
-        // Determine the maximum width for the image based on the constrainToHalfWidth parameter
+        // Determine the maximum width for the image based on the constrainWidthFactor parameter
         const maxWidth =
             constrainWidthFactor && img.new
                 ? availableContainerWidth * constrainWidthFactor

@@ -5,7 +5,6 @@ import Button from "../../../../components/Button";
 import {
     setImagesLoaded,
     setInResizeMode,
-    setIsResizingAgain,
 } from "../../../../redux/features/slices/mainSlice";
 
 type ResizeButtonProps = {
@@ -17,7 +16,6 @@ const ResizeButton = ({ setBoxes }: ResizeButtonProps) => {
     return (
         <Button
             onClick={() => {
-                dispatch(setIsResizingAgain(true));
                 dispatch(setInResizeMode(true));
                 dispatch(setImagesLoaded(false));
                 setBoxes([]);

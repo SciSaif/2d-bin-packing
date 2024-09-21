@@ -18,7 +18,6 @@ const useResizeImage = ({
     const {
         container,
         filesUpdatedFlag,
-        isResizingAgain,
         startingMaxWidthFactor,
     } = useAppSelector((state) => state.main);
 
@@ -44,11 +43,10 @@ const useResizeImage = ({
         setImageUrls(newImageUrls);
 
         // position the images in the container
-
         const { _maxY, _localImages } = positionImages(
             images,
             container,
-            isResizingAgain ? undefined : startingMaxWidthFactor
+            startingMaxWidthFactor
         );
 
         setMaxY(Math.max(container.h, _maxY));
