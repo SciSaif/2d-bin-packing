@@ -17,8 +17,8 @@ const useResizeImage = ({
 }: UseResizeImageProps) => {
     const {
         container,
-        filesUpdatedFlag,
         startingMaxWidthFactor,
+        totalImages
     } = useAppSelector((state) => state.main);
 
     const [localImages, setLocalImages] = useState<ImageBox[]>(images);
@@ -30,6 +30,7 @@ const useResizeImage = ({
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
     useEffect(() => {
+        console.log("useResizeImage");
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
         if (!images.length) {
             setLocalImages([]);
@@ -51,7 +52,14 @@ const useResizeImage = ({
 
         setMaxY(Math.max(container.h, _maxY));
         setLocalImages(_localImages);
-    }, [filesUpdatedFlag]);
+
+        // we need totalImages here because we need to call this effect whenever the files 
+        // change, but we can't use images.length because there is a useEffect down below with container 
+        // as a dependency and that will run first and the images will not be positioned with startingMaxWidthFactor
+        // therefore we use totalImages as a dependency here. 
+        // whenever the files change, we are updating totalImages in a setTimeout so that it runs after 
+        // the useEffect with container as a dependency
+    }, [totalImages]);
 
     // for preventive page scrolling while resizing in mobile
     useEffect(() => {
@@ -126,6 +134,7 @@ const useResizeImage = ({
     };
 
     const repositionImages = (updatedImages: ImageBox[]) => {
+        console.log("repositionImages")
         const repositionedImages = positionImages(
             updatedImages,
             container
@@ -162,7 +171,6 @@ const useResizeImage = ({
         }
     };
 
-    // // Function to handle mouse down event
     const handleMouseDown = (
         // e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
         e: any,
@@ -203,7 +211,6 @@ const useResizeImage = ({
         handleResize(e.clientX, e.clientY);
     };
 
-    // Touch move event handler
     const handleTouchMove = (e: globalThis.TouchEvent) => {
         if (e.touches.length > 0) {
             const touch = e.touches[0];
@@ -211,13 +218,11 @@ const useResizeImage = ({
         }
     };
 
-    // Function to handle mouse up event
     const handleMouseUp = useCallback(() => {
         setIsResizing(false);
         setImages(localImages);
     }, [localImages]);
 
-    // Effect for adding event listeners
     useEffect(() => {
         window.addEventListener("mousemove", handleMouseMove);
         window.addEventListener("mouseup", handleMouseUp);
@@ -236,24 +241,7 @@ const useResizeImage = ({
         repositionImages(localImages);
     }, [container]);
 
-    // // function to resize every image that is larger in width than the given width to the given width
-    // const resizeImagesWithMaxWidth = () => {
-    //     // startingMaxWidthFactor
-    //     const updatedImages = localImages.map((img) => {
-    //         if (img.w > container.w * startingMaxWidthFactor) {
-    //             const newHeight =
-    //                 (container.w * startingMaxWidthFactor) / img.w;
-    //             return {
-    //                 ...img,
-    //                 w: container.w * startingMaxWidthFactor,
-    //                 h: newHeight,
-    //             };
-    //         }
-    //         return img;
-    //     });
 
-    //     repositionImages(updatedImages);
-    // };
 
     return {
         localImages,
@@ -265,7 +253,6 @@ const useResizeImage = ({
         selectedId,
         imageUrls,
         setMaxY,
-        // resizeImagesWithMaxWidth,
     };
 };
 

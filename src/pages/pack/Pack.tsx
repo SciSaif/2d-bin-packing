@@ -52,7 +52,7 @@ const Pack = () => {
                     box.imageElement = img;
                     loadedCount++;
                     if (loadedCount === totalImages) {
-                    dispatch(setImagesLoaded(true));
+                        dispatch(setImagesLoaded(true));
                     }
                 };
 
@@ -60,6 +60,7 @@ const Pack = () => {
             });
         });
     }, [boxes, images]);
+
 
     const containerWrapper = React.useRef<HTMLDivElement>(null);
 

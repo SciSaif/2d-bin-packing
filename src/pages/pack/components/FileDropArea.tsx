@@ -3,9 +3,9 @@ import { twMerge } from "tailwind-merge";
 import useDragAndDrop from "../../../hooks/useDragDrop";
 import { createImages } from "../utils";
 import {
-    filesUpdated,
     setImagesLoaded,
     setInResizeMode,
+    setTotalImages,
 } from "../../../redux/features/slices/mainSlice";
 import { useAppDispatch } from "../../../redux/hooks";
 import { ImageBox } from "../Pack";
@@ -23,18 +23,18 @@ const FileDropArea = ({ images, setImages, }: Props) => {
     const [showAllImages, setShowAllImages] = useState(false);
 
     const removeImage = (id: any) => {
+        const newTotalImages = images.length - 1;
         setImages(images.filter((image) => image.id !== id));
 
         // if all images are removed, reset the state
-        if (images.length === 1) {
+        if (newTotalImages === 0) {
             clearFileInput();
         }
 
-        // dispatch(filesUpdated());
-        // execute after 50ms to allow the state to update
+        // setTimeout to allow the state to update and the useeffect in useImageResizer to run 
         setTimeout(() => {
-            dispatch(filesUpdated());
-        }, 50);
+            dispatch(setTotalImages(newTotalImages));
+        }, 0);
     };
 
     const {
@@ -51,14 +51,14 @@ const FileDropArea = ({ images, setImages, }: Props) => {
 
     const handleImageUpload = async (uploadedFiles: File[]) => {
         const newImages = await createImages(uploadedFiles);
+        const newTotalImages = images.length + newImages.length;
         setImages([...images, ...newImages]);
         dispatch(setImagesLoaded(false));
         dispatch(setInResizeMode(true));
 
-        // dispatch(filesUpdated());
         setTimeout(() => {
-            dispatch(filesUpdated());
-        }, 50);
+            dispatch(setTotalImages(newTotalImages));
+        }, 0);
     };
 
     // Call handleImageUpload when files state changes
@@ -93,7 +93,7 @@ const FileDropArea = ({ images, setImages, }: Props) => {
                 </button>
             </div>
         ));
-    }, [images, filesUpdated, showAllImages]); // Dependency on images and filesUpdated
+    }, [images, showAllImages]);
 
     return (
         <>
