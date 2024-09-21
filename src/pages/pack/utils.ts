@@ -91,7 +91,6 @@ export const saveAsPDF = async ({
 
 export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
     let imagesContent = "";
-    console.log("stages", stages.length);
 
     stages.forEach((stage, index) => {
         if (!stage) {

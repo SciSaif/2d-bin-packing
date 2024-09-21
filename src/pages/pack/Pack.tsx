@@ -16,8 +16,9 @@ import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
 import PageStage from "./components/PageStage";
 import SettingsPanel from "./components/SettingsPanel";
-import {  terminateWorkerInstance } from "../../workerUtils";
+import { terminateWorkerInstance } from "../../workerUtils";
 import Button from "../../components/Button";
+import Loading from "./components/Loading";
 
 export interface ImageBox {
     id: string;
@@ -45,17 +46,11 @@ const Pack = () => {
         if (!boxes || boxes.length === 0) return;
 
         let loadedCount = 0;
-        const totalImages = boxes.reduce(
-            (acc, boxSet) => acc + boxSet.length,
-            0
-        );
+        const totalImages = images.length;
 
         boxes.forEach((boxSet) => {
             boxSet.forEach((box) => {
-                const correspondingFile = images.find((f) => f.id === box.id);
-
-                if (!correspondingFile) return;
-
+                if (!box.file) return;
                 const img = new window.Image();
                 img.onload = () => {
                     box.imageElement = img;
@@ -67,8 +62,7 @@ const Pack = () => {
                     }
                 };
 
-                if (!correspondingFile.file) return;
-                img.src = URL.createObjectURL(correspondingFile.file);
+                img.src = URL.createObjectURL(box.file);
             });
         });
     }, [boxes, images]);
@@ -76,8 +70,7 @@ const Pack = () => {
     const containerWrapper = React.useRef<HTMLDivElement>(null);
 
     const updateScaleFactor = useScaleFactor(containerWrapper);
-    const progressPercentage = Math.ceil(packingProgress * 100);
- 
+
 
     return (
         <div className="flex flex-col px-2 py-10 sm:px-10">
@@ -85,7 +78,6 @@ const Pack = () => {
             {!isPacking && boxes.length === 0 && (
                 <FileDropArea
                     images={images}
-                    setBoxes={setBoxes}
                     setImages={setImages}
                 />
             )}
@@ -102,29 +94,11 @@ const Pack = () => {
             />
 
             {isPacking && (
-                <div className="flex flex-col items-center justify-center py-10 text-green-900 gap-y-2">
-                    <ClipLoader color="#134e4a" size={50} />
-                    <p className="text-2xl font-semibold">
-                        Packing your images {progressPercentage === 0 ? "" : `${progressPercentage}%`}
-                    </p>
-                </div>
+                <Loading />
             )}
 
-
-            {isPacking && (
-                // stop button
-                <Button
-                    onClick={() => {
-                        console.log("terminating worker");
-                        terminateWorkerInstance();
-                        dispatch(setIsPacking(false));
-                        dispatch(setInResizeMode(true));
-                        dispatch(setPackingProgress(0));
-                    }}
-                    className="px-2 py-0 mx-auto text-sm text-black underline bg-transparent hover:bg-transparent hover:text-red-500 "
-                >
-                    Stop packing
-                </Button>
+            {inResizeMode && images?.length > 0 && (
+                <ResizingWindow setImages={setImages} images={images} />
             )}
 
             <div
@@ -132,10 +106,6 @@ const Pack = () => {
                 className="flex flex-wrap w-full items-center justify-center mx-auto   max-w-[1050px] gap-y-10 gap-x-5 "
                 style={{ overscrollBehavior: "auto" }}
             >
-                {inResizeMode && images?.length > 0 && (
-                    <ResizingWindow setImages={setImages} images={images} />
-                )}
-
                 {boxes &&
                     boxes.map((boxSet, index) => (
                         <PageStage
@@ -146,6 +116,8 @@ const Pack = () => {
                         />
                     ))}
             </div>
+
+            {/* dont remove */}
             <div id="temp-container" style={{ display: "none" }}></div>
         </div>
     );

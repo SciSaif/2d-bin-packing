@@ -2,18 +2,25 @@ import React from "react";
 import { Margin } from "../../../../../redux/features/slices/mainSlice";
 import { useAppSelector } from "../../../../../redux/hooks";
 import MarginHandleIcon from "../../../../../assets/MarginHandleIcon";
+import useMargin from "../../../../../hooks/useMargin";
+import { ImageBox } from "../../../Pack";
 
 interface Props {
-    handleMarginDragStart: (
-        e:
-            | React.MouseEvent<HTMLDivElement, MouseEvent>
-            | React.TouchEvent<HTMLDivElement>,
-        side: keyof Margin
-    ) => void;
+    localImages: ImageBox[];
+    setLocalImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
+    setMaxY: React.Dispatch<React.SetStateAction<number>>
+    containerRef: React.RefObject<HTMLDivElement>;
+
 }
 
-const MarginHandles = ({ handleMarginDragStart }: Props) => {
+const MarginHandles = ({ localImages, setLocalImages, setMaxY, containerRef }: Props) => {
     const { container } = useAppSelector((state) => state.main);
+    const { handleMarginDragStart } = useMargin({
+        localImages,
+        setLocalImages,
+        setMaxY,
+        containerRef,
+    });
 
     return (
         <>

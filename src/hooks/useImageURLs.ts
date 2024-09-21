@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { ImageData } from "../pages/pack/components/resizingWindow/ResizingWindow";
+import { ImageBox } from "../pages/pack/Pack";
 
-const useImageURLs = (images: ImageData[]) => {
+const useImageURLs = (images: ImageBox[]) => {
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
     useEffect(() => {

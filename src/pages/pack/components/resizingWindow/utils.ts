@@ -1,8 +1,8 @@
 import { ContainerType } from "../../../../redux/features/slices/mainSlice";
-import { ImageData } from "./ResizingWindow";
+import { ImageBox } from "../../Pack";
 
 export const positionImages = (
-    images: ImageData[],
+    images: ImageBox[],
     container: ContainerType,
     constrainWidthFactor?: number
 ) => {

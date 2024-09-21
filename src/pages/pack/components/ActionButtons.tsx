@@ -1,17 +1,13 @@
 import { Stage } from "konva/lib/Stage";
 import SaveAsPdfButton from "./actionButtons/SaveAsPDFButton";
 import { ImageBox } from "../Pack";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppSelector } from "../../../redux/hooks";
 import ResetButton from "./actionButtons/ResetButton";
 import StartPackingButton from "./actionButtons/StartPackingButton";
 import PrintButton from "./actionButtons/PrintButton";
 import ResizeButton from "./actionButtons/ResizeButton";
-import { endpointSymbol } from "vite-plugin-comlink/symbol";
-import {
-    setInResizeMode,
-    setIsPacking,
-} from "../../../redux/features/slices/mainSlice";
-import { terminateWorkerInstance } from "../../../workerUtils";
+import StopButton from "./actionButtons/StopButton";
+
 
 type ActionButtonsProps = {
     stageRefs: React.RefObject<Stage>[];
@@ -31,7 +27,6 @@ const ActionButtons = ({
     updateScaleFactor,
 }: ActionButtonsProps) => {
     const { inResizeMode, isPacking } = useAppSelector((state) => state.main);
-    const dispatch = useAppDispatch();
     return (
         <div className="flex flex-wrap justify-center w-full gap-2 py-2 mt-5 mb-5 ">
             {boxes.length > 0 && (
@@ -51,6 +46,7 @@ const ActionButtons = ({
                     updateScaleFactor={updateScaleFactor}
                 />
             )}
+            {isPacking && <StopButton />}
         </div>
     );
 };

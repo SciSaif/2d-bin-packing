@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAppSelector } from "../redux/hooks";
 import { ImageBox } from "../pages/pack/Pack";
-import { ImageData } from "../pages/pack/components/resizingWindow/ResizingWindow";
 import { positionImages } from "../pages/pack/components/resizingWindow/utils";
 
 interface UseResizeImageProps {
@@ -23,7 +22,7 @@ const useResizeImage = ({
         startingMaxWidthFactor,
     } = useAppSelector((state) => state.main);
 
-    const [localImages, setLocalImages] = useState<ImageData[]>(images);
+    const [localImages, setLocalImages] = useState<ImageBox[]>(images);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isResizing, setIsResizing] = useState(false);
     const [maxY, setMaxY] = useState(container.h);
@@ -79,7 +78,7 @@ const useResizeImage = ({
     const updateImageSize = (
         clientX: number,
         clientY: number
-    ): ImageData[] | null => {
+    ): ImageBox[] | null => {
         const selectedImage = localImages.find((img) => img.id === selectedId);
         if (selectedImage && containerRef.current) {
             const aspectRatio = selectedImage.w / selectedImage.h;
@@ -128,7 +127,7 @@ const useResizeImage = ({
         return null;
     };
 
-    const repositionImages = (updatedImages: ImageData[]) => {
+    const repositionImages = (updatedImages: ImageBox[]) => {
         const repositionedImages = positionImages(
             updatedImages,
             container
@@ -169,7 +168,7 @@ const useResizeImage = ({
     const handleMouseDown = (
         // e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
         e: any,
-        imgData: ImageData
+        imgData: ImageBox
     ) => {
         if (
             e.target instanceof HTMLElement &&

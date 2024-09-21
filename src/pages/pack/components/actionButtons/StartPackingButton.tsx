@@ -21,15 +21,12 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
     const { container, packingFactor } = useAppSelector((state) => state.main);
 
     const startPacking = async () => {
-        // if (!workerInstance) return;
         dispatch(setIsPacking(true));
         dispatch(setInResizeMode(false));
 
         try {
             const workerInstance = createWorkerInstance();
-            // packedBoxes = await workerInstance.packBoxes({ images, container, options:{
-            //     packingFactor
-            // }});
+           
             // Set up a message handler for the worker
             workerInstance.addEventListener('message', (event) => {
                 console.log('e2');

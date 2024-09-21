@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Margin, setContainer } from "../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { ImageData } from "../pages/pack/components/resizingWindow/ResizingWindow";
 import { positionImages } from "../pages/pack/components/resizingWindow/utils";
+import { ImageBox } from "../pages/pack/Pack";
 
 interface UseMarginProps {
     containerRef: React.RefObject<HTMLDivElement>;
-    localImages: ImageData[];
-    setLocalImages: any;
-    setMaxY: any;
+    localImages: ImageBox[];
+    setLocalImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
+    setMaxY: React.Dispatch<React.SetStateAction<number>>
 }
 
 const useMargin = ({

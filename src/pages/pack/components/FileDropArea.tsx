@@ -16,10 +16,9 @@ const MAX_IMAGES_TO_SHOW = 20;
 interface Props {
     images: ImageBox[];
     setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
-    setBoxes: React.Dispatch<React.SetStateAction<ImageBox[][]>>;
 }
 
-const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
+const FileDropArea = ({ images, setImages, }: Props) => {
     const dispatch = useAppDispatch();
     const [showAllImages, setShowAllImages] = useState(false);
 
@@ -55,7 +54,6 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
         setImages([...images, ...newImages]);
         dispatch(setImagesLoaded(false));
         dispatch(setInResizeMode(true));
-        setBoxes([]);
 
         // dispatch(filesUpdated());
         setTimeout(() => {
@@ -128,9 +126,8 @@ const FileDropArea = ({ images, setImages, setBoxes }: Props) => {
                             >
                                 {showAllImages
                                     ? "Hide"
-                                    : `Show ${
-                                          images.length - MAX_IMAGES_TO_SHOW
-                                      } more images`}
+                                    : `Show ${images.length - MAX_IMAGES_TO_SHOW
+                                    } more images`}
                             </button>
                         )}
                     </div>
