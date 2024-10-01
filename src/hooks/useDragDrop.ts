@@ -107,10 +107,10 @@ const useDragAndDrop = () => {
     return {
         dragging,
         files,
+        setFiles,
         handleDragOver,
         handleDrop,
         mainRef,
-        setFiles,
         handlePaste,
         fileInputRef,
         triggerFileInput,

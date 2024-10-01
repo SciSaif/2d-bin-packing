@@ -9,6 +9,7 @@ import ResizeAnchor from "./components/ResizeAnchor";
 import { ImageBox } from "../../Pack";
 import MarginInputs from "./components/MarginInputs";
 import ResizeWindowSettings from "./components/ResizeWindowSettings";
+import Options from "./components/Options";
 
 interface Props {
     images: ImageBox[];
@@ -125,6 +126,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                             onMouseDown={(e) => handleMouseDown(e, imgData)}
                             onTouchStart={(e) => handleMouseDown(e, imgData)}
                         >
+                            {selectedId === imgData.id && <Options id={imgData.id} images={images} setImages={setImages} />}
                             {selectedId === imgData.id && <ResizeAnchor />}
                         </div>
                     );

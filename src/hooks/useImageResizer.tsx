@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useLayoutEffect } from "react";
 import { useAppSelector } from "../redux/hooks";
 import { ImageBox } from "../pages/pack/Pack";
 import { positionImages } from "../pages/pack/components/resizingWindow/utils";
@@ -18,7 +18,7 @@ const useResizeImage = ({
     const {
         container,
         startingMaxWidthFactor,
-        totalImages
+        filesChangedFlag
     } = useAppSelector((state) => state.main);
 
     const [localImages, setLocalImages] = useState<ImageBox[]>(images);
@@ -30,7 +30,6 @@ const useResizeImage = ({
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
 
     useEffect(() => {
-        console.log("useResizeImage");
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
         if (!images.length) {
             setLocalImages([]);
@@ -53,13 +52,13 @@ const useResizeImage = ({
         setMaxY(Math.max(container.h, _maxY));
         setLocalImages(_localImages);
 
-        // we need totalImages here because we need to call this effect whenever the files 
-        // change, but we can't use images.length because there is a useEffect down below with container 
-        // as a dependency and that will run first and the images will not be positioned with startingMaxWidthFactor
-        // therefore we use totalImages as a dependency here. 
-        // whenever the files change, we are updating totalImages in a setTimeout so that it runs after 
+        // we need filesChangedFlag here because we need to call this effect whenever the files 
+        // change,  but we can't use images.length because there is a useEffect down below with container 
+        // as a dependency and that will run after this and the images will not be positioned with startingMaxWidthFactor
+        // therefore we use filesChangedFlag as a dependency here. 
+        // whenever the files change, we are updating filesChangedFlag in a setTimeout so that it runs after 
         // the useEffect with container as a dependency
-    }, [totalImages]);
+    }, [images.length, filesChangedFlag]);
 
     // for preventive page scrolling while resizing in mobile
     useEffect(() => {
@@ -134,7 +133,6 @@ const useResizeImage = ({
     };
 
     const repositionImages = (updatedImages: ImageBox[]) => {
-        console.log("repositionImages")
         const repositionedImages = positionImages(
             updatedImages,
             container
@@ -237,10 +235,9 @@ const useResizeImage = ({
         };
     }, [handleMouseMove, handleMouseUp, handleTouchMove]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         repositionImages(localImages);
     }, [container]);
-
 
 
     return {

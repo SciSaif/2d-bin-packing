@@ -5,12 +5,10 @@ import { createImages } from "../utils";
 import {
     setImagesLoaded,
     setInResizeMode,
-    setTotalImages,
 } from "../../../redux/features/slices/mainSlice";
 import { useAppDispatch } from "../../../redux/hooks";
 import { ImageBox } from "../Pack";
 import { clearFileInput } from "../../../utils";
-
 const MAX_IMAGES_TO_SHOW = 20;
 
 interface Props {
@@ -30,11 +28,6 @@ const FileDropArea = ({ images, setImages, }: Props) => {
         if (newTotalImages === 0) {
             clearFileInput();
         }
-
-        // setTimeout to allow the state to update and the useeffect in useImageResizer to run 
-        setTimeout(() => {
-            dispatch(setTotalImages(newTotalImages));
-        }, 0);
     };
 
     const {
@@ -49,21 +42,19 @@ const FileDropArea = ({ images, setImages, }: Props) => {
         handleFileInputChange,
     } = useDragAndDrop();
 
+    // adds the new files to the images array
     const handleImageUpload = async (uploadedFiles: File[]) => {
+
         const newImages = await createImages(uploadedFiles);
-        const newTotalImages = images.length + newImages.length;
+
         setImages([...images, ...newImages]);
         dispatch(setImagesLoaded(false));
         dispatch(setInResizeMode(true));
-
-        setTimeout(() => {
-            dispatch(setTotalImages(newTotalImages));
-        }, 0);
     };
 
-    // Call handleImageUpload when files state changes
     useEffect(() => {
         if (files && files.length > 0) {
+            // files don't hold all the files, only the new ones
             handleImageUpload(files);
         }
     }, [files]);
