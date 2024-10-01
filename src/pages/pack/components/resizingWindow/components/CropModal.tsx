@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactCrop, { Crop } from 'react-image-crop';
 import { createImages } from '../../../utils';
 import { ImageBox } from '../../../Pack';
@@ -20,55 +20,109 @@ const CropModal = (
     const dispatch = useAppDispatch();
 
     const [crop, setCrop] = useState<Crop>({ unit: 'px', width: 100, height: 100, x: 0, y: 0 });
-    const [selectedImage, setSelectedImage] = useState<File | null>(images.find((image) => image.id === id)?.file ?? null); // Selected image to crop
+    const [selectedImage] = useState<File | null>(images.find((image) => image.id === id)?.file ?? null); // Selected image to crop
     const [croppedFile, setCroppedFile] = useState<File | null>(null);
     const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
+    const [actualImageDimensions, setActualImageDimensions] = useState<{ width: number; height: number } | null>(null);
 
+    useEffect(() => {
+        if (selectedImage) {
+            // Get actual image dimensions before displaying
+            const img = new Image();
+            img.onload = () => {
+                setActualImageDimensions({
+                    width: img.width,
+                    height: img.height
+                });
+            };
+            img.src = URL.createObjectURL(selectedImage);
 
-    // Convert canvas to file
-    const getCroppedImageFile = (canvas: HTMLCanvasElement, fileName: string) => {
-        return new Promise<File>((resolve) => {
-            canvas.toBlob((blob) => {
-                if (blob) {
-                    const croppedFile = new File([blob], fileName, { type: "image/jpeg" });
-                    resolve(croppedFile);
-                }
-            }, "image/jpeg");
+            // Cleanup
+            return () => {
+                URL.revokeObjectURL(img.src);
+            };
+        }
+    }, [selectedImage]);
+
+    const getCroppedImageFile = (canvas: HTMLCanvasElement, fileName: string): Promise<File> => {
+        return new Promise((resolve, reject) => {
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) {
+                        reject(new Error('Canvas to Blob failed'));
+                        return;
+                    }
+                    const file = new File([blob], fileName, { type: 'image/jpeg' });
+                    resolve(file);
+                },
+                'image/jpeg',
+                0.95
+            );
         });
     };
 
-    const onCropComplete = async (crop: Crop) => {
-        if (imageRef && crop.width && crop.height) {
-            const scaleX = imageRef.naturalWidth / imageRef.width;
-            const scaleY = imageRef.naturalHeight / imageRef.height;
 
-            // Set the canvas size to match the natural size of the cropped area
+    const onCropComplete = async (crop: Crop) => {
+        console.log(imageRef, crop, actualImageDimensions)
+        if (!imageRef || !crop.width || !crop.height || !actualImageDimensions)
+            return;
+        try {
+            // Calculate scale based on actual dimensions vs displayed dimensions
+            const scaleX = actualImageDimensions.width / imageRef.width;
+            const scaleY = actualImageDimensions.height / imageRef.height;
+
             const canvas = document.createElement('canvas');
-            canvas.width = crop.width * scaleX;
-            canvas.height = crop.height * scaleY;
+
+            // Use scaled dimensions for the canvas
+            canvas.width = Math.round(crop.width * scaleX);
+            canvas.height = Math.round(crop.height * scaleY);
 
             const ctx = canvas.getContext('2d');
-            if (ctx) {
-                // Draw the cropped image at natural resolution
-                ctx.drawImage(
-                    imageRef,
-                    crop.x * scaleX,
-                    crop.y * scaleY,
-                    crop.width * scaleX,
-                    crop.height * scaleY,
-                    0,
-                    0,
-                    crop.width * scaleX,
-                    crop.height * scaleY
-                );
-
-                // Convert the cropped area to a file
-                const croppedFile = await getCroppedImageFile(canvas, selectedImage!.name);
-                setCroppedFile(croppedFile);
+            if (!ctx) {
+                throw new Error('Could not get canvas context');
             }
+
+            // temporary canvas to hold the full image
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = actualImageDimensions.width;
+            tempCanvas.height = actualImageDimensions.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            if (!tempCtx) {
+                throw new Error('Could not get temp canvas context');
+            }
+
+            // Draw the full image on the temporary canvas
+            await new Promise<void>((resolve, reject) => {
+                const fullImg = new Image();
+                fullImg.onload = () => {
+                    tempCtx.drawImage(fullImg, 0, 0);
+                    resolve();
+                };
+                fullImg.onerror = reject;
+                fullImg.src = URL.createObjectURL(selectedImage!);
+            });
+
+            // Draw the cropped portion onto the final canvas
+            ctx.drawImage(
+                tempCanvas,
+                Math.round(crop.x * scaleX),
+                Math.round(crop.y * scaleY),
+                Math.round(crop.width * scaleX),
+                Math.round(crop.height * scaleY),
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+            const croppedFile = await getCroppedImageFile(canvas, selectedImage!.name);
+            setCroppedFile(croppedFile);
+
+        } catch (error) {
+            console.error('Error during crop:', error);
         }
     };
-
 
     const saveCroppedImage = async () => {
         if (croppedFile && selectedImage) {
@@ -78,7 +132,7 @@ const CropModal = (
             const newImages = images.map((image) =>
                 image.file === selectedImage ? croppedImage[0] : image
             );
-            setImages(newImages); // Persist the cropped image
+            setImages(newImages);
 
             setTimeout(() => {
                 dispatch(setFilesChangedFlag());
@@ -86,6 +140,13 @@ const CropModal = (
             close();
         }
     };
+
+    useEffect(() => {
+        if (crop && imageRef && actualImageDimensions) {
+            onCropComplete(crop);
+        }
+    }, [imageRef, actualImageDimensions, crop])
+
     if (!selectedImage) return null;
 
     return (
