@@ -63,7 +63,6 @@ const CropModal = (
 
 
     const onCropComplete = async (crop: Crop) => {
-        console.log(imageRef, crop, actualImageDimensions)
         if (!imageRef || !crop.width || !crop.height || !actualImageDimensions)
             return;
         try {
@@ -145,7 +144,7 @@ const CropModal = (
         if (crop && imageRef && actualImageDimensions) {
             onCropComplete(crop);
         }
-    }, [imageRef, actualImageDimensions, crop])
+    }, [imageRef, actualImageDimensions])
 
     if (!selectedImage) return null;
 
