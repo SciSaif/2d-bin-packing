@@ -2,39 +2,55 @@
 import colors from "tailwindcss/colors";
 import flattenColorPalette from "tailwindcss/lib/util/flattenColorPalette";
 import svgToDataUri from "mini-svg-data-uri";
+import tailwindcssAnimate from "tailwindcss-animate";
+
 export default {
+    darkMode: ["class"],
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     theme: {
         extend: {
             colors: {
-                // Original palette
                 bg: { ...colors.neutral, DEFAULT: colors.neutral[100] },
                 primary: { ...colors.yellow, DEFAULT: colors.yellow[400] },
                 secondary: { ...colors.teal, DEFAULT: colors.teal[900] },
                 tertiary: { ...colors.zinc, DEFAULT: colors.zinc[700] },
-
-                // Alternative Palette 1: Cool and Calm
-                // bg: { ...colors.slate, DEFAULT: colors.slate[100] },
-                // primary: { ...colors.sky, DEFAULT: colors.sky[400] },
-                // secondary: { ...colors.indigo, DEFAULT: colors.indigo[700] },
-                // tertiary: { ...colors.gray, DEFAULT: colors.gray[600] },
-
-                // // Alternative Palette 2: Warm and Earthy
-                // bg: { ...colors.stone, DEFAULT: colors.stone[100] },
-                // primary: { ...colors.amber, DEFAULT: colors.amber[500] },
-                // secondary: { ...colors.emerald, DEFAULT: colors.emerald[700] },
-                // tertiary: { ...colors.brown, DEFAULT: colors.orange[700] },
-
-                // Alternative Palette 3
-                // bg: { ...colors.stone, DEFAULT: colors.yellow[50] },
-                // primary: { ...colors.amber, DEFAULT: colors.amber[700] },
-                // primaryLight: { ...colors.amber, DEFAULT: colors.orange[300] },
-                // secondary: { ...colors.emerald, DEFAULT: colors.stone[800] },
-                // secondaryLight: {
-                //     ...colors.emerald,
-                //     DEFAULT: colors.stone[600],
-                // },
-                // tertiary: { ...colors.brown, DEFAULT: colors.orange[700] },
+                background: "hsl(var(--background))",
+                foreground: "hsl(var(--foreground))",
+                card: {
+                    DEFAULT: "hsl(var(--card))",
+                    foreground: "hsl(var(--card-foreground))",
+                },
+                popover: {
+                    DEFAULT: "hsl(var(--popover))",
+                    foreground: "hsl(var(--popover-foreground))",
+                },
+                muted: {
+                    DEFAULT: "hsl(var(--muted))",
+                    foreground: "hsl(var(--muted-foreground))",
+                },
+                accent: {
+                    DEFAULT: "hsl(var(--accent))",
+                    foreground: "hsl(var(--accent-foreground))",
+                },
+                destructive: {
+                    DEFAULT: "hsl(var(--destructive))",
+                    foreground: "hsl(var(--destructive-foreground))",
+                },
+                border: "hsl(var(--border))",
+                input: "hsl(var(--input))",
+                ring: "hsl(var(--ring))",
+                chart: {
+                    1: "hsl(var(--chart-1))",
+                    2: "hsl(var(--chart-2))",
+                    3: "hsl(var(--chart-3))",
+                    4: "hsl(var(--chart-4))",
+                    5: "hsl(var(--chart-5))",
+                },
+            },
+            borderRadius: {
+                lg: "var(--radius)",
+                md: "calc(var(--radius) - 2px)",
+                sm: "calc(var(--radius) - 4px)",
             },
         },
     },
@@ -65,6 +81,7 @@ export default {
                 }
             );
         },
+        tailwindcssAnimate,
     ],
 };
 

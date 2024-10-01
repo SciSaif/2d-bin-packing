@@ -2,6 +2,7 @@ import { comlink } from "vite-plugin-comlink";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa";
+import path from "path";
 const manifestForPlugin: Partial<VitePWAOptions> = {
     // registerType: "prompt",
     // includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
@@ -53,5 +54,10 @@ export default defineConfig({
     plugins: [comlink(), react(), VitePWA(manifestForPlugin)],
     worker: {
         plugins: () => [comlink()],
+    },
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "./src"),
+        },
     },
 });
