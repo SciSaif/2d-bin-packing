@@ -150,7 +150,12 @@ export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
 };
 
 // function to create the images from files
-export const createImages = async (files: File[]) => {
+export const createImages = async (
+    files: File[],
+    options?: {
+        size: { width: number; height: number };
+    }
+) => {
     // const files = Array.from(fileList);
     const newImages: ImageBox[] = await Promise.all(
         files.map((file) => {
@@ -160,8 +165,8 @@ export const createImages = async (files: File[]) => {
                 img.onload = () => {
                     resolve({
                         id,
-                        w: img.width,
-                        h: img.height,
+                        w: options?.size.width ?? img.width,
+                        h: options?.size.height ?? img.height,
                         x: 0,
                         y: 0,
                         file,

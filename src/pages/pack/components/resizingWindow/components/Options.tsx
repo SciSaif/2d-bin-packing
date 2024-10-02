@@ -1,17 +1,17 @@
-import { Crop, EllipsisVerticalIcon, Trash } from "lucide-react";
+import { Crop, EllipsisVerticalIcon, Images, Trash } from "lucide-react";
 import { useState } from "react";
 import CropModal from "./CropModal";
 import { ImageBox } from "../../../Pack";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import { clearFileInput } from "@/utils";
+import CreateDuplicateModal from "./CreateDuplicatesModal";
 
 type OptionsProps = {
     id: string;
@@ -23,6 +23,7 @@ const Options = (
     { id, images, setImages }: OptionsProps
 ) => {
     const [showCropModal, setShowCropModal] = useState(false);
+    const [showCreateDuplicateModal, setShowCreateDuplicateModal] = useState(false);
 
     const removeImage = () => {
         const newTotalImages = images.length - 1;
@@ -56,6 +57,16 @@ const Options = (
                         <Button
                             variant={"ghost"}
                             className="flex flex-row items-center justify-start w-full gap-2 py-0"
+                            onClick={() => setShowCreateDuplicateModal(true)}
+                        >
+                            <Images size={16} /> Create Duplicates
+
+                        </Button>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Button
+                            variant={"ghost"}
+                            className="flex flex-row items-center justify-start w-full gap-2 py-0"
                             onClick={() => setShowCropModal(true)}
                         >
                             <Crop size={16} /> Crop
@@ -79,6 +90,9 @@ const Options = (
             </DropdownMenu>
             {
                 showCropModal && <CropModal id={id} images={images} setImages={setImages} close={() => setShowCropModal(false)} />
+            }
+            {
+                showCreateDuplicateModal && <CreateDuplicateModal id={id} images={images} setImages={setImages} close={() => setShowCreateDuplicateModal(false)} />
             }
 
         </div>
