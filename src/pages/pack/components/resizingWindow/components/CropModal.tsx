@@ -18,7 +18,7 @@ const CropModal = (
     { images, setImages, id, close }: CropModalProps
 ) => {
     const dispatch = useAppDispatch();
-
+    const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
     const [crop, setCrop] = useState<Crop>({ unit: 'px', width: 100, height: 100, x: 0, y: 0 });
     const [selectedImage] = useState<File | null>(images.find((image) => image.id === id)?.file ?? null); // Selected image to crop
     const [croppedFile, setCroppedFile] = useState<File | null>(null);
@@ -146,6 +146,17 @@ const CropModal = (
         }
     }, [imageRef, actualImageDimensions])
 
+    const handleAspectRatioChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value;
+        if (value === 'free') {
+            setAspectRatio(undefined); 
+        } else {
+            setAspectRatio(parseFloat(value)); 
+   
+            setCrop({ unit: 'px', width: 100 * parseFloat(value), height: 100, x: 0, y: 0 });
+        }
+    };
+
     if (!selectedImage) return null;
 
     return (
@@ -162,10 +173,26 @@ const CropModal = (
                     overflow: 'hidden',
                 }}
             >
+                <div className="mb-4">
+                    <label htmlFor="aspect-ratio" className="mr-2">Aspect Ratio:</label>
+                    <select
+                        id="aspect-ratio"
+                        value={aspectRatio ?? 'free'}
+                        onChange={handleAspectRatioChange}
+                        className="px-2 py-1 border border-gray-300 rounded"
+                    >
+                        <option value="free">Free</option>
+                        <option value="1">1:1 (Square)</option>
+                        <option value={4 / 3}>4:3</option>
+                        <option value={16 / 9}>16:9</option>
+                        <option value={7 / 9}>3.5x4.5  (Passport)</option>
+                    </select>
+                </div>
                 <ReactCrop
                     crop={crop}
                     onChange={(c) => setCrop(c)}
                     onComplete={onCropComplete}
+                    aspect={aspectRatio}
                 >
                     <div
                         style={{
