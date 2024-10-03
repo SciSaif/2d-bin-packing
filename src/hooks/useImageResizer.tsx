@@ -88,7 +88,6 @@ const useResizeImage = ({
         if (selectedImage && containerRef.current) {
             const aspectRatio = selectedImage.w / selectedImage.h;
             let mouseX = clientX / container.scaleFactor;
-            let mouseY = clientY / container.scaleFactor; // Assuming you want to scale Y as well
 
             const rect = containerRef.current.getBoundingClientRect();
 

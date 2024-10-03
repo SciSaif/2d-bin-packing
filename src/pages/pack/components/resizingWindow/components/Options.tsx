@@ -1,4 +1,4 @@
-import { Crop, EllipsisVerticalIcon, Images, Trash } from "lucide-react";
+import { Crop, EllipsisVerticalIcon, File, Images, Trash } from "lucide-react";
 import { useState } from "react";
 import CropModal from "./CropModal";
 import { ImageBox } from "../../../Pack";
@@ -12,18 +12,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { clearFileInput } from "@/utils";
 import CreateDuplicateModal from "./CreateDuplicatesModal";
+import ViewModal from "./ViewModal";
 
 type OptionsProps = {
     id: string;
     images: ImageBox[];
     setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
+    imageUrl: string;
 }
 
 const Options = (
-    { id, images, setImages }: OptionsProps
+    { id, images, setImages, imageUrl, }: OptionsProps
 ) => {
     const [showCropModal, setShowCropModal] = useState(false);
     const [showCreateDuplicateModal, setShowCreateDuplicateModal] = useState(false);
+    const [showViewModal, setShowViewModal] = useState(false);
 
     const removeImage = () => {
         const newTotalImages = images.length - 1;
@@ -57,9 +60,18 @@ const Options = (
                         <Button
                             variant={"ghost"}
                             className="flex flex-row items-center justify-start w-full gap-2 py-0"
+                            onClick={() => setShowViewModal(true)}
+                        >
+                            <File size={16} /> Compare with paper size
+                        </Button>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Button
+                            variant={"ghost"}
+                            className="flex flex-row items-center justify-start w-full gap-2 py-0"
                             onClick={() => setShowCreateDuplicateModal(true)}
                         >
-                            <Images size={16} /> Create Duplicates
+                            <Images size={16} /> Create duplicates
 
                         </Button>
                     </DropdownMenuItem>
@@ -93,6 +105,9 @@ const Options = (
             }
             {
                 showCreateDuplicateModal && <CreateDuplicateModal id={id} images={images} setImages={setImages} close={() => setShowCreateDuplicateModal(false)} />
+            }
+            {
+                showViewModal && <ViewModal id={id} images={images} close={() => setShowViewModal(false)} imageUrl={imageUrl} />
             }
 
         </div>

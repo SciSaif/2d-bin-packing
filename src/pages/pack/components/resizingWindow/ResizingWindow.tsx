@@ -126,7 +126,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
                             onMouseDown={(e) => handleMouseDown(e, imgData)}
                             onTouchStart={(e) => handleMouseDown(e, imgData)}
                         >
-                            {selectedId === imgData.id && <Options id={imgData.id} images={images} setImages={setImages} />}
+                            {selectedId === imgData.id && <Options id={imgData.id} images={images} setImages={setImages} imageUrl={imageUrl} />}
                             {selectedId === imgData.id && <ResizeAnchor />}
                         </div>
                     );
