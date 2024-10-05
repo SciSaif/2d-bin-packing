@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useLayoutEffect } from "react"
 import { useAppSelector } from "../redux/hooks";
 import { ImageBox } from "../pages/pack/Pack";
 import { positionImages } from "../pages/pack/components/resizingWindow/utils";
-
+import { PhotoSizeDefinition, getPhotoSizeInPixels } from '../data/paperSizes';
 interface UseResizeImageProps {
     containerRef: React.RefObject<HTMLDivElement>;
     startWithMaxHalfWidth?: boolean;
@@ -28,6 +28,27 @@ const useResizeImage = ({
     const [startingDistFromRightEdge, setStartingDistFromRightEdge] =
         useState(0);
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
+
+    const setImageToPresetSize = useCallback((imageId: string, photoSize: PhotoSizeDefinition) => {
+
+        const selectedImage = localImages.find(img => img.id === imageId);
+        if (!selectedImage) return;
+
+        const { width: targetWidthInPixels } = getPhotoSizeInPixels(photoSize, container);
+
+        // Calculate new height maintaining aspect ratio
+        const aspectRatio = selectedImage.w / selectedImage.h;
+        const newHeight = targetWidthInPixels / aspectRatio;
+
+        const updatedImages = localImages.map(img =>
+            img.id === imageId
+                ? { ...img, w: targetWidthInPixels, h: newHeight }
+                : img
+        );
+
+        repositionImages(updatedImages);
+    }, [localImages, container.paperSize]);
+
 
     useEffect(() => {
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
@@ -249,6 +270,7 @@ const useResizeImage = ({
         selectedId,
         imageUrls,
         setMaxY,
+        setImageToPresetSize
     };
 };
 

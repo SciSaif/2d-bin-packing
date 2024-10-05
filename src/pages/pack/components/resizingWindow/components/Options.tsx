@@ -1,28 +1,35 @@
-import { Crop, EllipsisVerticalIcon, File, Images, Trash } from "lucide-react";
+import { Crop, EllipsisVerticalIcon, File, Images, Scaling, Trash } from "lucide-react";
 import { useState } from "react";
 import CropModal from "./CropModal";
 import { ImageBox } from "../../../Pack";
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
+    DropdownMenuPortal,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import { clearFileInput } from "@/utils";
 import CreateDuplicateModal from "./CreateDuplicatesModal";
 import ViewModal from "./ViewModal";
+import { PhotoSizeDefinition, photoSizes } from "@/data/paperSizes";
 
 type OptionsProps = {
     id: string;
     images: ImageBox[];
     setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
     imageUrl: string;
+    setImageToPresetSize: (imageId: string, photoSize: PhotoSizeDefinition) => void;
 }
 
 const Options = (
-    { id, images, setImages, imageUrl, }: OptionsProps
+    { id, images, setImages, imageUrl, setImageToPresetSize }: OptionsProps
 ) => {
     const [showCropModal, setShowCropModal] = useState(false);
     const [showCreateDuplicateModal, setShowCreateDuplicateModal] = useState(false);
@@ -56,34 +63,46 @@ const Options = (
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="p-0 w-42">
-                    <DropdownMenuItem>
-                        <Button
-                            variant={"ghost"}
-                            className="flex flex-row items-center justify-start w-full gap-2 py-0"
-                            onClick={() => setShowViewModal(true)}
-                        >
-                            <File size={16} /> Compare with paper size
-                        </Button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Button
-                            variant={"ghost"}
-                            className="flex flex-row items-center justify-start w-full gap-2 py-0"
-                            onClick={() => setShowCreateDuplicateModal(true)}
-                        >
-                            <Images size={16} /> Create duplicates
 
-                        </Button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Button
-                            variant={"ghost"}
-                            className="flex flex-row items-center justify-start w-full gap-2 py-0"
-                            onClick={() => setShowCropModal(true)}
-                        >
-                            <Crop size={16} /> Crop
+                    <DropdownMenuGroup>
+                        <DropdownMenuSub>
+                            <DropdownMenuSubTrigger
+                                className="flex flex-row items-center justify-start w-full gap-2 py-2"
+                            ><Scaling size={16} /> Resize to</DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            const passportSize = photoSizes.find((size) => size.name === "Passport");
+                                            if (passportSize) {
+                                                setImageToPresetSize(id, passportSize);
+                                            }
+                                        }}
 
-                        </Button>
+                                    >Passport size</DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                        </DropdownMenuSub>
+                    </DropdownMenuGroup>
+
+                    <DropdownMenuItem
+                        className="flex flex-row items-center justify-start w-full gap-2 py-2"
+                        onClick={() => setShowViewModal(true)}
+                    >
+                        <File size={16} /> Compare with paper size
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        className="flex flex-row items-center justify-start w-full gap-2 py-2"
+                        onClick={() => setShowCreateDuplicateModal(true)}
+                    >
+                        <Images size={16} /> Create duplicates
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        className="flex flex-row items-center justify-start w-full gap-2 py-2"
+                        onClick={() => setShowCropModal(true)}
+
+                    >
+                        <Crop size={16} /> Crop
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
@@ -110,7 +129,7 @@ const Options = (
                 showViewModal && <ViewModal id={id} images={images} close={() => setShowViewModal(false)} imageUrl={imageUrl} />
             }
 
-        </div>
+        </div >
     )
 }
 
