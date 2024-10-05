@@ -65,39 +65,25 @@ export const paperSizes: Record<string, PaperSize> = {
     B5,
 };
 
-export interface PhotoSizeDefinition {
-    name: string;
-    description?: string;
-    widthMm: number;
-    heightMm: number;
-}
-
-export const photoSizes: PhotoSizeDefinition[] = [
-    {
-        name: "Passport",
+export const photoSizes = {
+    Passport: {
         description: "Standard passport photo size",
         widthMm: 35,
         heightMm: 45,
     },
-    {
-        name: "Visa",
+    Visa: {
         description: "Common visa photo size",
         widthMm: 50,
         heightMm: 50,
     },
-    {
-        name: "ID Card",
-        description: "Typical ID card photo size",
-        widthMm: 25,
-        heightMm: 35,
-    },
-    {
-        name: "2x2 inch",
+    "2x2 inch": {
         description: "Square format used in some documents",
         widthMm: 50.8, // 2 inches in mm
         heightMm: 50.8,
     },
-];
+} as const;
+
+export type PhotoSizeDefinition = (typeof photoSizes)[keyof typeof photoSizes];
 
 export function getPhotoSizeInPixels(
     photoSize: PhotoSizeDefinition,
@@ -118,10 +104,4 @@ export function getPhotoSizeInPixels(
         width: widthInPx,
         height: heightInPx,
     };
-}
-
-export function getPhotoSizeDescription(
-    photoSize: PhotoSizeDefinition
-): string {
-    return `${photoSize.name} (${photoSize.widthMm}mm × ${photoSize.heightMm}mm)`;
 }

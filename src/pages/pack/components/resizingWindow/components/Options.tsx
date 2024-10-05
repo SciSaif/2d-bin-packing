@@ -73,13 +73,22 @@ const Options = (
                                 <DropdownMenuSubContent>
                                     <DropdownMenuItem
                                         onClick={() => {
-                                            const passportSize = photoSizes.find((size) => size.name === "Passport");
-                                            if (passportSize) {
-                                                setImageToPresetSize(id, passportSize);
-                                            }
+                                            setImageToPresetSize(id, photoSizes.Passport);
                                         }}
 
                                     >Passport size</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            setImageToPresetSize(id, photoSizes["2x2 inch"]);
+                                        }}
+
+                                    >2x2 inch size</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            setImageToPresetSize(id, photoSizes.Visa);
+                                        }}
+
+                                    >Visa size</DropdownMenuItem>
                                 </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                         </DropdownMenuSub>
