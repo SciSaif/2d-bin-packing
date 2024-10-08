@@ -1,5 +1,4 @@
 import { endpointSymbol } from "vite-plugin-comlink/symbol";
-import { packBoxes } from "./worker/worker";
 
 let workerInstance = new ComlinkWorker<typeof import("./worker/worker")>(
     new URL("./worker/worker", import.meta.url)

@@ -18,7 +18,7 @@ type StartPackingButtonsProps = {
 
 const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
     const dispatch = useAppDispatch();
-    const { container, packingFactor } = useAppSelector((state) => state.main);
+    const { container, packingFactor, algorithm } = useAppSelector((state) => state.main);
 
     const startPacking = async () => {
         dispatch(setIsPacking(true));
@@ -32,7 +32,6 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
                 if (event.data.type === 'progress') {
                     console.log(event.data.progress);
                     dispatch(setPackingProgress(Number(event.data.progress)));
-
                 } else if (event.data.type === 'complete') {
                     const packedBoxes = event.data.result;
                     setBoxes(packedBoxes);
@@ -48,7 +47,7 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
             workerInstance.postMessage({
                 type: 'start', payload: {
                     images, container, options: {
-                        packingFactor
+                        packingFactor, algorithm
                     }
                 }
             });

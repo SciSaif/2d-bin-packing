@@ -1,6 +1,6 @@
+import { ImageBox } from "@/pages/pack/Pack";
+import { ContainerType } from "@/redux/features/slices/mainSlice";
 import { pack, UnpackedRect, Rectangle } from "efficient-rect-packer";
-import { ContainerType } from "../../redux/features/slices/mainSlice";
-import { ImageBox } from "./Pack";
 
 function toUnpackedRect(image: ImageBox): UnpackedRect {
     return {
@@ -80,7 +80,7 @@ async function callPackFunction({
     }
 }
 
-export type PackBoxesProps = {
+export type efficientPackingProps = {
     images: ImageBox[];
     container: ContainerType;
     options?: {
@@ -89,11 +89,11 @@ export type PackBoxesProps = {
     };
 };
 
-export const packBoxes = async ({
+export const efficientPacking = async ({
     images,
     container,
     options = {},
-}: PackBoxesProps): Promise<ImageBox[][]> => {
+}: efficientPackingProps): Promise<ImageBox[][]> => {
     const totalImages = images.length;
     let remainingImages = [...images];
     const allPackedBoxes: ImageBox[][] = [];
@@ -174,74 +174,3 @@ export const packBoxes = async ({
 
     return allPackedBoxes;
 };
-
-// export const packBoxes = async ({
-//     images,
-//     container,
-//     useApi,
-// }: {
-//     images: ImageBox[];
-//     container: ContainerType;
-//     useApi?: boolean;
-// }): Promise<ImageBox[][]> => {
-//     let remainingImages = [...images]; // Copy the images array to manipulate
-//     const allPackedBoxes: ImageBox[][] = [];
-//     const imageMap = new Map(images.map((img) => [img.id, img]));
-
-//     while (remainingImages.length > 0) {
-//         const { packed_rectangles, unpacked_rectangles } =
-//             await callPackFunction({
-//                 rectangles: remainingImages.map(toUnpackedRect),
-//                 container,
-//                 useApi,
-//             });
-
-//         // Calculate total packed area for efficiency logging
-//         const totalArea = packed_rectangles.reduce((acc, rect) => {
-//             return acc + rect.w * rect.h;
-//         }, 0);
-//         console.log("Total available area", container.w * container.h);
-//         console.log("Total packed area", totalArea);
-//         console.log(
-//             "Efficiency",
-//             (totalArea / (container.w * container.h)) * 100
-//         );
-
-//         // Map packed rectangles back to ImageBox objects
-//         const packedImageBoxes = packed_rectangles.map((rect) => {
-//             const originalImage = imageMap.get(rect.id);
-//             if (!originalImage) {
-//                 throw new Error(
-//                     `No matching original image found for id: ${rect.id}`
-//                 );
-//             }
-//             return mapPackedRectToImageBox(rect, originalImage);
-//         });
-
-//         allPackedBoxes.push(packedImageBoxes);
-
-//         // Update remaining images
-//         remainingImages = unpacked_rectangles.map((rect) => {
-//             const originalImage = imageMap.get(rect.id);
-//             if (!originalImage) {
-//                 throw new Error(
-//                     `No matching original image found for id: ${rect.id}`
-//                 );
-//             }
-//             return originalImage;
-//         });
-//     }
-
-//     // Log overall efficiency
-//     const totalAvailableArea =
-//         allPackedBoxes.length * container.w * container.h;
-//     const totalPackedArea = allPackedBoxes.reduce((acc, boxes) => {
-//         return acc + boxes.reduce((boxAcc, box) => boxAcc + box.w * box.h, 0);
-//     }, 0);
-//     console.log("_________________________________________");
-//     console.log("Total packed area", totalPackedArea);
-//     console.log("Total available area", totalAvailableArea);
-//     console.log("Efficiency", (totalPackedArea / totalAvailableArea) * 100);
-
-//     return allPackedBoxes;
-// };

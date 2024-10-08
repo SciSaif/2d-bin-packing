@@ -1,6 +1,7 @@
 import LabelInput from "../../../components/LabelInput";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import {
+    setAlgorithm,
     setContainer,
     setPackingFactor,
     setStartingMaxWidthFactor,
@@ -11,7 +12,7 @@ import { packingFactors } from "../../../data/packingFactors";
 
 const SettingsPanel = () => {
     const dispatch = useAppDispatch();
-    const { startingMaxWidthFactor, container, inResizeMode, packingFactor } =
+    const { startingMaxWidthFactor, container, inResizeMode, packingFactor, algorithm } =
         useAppSelector((state) => state.main);
 
     if (!inResizeMode) return null;
@@ -21,8 +22,8 @@ const SettingsPanel = () => {
             <LabelInput
                 type="number"
                 label="Initial max width %"
-                labelClassName="min-w-[150px]"
-                wrapperClassName="max-w-[250px]"
+                labelClassName="min-w-[140px]"
+                wrapperClassName="max-w-[230px]"
                 min={10}
                 max={100}
                 value={startingMaxWidthFactor * 100}
@@ -42,14 +43,33 @@ const SettingsPanel = () => {
                         value,
                     })
                 )}
-                 labelClassName="min-w-[150px]"
-                wrapperClassName="max-w-[250px]"
+                labelClassName="min-w-[90px]"
+                wrapperClassName="max-w-[220px]"
                 className="w-[50px]"
                 value={packingFactor}
                 onChange={(e) => {
                     const selectedPackingFactor = e.target.value;
                     dispatch(setPackingFactor(Number(selectedPackingFactor)));
-                }} 
+                }}
+            />
+            <LabelSelectInput
+                label="Algorithm"
+                options={[{
+                    label: "Efficient",
+                    value: "efficient",
+                }, {
+                    label: "Simple",
+                    value: "simple",
+                }
+                ]}
+                labelClassName="min-w-[60px]"
+                wrapperClassName="max-w-[170px] "
+                className="w-[85px] "
+                value={algorithm}
+                onChange={(e) => {
+                    const selectedAlgorithm = e.target.value as 'simple' | 'efficient';
+                    dispatch(setAlgorithm(selectedAlgorithm));
+                }}
             />
 
             <LabelSelectInput
@@ -74,6 +94,8 @@ const SettingsPanel = () => {
                         dispatch(setContainer(newContainer));
                     }
                 }}
+                className="w-[50px] "
+
             />
         </div>
     );

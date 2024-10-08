@@ -26,6 +26,8 @@ export interface Margin {
     left: number;
 }
 
+export type Algorithm = "efficient" | "hff";
+
 interface initialStateProps {
     container: ContainerType;
     isPacking: boolean;
@@ -36,6 +38,7 @@ interface initialStateProps {
     packingFactor: number;
     packingProgress: number;
     filesChangedFlag: boolean;
+    algorithm: Algorithm;
 }
 
 const initialState: initialStateProps = {
@@ -48,6 +51,7 @@ const initialState: initialStateProps = {
     packingFactor: 3,
     packingProgress: 0,
     filesChangedFlag: false,
+    algorithm: "efficient",
 };
 
 export const mainSlice = createSlice({
@@ -87,6 +91,9 @@ export const mainSlice = createSlice({
         setFilesChangedFlag: (state) => {
             state.filesChangedFlag = !state.filesChangedFlag;
         },
+        setAlgorithm: (state, action: PayloadAction<Algorithm>) => {
+            state.algorithm = action.payload;
+        },
         resetState: () => initialState,
     },
 });
@@ -102,5 +109,6 @@ export const {
     setPackingFactor,
     setPackingProgress,
     setFilesChangedFlag,
+    setAlgorithm,
 } = mainSlice.actions;
 export default mainSlice.reducer;
