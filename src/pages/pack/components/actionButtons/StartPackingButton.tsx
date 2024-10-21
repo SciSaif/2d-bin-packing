@@ -8,7 +8,6 @@ import {
 } from "../../../../redux/features/slices/mainSlice";
 import { ImageBox } from "../../Pack";
 import { createWorkerInstance } from "../../../../workerUtils";
-import { endpointSymbol } from "vite-plugin-comlink/symbol";
 
 
 type StartPackingButtonsProps = {

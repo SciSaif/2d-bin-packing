@@ -1,6 +1,7 @@
 import { ImageBox } from "@/pages/pack/Pack";
 import { ContainerType } from "@/redux/features/slices/mainSlice";
 import { pack, UnpackedRect, Rectangle } from "efficient-rect-packer";
+import { AlgorithmProps } from "./utils";
 
 function toUnpackedRect(image: ImageBox): UnpackedRect {
     return {
@@ -80,9 +81,7 @@ async function callPackFunction({
     }
 }
 
-export type efficientPackingProps = {
-    images: ImageBox[];
-    container: ContainerType;
+export type efficientPackingProps = AlgorithmProps & {
     options?: {
         packingFactor?: number;
         useApi?: boolean;

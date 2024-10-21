@@ -1,6 +1,7 @@
 import LabelInput from "../../../components/LabelInput";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import {
+    Algorithm,
     setAlgorithm,
     setContainer,
     setPackingFactor,
@@ -59,7 +60,7 @@ const SettingsPanel = () => {
                     value: "efficient",
                 }, {
                     label: "Simple",
-                    value: "simple",
+                    value: "hff",
                 }
                 ]}
                 labelClassName="min-w-[60px]"
@@ -67,7 +68,7 @@ const SettingsPanel = () => {
                 className="w-[85px] "
                 value={algorithm}
                 onChange={(e) => {
-                    const selectedAlgorithm = e.target.value as 'simple' | 'efficient';
+                    const selectedAlgorithm = e.target.value as Algorithm;
                     dispatch(setAlgorithm(selectedAlgorithm));
                 }}
             />
