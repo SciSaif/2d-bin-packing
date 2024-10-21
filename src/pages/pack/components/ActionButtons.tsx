@@ -32,7 +32,7 @@ const ActionButtons = ({
             {boxes.length > 0 && (
                 <>
                     <SaveAsPdfButton boxes={boxes} />
-                    <PrintButton stageRefs={stageRefs} />
+                    {/* <PrintButton stageRefs={stageRefs} /> */}
                     <ResizeButton setBoxes={setBoxes} />
                 </>
             )}

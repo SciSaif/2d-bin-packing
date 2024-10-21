@@ -23,8 +23,8 @@ const SettingsPanel = () => {
             <LabelInput
                 type="number"
                 label="Initial max width %"
-                labelClassName="min-w-[140px]"
-                wrapperClassName="max-w-[230px]"
+                labelClassName="min-w-[130px]"
+                wrapperClassName="max-w-[185px]"
                 min={10}
                 max={100}
                 value={startingMaxWidthFactor * 100}
