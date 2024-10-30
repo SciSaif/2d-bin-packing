@@ -36,12 +36,31 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
             );
             if (selectedImage && containerRef.current) {
                 const rect = containerRef.current.getBoundingClientRect();
-                const newX =
+                let newX =
                     (clientX - rect.left) / container.scaleFactor -
                     dragOffset.x;
-                const newY =
+                let newY =
                     (clientY - rect.top) / container.scaleFactor - dragOffset.y;
 
+                // Restrict dragging within the container's bounds
+                newX = Math.max(
+                    container.margin.left,
+                    Math.min(
+                        newX,
+                        container.w - container.margin.right - selectedImage.w
+                    )
+                );
+                newY = Math.max(
+                    container.margin.top,
+                    Math.min(newY, maxY - selectedImage.h)
+                );
+
+                // Update maxY if the image is dragged close to the current maxY
+                if (newY + selectedImage.h > maxY - 20) {
+                    setMaxY((prevMaxY) => prevMaxY + 100);
+                }
+
+                // Update the local image positions
                 const updatedImages = localImages.map((img) =>
                     img.id === selectedId ? { ...img, x: newX, y: newY } : img
                 );
