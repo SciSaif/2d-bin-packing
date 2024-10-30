@@ -5,11 +5,13 @@ import { useAppDispatch, useAppSelector } from "../../../../../redux/hooks";
 type ResizeWindowSettingsProps = {
     showMarginControls: boolean;
     setShowMarginControls: React.Dispatch<React.SetStateAction<boolean>>;
+    freeform?: boolean
 };
 
 const ResizeWindowSettings = ({
     showMarginControls,
     setShowMarginControls,
+    freeform
 }: ResizeWindowSettingsProps) => {
     const dispatch = useAppDispatch();
     const { container, showBorder } = useAppSelector((state) => state.main);
@@ -22,23 +24,27 @@ const ResizeWindowSettings = ({
             >
                 {showMarginControls ? "Hide Margins" : "Show Margins"}
             </button>
-            <LabelInput
-                type="number"
-                label="Padding"
-                min={0}
-                max={30}
-                value={container.padding}
-                onChange={(e) => {
-                    let padding = parseInt(e.target.value, 10);
-                    if (isNaN(padding)) padding = 0;
-                    dispatch(
-                        setContainer({
-                            ...container,
-                            padding,
-                        })
-                    );
-                }}
-            />
+            {
+                !freeform &&
+                <LabelInput
+                    type="number"
+                    label="Padding"
+                    min={0}
+                    max={30}
+                    value={container.padding}
+                    onChange={(e) => {
+                        let padding = parseInt(e.target.value, 10);
+                        if (isNaN(padding)) padding = 0;
+                        dispatch(
+                            setContainer({
+                                ...container,
+                                padding,
+                            })
+                        );
+                    }}
+                />
+            }
+
 
             <button
                 onClick={() => {

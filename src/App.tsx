@@ -5,6 +5,8 @@ import Header from "./components/Header";
 import Home from "./pages/home/Home";
 import About from "./pages/about/About";
 import Pack from "./pages/pack/Pack";
+import ModeSelection from "./pages/modeSelection/ModeSelection";
+import FreeForm from "./pages/freeform/FreeForm";
 
 // wrapper with Header and Footer
 const w = (Component: React.FC) => {
@@ -26,6 +28,8 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={w(Home)} />
                     <Route path="/about" element={w(About)} />
+                    <Route path="/modeSelection" element={w(ModeSelection)} />
+                    <Route path="/freeForm" element={w(FreeForm)} />
                     <Route path="/pack" element={w(Pack)} />
                 </Routes>
             </Router>

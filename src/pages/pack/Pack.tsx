@@ -26,6 +26,7 @@ export interface ImageBox {
     imageElement?: HTMLImageElement;
     rotated?: boolean;
     new?: boolean;
+    url?: any
 }
 
 const Pack = () => {

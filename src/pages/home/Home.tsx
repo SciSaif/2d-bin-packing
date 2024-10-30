@@ -27,11 +27,12 @@ const Home: React.FC = () => {
                 </div>
 
                 <Link
-                    to={"/pack"}
+                    to={"/modeSelection"}
                     className="px-8 py-2 mt-10 font-bold text-white transition duration-200 border-2 border-transparent rounded-md bg-secondary-700 w-fit hover:bg-white hover:text-secondary-700 hover:border-secondary-700"
                 >
                     Let's go!
                 </Link>
+
             </div>
         </main>
     );
