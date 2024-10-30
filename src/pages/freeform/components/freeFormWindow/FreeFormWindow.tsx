@@ -43,7 +43,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                 setShowMarginControls={setShowMarginControls}
                 freeform
             />
-            {showMarginControls && <MarginInputs localImages={localImages} setLocalImages={setLocalImages} setMaxY={setMaxY} />}
+            {/* {showMarginControls && <MarginInputs localImages={localImages} setLocalImages={setLocalImages} setMaxY={setMaxY} />} */}
 
             <div
                 ref={containerRef}
@@ -58,7 +58,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                 <PageWidthIndicator />
 
 
-                {showMarginControls && (
+                {/* {showMarginControls && (
                     <MarginHandles
                         localImages={localImages}
                         setLocalImages={setLocalImages}
@@ -66,9 +66,9 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                         containerRef={containerRef}
                     />
 
-                )}
+                )} */}
 
-                <PageEndIndicators maxY={maxY} />
+                <PageEndIndicators maxY={maxY} localImages={localImages} />
                 {localImages.map((imgData) => {
                     const imageUrl = imageUrls.get(imgData.id) || "";
 

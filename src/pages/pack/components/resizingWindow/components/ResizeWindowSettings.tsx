@@ -18,31 +18,34 @@ const ResizeWindowSettings = ({
 
     return (
         <div className="flex flex-wrap items-center justify-center gap-2 mb-4 wrap ">
-            <button
-                onClick={() => setShowMarginControls(!showMarginControls)}
-                className="px-2 py-2   text-sm w-[150px] text-black bg-slate-100 rounded  hover:bg-slate-200 shadow"
-            >
-                {showMarginControls ? "Hide Margins" : "Show Margins"}
-            </button>
             {
-                !freeform &&
-                <LabelInput
-                    type="number"
-                    label="Padding"
-                    min={0}
-                    max={30}
-                    value={container.padding}
-                    onChange={(e) => {
-                        let padding = parseInt(e.target.value, 10);
-                        if (isNaN(padding)) padding = 0;
-                        dispatch(
-                            setContainer({
-                                ...container,
-                                padding,
-                            })
-                        );
-                    }}
-                />
+                !freeform && <>
+                    <button
+                        onClick={() => setShowMarginControls(!showMarginControls)}
+                        className="px-2 py-2   text-sm w-[150px] text-black bg-slate-100 rounded  hover:bg-slate-200 shadow"
+                    >
+                        {showMarginControls ? "Hide Margins" : "Show Margins"}
+                    </button>
+
+                    <LabelInput
+                        type="number"
+                        label="Padding"
+                        min={0}
+                        max={30}
+                        value={container.padding}
+                        onChange={(e) => {
+                            let padding = parseInt(e.target.value, 10);
+                            if (isNaN(padding)) padding = 0;
+                            dispatch(
+                                setContainer({
+                                    ...container,
+                                    padding,
+                                })
+                            );
+                        }}
+                    />
+                </>
+
             }
 
 

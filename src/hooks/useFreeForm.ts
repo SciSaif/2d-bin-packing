@@ -285,7 +285,6 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
     }, [handleMouseMove, handleMouseUp, handleTouchMove]);
 
     useLayoutEffect(() => {
-        console.log("container changed");
         const repositionedImages = positionNewImages(
             localImages,
             container
