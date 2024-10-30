@@ -3,6 +3,7 @@ import { useAppSelector } from "../redux/hooks";
 import { ImageBox } from "../pages/pack/Pack";
 import { positionImages } from "../pages/pack/components/resizingWindow/utils";
 import { PhotoSizeDefinition, getPhotoSizeInPixels } from '../data/paperSizes';
+import usePreventScroll from "./usePreventScroll";
 interface UseResizeImageProps {
     containerRef: React.RefObject<HTMLDivElement>;
     startWithMaxHalfWidth?: boolean;
@@ -81,25 +82,9 @@ const useResizeImage = ({
         // the useEffect with container as a dependency
     }, [images.length, filesChangedFlag]);
 
-    // for preventive page scrolling while resizing in mobile
-    useEffect(() => {
-        const preventDefaultWhenResizing = (e: globalThis.TouchEvent) => {
-            if (isResizing) {
-                e.preventDefault();
-            }
-        };
+    usePreventScroll(isResizing)
 
-        document.addEventListener("touchmove", preventDefaultWhenResizing, {
-            passive: false,
-        });
 
-        return () => {
-            document.removeEventListener(
-                "touchmove",
-                preventDefaultWhenResizing
-            );
-        };
-    }, [isResizing]);
 
     const updateImageSize = (
         clientX: number,

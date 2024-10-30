@@ -7,6 +7,7 @@ import {
     resizeImages,
 } from "@/pages/freeform/components/freeFormWindow/utils";
 import { getPhotoSizeInPixels, PhotoSizeDefinition } from "@/data/paperSizes";
+import usePreventScroll from "./usePreventScroll";
 
 interface UseFreeFormProps {
     containerRef: React.RefObject<HTMLDivElement>;
@@ -25,6 +26,29 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
 
     const [maxY, setMaxY] = useState(container.h);
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+    const handleDrag = (clientX: number, clientY: number) => {
+        if (isDragging && selectedId) {
+            const selectedImage = localImages.find(
+                (img) => img.id === selectedId
+            );
+            if (selectedImage && containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const newX =
+                    (clientX - rect.left) / container.scaleFactor -
+                    dragOffset.x;
+                const newY =
+                    (clientY - rect.top) / container.scaleFactor - dragOffset.y;
+
+                const updatedImages = localImages.map((img) =>
+                    img.id === selectedId ? { ...img, x: newX, y: newY } : img
+                );
+                setLocalImages(updatedImages);
+            }
+        }
+    };
 
     const setImageToPresetSize = useCallback(
         (imageId: string, photoSize: PhotoSizeDefinition) => {
@@ -82,25 +106,7 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
         // the useEffect with container as a dependency
     }, [images.length, filesChangedFlag]);
 
-    // for preventive page scrolling while resizing in mobile
-    useEffect(() => {
-        const preventDefaultWhenResizing = (e: globalThis.TouchEvent) => {
-            if (isResizing) {
-                e.preventDefault();
-            }
-        };
-
-        document.addEventListener("touchmove", preventDefaultWhenResizing, {
-            passive: false,
-        });
-
-        return () => {
-            document.removeEventListener(
-                "touchmove",
-                preventDefaultWhenResizing
-            );
-        };
-    }, [isResizing]);
+    usePreventScroll(isResizing || isDragging);
 
     const updateImageSize = (
         clientX: number,
@@ -186,53 +192,64 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
     };
 
     const handleMouseDown = (e: any, imgData: ImageBox) => {
-        if (
+        const isResizeHandle =
             e.target instanceof HTMLElement &&
-            e.target.classList.contains("resize-handle")
-        ) {
-            const clientX = e.clientX || e.touches[0].clientX;
+            e.target.classList.contains("resize-handle");
 
-            let mouseX = clientX / container.scaleFactor;
+        if (isResizeHandle) {
+            // Existing resizing setup
+            const clientX = e.clientX || e.touches[0].clientX;
+            const rect = containerRef.current?.getBoundingClientRect();
+            let mouseX =
+                clientX / container.scaleFactor -
+                (rect?.left || 0) / container.scaleFactor;
+            const distBetweenMouseAndRightEdge = imgData.x + imgData.w - mouseX;
+            setStartingDistFromRightEdge(distBetweenMouseAndRightEdge);
+            setIsResizing(true);
+        } else {
+            // Start dragging
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
 
             const rect = containerRef.current?.getBoundingClientRect();
-
-            if (!rect) return;
-
-            mouseX -= rect.left / container.scaleFactor;
-
-            // calculate the distance between the mouse and the right edge of the image
-            const distBetweenMouseAndRightEdge = imgData.x + imgData.w - mouseX;
-
-            // set the state
-            setStartingDistFromRightEdge(distBetweenMouseAndRightEdge);
-            console.log("handleMouseDown ", distBetweenMouseAndRightEdge);
-
-            setIsResizing(true);
-            setSelectedId(imgData.id);
-
-            return;
+            setDragOffset({
+                x:
+                    (clientX - (rect?.left || 0)) / container.scaleFactor -
+                    imgData.x,
+                y:
+                    (clientY - (rect?.top || 0)) / container.scaleFactor -
+                    imgData.y,
+            });
+            setIsDragging(true);
         }
 
-        if (selectedId !== imgData.id) {
-            setSelectedId(imgData.id);
-        }
+        setSelectedId(imgData.id);
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-        handleResize(e.clientX, e.clientY);
-    };
-
-    const handleTouchMove = (e: globalThis.TouchEvent) => {
-        if (e.touches.length > 0) {
-            const touch = e.touches[0];
-            handleResize(touch.clientX, touch.clientY);
+        if (isResizing) {
+            handleResize(e.clientX, e.clientY);
+        } else if (isDragging) {
+            handleDrag(e.clientX, e.clientY);
         }
     };
 
     const handleMouseUp = useCallback(() => {
         setIsResizing(false);
+        setIsDragging(false);
         setImages(localImages);
     }, [localImages]);
+
+    const handleTouchMove = (e: globalThis.TouchEvent) => {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            if (isResizing) {
+                handleResize(touch.clientX, touch.clientY);
+            } else if (isDragging) {
+                handleDrag(touch.clientX, touch.clientY);
+            }
+        }
+    };
 
     useEffect(() => {
         window.addEventListener("mousemove", handleMouseMove);
