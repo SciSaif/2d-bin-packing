@@ -1,11 +1,11 @@
 import { Stage } from "konva/lib/Stage";
-import SaveAsPdfButton from "../../../components/actionButtons/SaveAsPDFButton";
-import { ImageBox } from "../Pack";
 import { useAppSelector } from "../../../redux/hooks";
-import ResetButton from "../../../components/actionButtons/ResetButton";
-import StartPackingButton from "../../../components/actionButtons/StartPackingButton";
-import ResizeButton from "../../../components/actionButtons/ResizeButton";
-import StopButton from "../../../components/actionButtons/StopButton";
+import { ImageBox } from "@/pages/pack/Pack";
+import ResetButton from "@/components/actionButtons/ResetButton";
+import SaveAsPdfButton from "@/components/actionButtons/SaveAsPDFButton";
+import ResizeButton from "@/components/actionButtons/ResizeButton";
+import ShowFreeFormResult from "@/components/actionButtons/ShowFreeFormResult";
+
 
 
 type ActionButtonsProps = {
@@ -16,7 +16,7 @@ type ActionButtonsProps = {
     updateScaleFactor: () => void;
 };
 
-const ActionButtons = ({
+const FreeFormActionButtons = ({
     boxes,
     setBoxes,
     images,
@@ -33,18 +33,17 @@ const ActionButtons = ({
                 </>
             )}
             {inResizeMode && images.length > 0 && (
-                <StartPackingButton setBoxes={setBoxes} images={images} />
+                <ShowFreeFormResult setBoxes={setBoxes} images={images} />
             )}
-            {!isPacking && images.length > 0 && (
+            {images.length > 0 && (
                 <ResetButton
                     setBoxes={setBoxes}
                     setImages={setImages}
                     updateScaleFactor={updateScaleFactor}
                 />
             )}
-            {isPacking && <StopButton />}
         </div>
     );
 };
 
-export default ActionButtons;
+export default FreeFormActionButtons;

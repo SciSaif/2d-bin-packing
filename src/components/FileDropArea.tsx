@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import useDragAndDrop from "../../../hooks/useDragDrop";
-import { createImages } from "../utils";
+import useDragAndDrop from "../hooks/useDragDrop";
 import {
     setImagesLoaded,
     setInResizeMode,
-} from "../../../redux/features/slices/mainSlice";
-import { useAppDispatch } from "../../../redux/hooks";
-import { ImageBox } from "../Pack";
-import { clearFileInput } from "../../../utils";
+} from "../redux/features/slices/mainSlice";
+import { useAppDispatch } from "../redux/hooks";
+import { ImageBox } from "../pages/pack/Pack";
+import { clearFileInput, createImages } from "../utils";
 const MAX_IMAGES_TO_SHOW = 20;
 
 interface Props {

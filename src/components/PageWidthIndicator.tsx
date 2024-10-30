@@ -7,7 +7,7 @@ const PageWidthIndicator = () => {
             <div className="w-full h-[1px] bg-gray-500 relative ">
                 <div className="w-[10px] h-[1px] rotate-90 bg-gray-500 absolute -left-[6px]"></div>
             </div>
-            <div className="px-2 text-sm text-center whitespace-nowrap ">
+            <div className="px-2 text-sm text-center select-none whitespace-nowrap ">
                 {container.paperSize.name} Paper Width
             </div>
             <div className="w-full h-[1px] bg-gray-500 relative">

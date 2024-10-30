@@ -17,7 +17,7 @@ const ModeSelection = () => {
                                 <CardDescription>For packing as many images as possible in one page so as to reduce the number of pages required</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <img src="packed_images_2.png" />
+                                <img src="packed_images_example.png" />
 
                             </CardContent>
 
@@ -28,11 +28,11 @@ const ModeSelection = () => {
 
                         <Card className="w-[350px] cursor-pointer flex flex-col justify-between hover:bg-slate-50 hover:border-secondary/50 min-h-[380px]">
                             <CardHeader>
-                                <CardTitle>FreeForm packing</CardTitle>
+                                <CardTitle>FreeForm </CardTitle>
                                 <CardDescription>Move and resize the images freely for printing</CardDescription>
                             </CardHeader>
                             <CardContent >
-                                <img src="packed_images_2.png" />
+                                <img src="free_form_example.png" />
 
                             </CardContent>
 

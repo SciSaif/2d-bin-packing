@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useLayoutEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { ImageBox } from "@/pages/pack/Pack";
-import { positionImages } from "@/pages/pack/components/resizingWindow/utils";
+
+import { getPhotoSizeInPixels, PhotoSizeDefinition } from "@/data/paperSizes";
+import usePreventScroll from "./usePreventScroll";
 import {
     positionNewImages,
     resizeImages,
-} from "@/pages/freeform/components/freeFormWindow/utils";
-import { getPhotoSizeInPixels, PhotoSizeDefinition } from "@/data/paperSizes";
-import usePreventScroll from "./usePreventScroll";
+} from "@/components/utils/freeFormWindowUtils";
 
 interface UseFreeFormProps {
     containerRef: React.RefObject<HTMLDivElement>;

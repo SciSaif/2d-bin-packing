@@ -1,5 +1,5 @@
 import { ImageBox } from "@/pages/pack/Pack";
-import { ContainerType } from "../../../../redux/features/slices/mainSlice";
+import { ContainerType } from "@/redux/features/slices/mainSlice";
 
 export const resizeImages = (
     images: ImageBox[],

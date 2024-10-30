@@ -1,14 +1,15 @@
 import { createRef, useEffect, useRef, useState } from 'react'
-import FileDropArea from '../pack/components/FileDropArea'
+import FileDropArea from '../../components/FileDropArea'
 import { ImageBox } from '../pack/Pack';
-import SettingsPanel from '../pack/components/SettingsPanel';
+import SettingsPanel from '../../components/SettingsPanel';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import FreeFormWindow from './components/freeFormWindow/FreeFormWindow';
+import FreeFormWindow from './components/FreeFormWindow';
 import { useScaleFactor } from '@/hooks/useScaleFactor';
-import PageStage from '../pack/components/PageStage';
+import PageStage from '../../components/PageStage';
 import Konva from 'konva';
 import ActionButtons from '../pack/components/ActionButtons';
 import { setImagesLoaded } from '@/redux/features/slices/mainSlice';
+import FreeFormActionButtons from './components/FreeFormActionButtons';
 
 const FreeForm = () => {
     const dispatch = useAppDispatch();
@@ -42,6 +43,7 @@ const FreeForm = () => {
     }, [boxes, images]);
 
     const updateScaleFactor = useScaleFactor(containerWrapper);
+    console.log('images', images)
 
 
     return (
@@ -57,7 +59,7 @@ const FreeForm = () => {
                 />
                 <SettingsPanel freeform />
 
-                <ActionButtons
+                <FreeFormActionButtons
                     boxes={boxes}
                     setBoxes={setBoxes}
                     images={images}
@@ -70,7 +72,7 @@ const FreeForm = () => {
                 )}
                 <div
                     ref={containerWrapper}
-                    className="flex flex-wrap w-full items-center justify-center mx-auto   max-w-[1050px] gap-y-10 gap-x-5 "
+                    className="flex flex-wrap mb-10 w-full items-center justify-center mx-auto   max-w-[1050px] gap-y-10 gap-x-5 "
                     style={{ overscrollBehavior: "auto" }}
                 >
                     {boxes &&
@@ -85,7 +87,10 @@ const FreeForm = () => {
                 </div>
 
 
+
             </div>
+            {/* dont remove */}
+            <div id="temp-container" style={{ display: "none" }}></div>
         </div>
     )
 }

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Konva from "konva";
-import FileDropArea from "./components/FileDropArea";
+import FileDropArea from "../../components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
     setImagesLoaded,
 } from "../../redux/features/slices/mainSlice";
 
-import ResizingWindow from "./components/resizingWindow/ResizingWindow";
+import ResizingWindow from "./components/ResizingWindow";
 import Content from "./components/Content";
 
 import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
-import PageStage from "./components/PageStage";
-import SettingsPanel from "./components/SettingsPanel";
+import PageStage from "../../components/PageStage";
+import SettingsPanel from "../../components/SettingsPanel";
 
 import Loading from "./components/Loading";
 

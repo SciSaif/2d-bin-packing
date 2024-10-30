@@ -1,9 +1,9 @@
 import { RefreshCw } from "lucide-react";
-import Button from "../../../../components/Button";
-import { resetMargin, resetState, setContainer } from "../../../../redux/features/slices/mainSlice";
-import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
-import { clearFileInput } from "../../../../utils";
-import { ImageBox } from "../../Pack";
+import Button from "../Button";
+import { resetMargin, resetState, setContainer } from "../../redux/features/slices/mainSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { clearFileInput } from "../../utils";
+import { ImageBox } from "../../pages/pack/Pack";
 
 type ResetButtonProps = {
     setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;

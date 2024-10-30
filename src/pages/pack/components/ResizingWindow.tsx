@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import useResizeImage from "../../../../hooks/useImageResizer";
+import useResizeImage from "../../../hooks/useImageResizer";
 
-import MarginHandles from "./components/MarginHandles";
+import MarginHandles from "../../../components/window/MarginHandles";
 
-import { useAppSelector } from "../../../../redux/hooks";
+import { useAppSelector } from "../../../redux/hooks";
 
-import ResizeAnchor from "./components/ResizeAnchor";
-import { ImageBox } from "../../Pack";
-import MarginInputs from "./components/MarginInputs";
-import ResizeWindowSettings from "./components/ResizeWindowSettings";
-import Options from "./components/Options";
+import ResizeAnchor from "../../../components/window/ResizeAnchor";
+import { ImageBox } from "../Pack";
+import MarginInputs from "../../../components/window/MarginInputs";
+import ResizeWindowSettings from "../../../components/window/ResizeWindowSettings";
+import Options from "../../../components/window/Options";
 import PageEndIndicators from "@/components/PageEndIndicators";
 import PageWidthIndicator from "@/components/PageWidthIndicator";
 

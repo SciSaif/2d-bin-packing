@@ -1,5 +1,5 @@
-import { ContainerType } from "../../../../redux/features/slices/mainSlice";
-import { ImageBox } from "../../Pack";
+import { ImageBox } from "@/pages/pack/Pack";
+import { ContainerType } from "@/redux/features/slices/mainSlice";
 
 export const positionImages = (
     images: ImageBox[],

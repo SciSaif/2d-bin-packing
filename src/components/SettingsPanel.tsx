@@ -1,15 +1,15 @@
-import LabelInput from "../../../components/LabelInput";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import LabelInput from "./LabelInput";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import {
     Algorithm,
     setAlgorithm,
     setContainer,
     setPackingFactor,
     setStartingMaxWidthFactor,
-} from "../../../redux/features/slices/mainSlice";
-import LabelSelectInput from "../../../components/LabelSelect";
-import { paperSizes } from "../../../data/paperSizes";
-import { packingFactors } from "../../../data/packingFactors";
+} from "../redux/features/slices/mainSlice";
+import LabelSelectInput from "./LabelSelect";
+import { paperSizes } from "../data/paperSizes";
+import { packingFactors } from "../data/packingFactors";
 
 type SettingsPanelProps = {
     freeform?: boolean

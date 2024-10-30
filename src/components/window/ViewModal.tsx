@@ -1,5 +1,5 @@
 import { useAppSelector } from '@/redux/hooks';
-import { ImageBox } from '../../../Pack';
+import { ImageBox } from '../../pages/pack/Pack';
 import 'react-image-crop/dist/ReactCrop.css'
 
 type ViewModalProps = {

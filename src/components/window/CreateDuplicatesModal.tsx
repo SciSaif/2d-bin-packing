@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import ReactCrop, { Crop } from 'react-image-crop';
-import { createImages } from '../../../utils';
-import { ImageBox } from '../../../Pack';
-import { useAppDispatch } from '../../../../../redux/hooks';
-import { setFilesChangedFlag } from '../../../../../redux/features/slices/mainSlice';
+import { ImageBox } from '../../pages/pack/Pack';
+import { useAppDispatch } from '../../redux/hooks';
+import { setFilesChangedFlag } from '../../redux/features/slices/mainSlice';
 import 'react-image-crop/dist/ReactCrop.css'
-import Button from '../../../../../components/Button';
+import Button from '../Button';
 import LabelInput from '@/components/LabelInput';
+import { createImages } from '@/utils';
 
 type CreateDuplicateProps = {
     images: ImageBox[];

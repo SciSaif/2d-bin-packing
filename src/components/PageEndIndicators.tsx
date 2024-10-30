@@ -27,7 +27,6 @@ const PageEndIndicators: React.FC<PageEndIndicatorsProps> = ({ maxY, localImages
         });
     }
 
-    console.log(indicators);
 
     return (
         <>
@@ -43,7 +42,7 @@ const PageEndIndicators: React.FC<PageEndIndicatorsProps> = ({ maxY, localImages
 
                     }}
                 >
-                    <p className="absolute text-[8px] opacity-50 -top-3 right-1">
+                    <p className="absolute text-[8px] opacity-50 -top-3 right-1 select-none">
                         {indicator.collision ? "Image will be cut off" : `Page ${index + 1} end`}
                     </p>
                 </div>

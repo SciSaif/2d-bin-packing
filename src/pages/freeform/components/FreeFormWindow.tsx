@@ -1,11 +1,9 @@
 import PageEndIndicators from "@/components/PageEndIndicators";
 import PageWidthIndicator from "@/components/PageWidthIndicator";
 import useFreeForm from "@/hooks/useFreeForm";
-import MarginHandles from "@/pages/pack/components/resizingWindow/components/MarginHandles";
-import MarginInputs from "@/pages/pack/components/resizingWindow/components/MarginInputs";
-import Options from "@/pages/pack/components/resizingWindow/components/Options";
-import ResizeAnchor from "@/pages/pack/components/resizingWindow/components/ResizeAnchor";
-import ResizeWindowSettings from "@/pages/pack/components/resizingWindow/components/ResizeWindowSettings";
+import Options from "@/components/window/Options";
+import ResizeAnchor from "@/components/window/ResizeAnchor";
+import ResizeWindowSettings from "@/components/window/ResizeWindowSettings";
 import { ImageBox } from "@/pages/pack/Pack";
 import { useAppSelector } from "@/redux/hooks";
 import React, { useState } from "react";
@@ -26,8 +24,6 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
         setImages,
     });
 
-
-
     return (
         <div className="flex flex-col items-center justify-center w-full pt-5 border-t">
             <div className="mb-4">
@@ -43,7 +39,6 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                 setShowMarginControls={setShowMarginControls}
                 freeform
             />
-            {/* {showMarginControls && <MarginInputs localImages={localImages} setLocalImages={setLocalImages} setMaxY={setMaxY} />} */}
 
             <div
                 ref={containerRef}
@@ -56,17 +51,6 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                 className="mt-10 bg-white shadow-xl"
             >
                 <PageWidthIndicator />
-
-
-                {/* {showMarginControls && (
-                    <MarginHandles
-                        localImages={localImages}
-                        setLocalImages={setLocalImages}
-                        setMaxY={setMaxY}
-                        containerRef={containerRef}
-                    />
-
-                )} */}
 
                 <PageEndIndicators maxY={maxY} localImages={localImages} />
                 {localImages.map((imgData) => {

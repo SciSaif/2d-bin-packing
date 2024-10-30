@@ -1,7 +1,7 @@
 import { Crop, EllipsisVerticalIcon, File, Images, Scaling, Trash } from "lucide-react";
 import { useState } from "react";
 import CropModal from "./CropModal";
-import { ImageBox } from "../../../Pack";
+import { ImageBox } from "../../pages/pack/Pack";
 import {
     DropdownMenu,
     DropdownMenuContent,

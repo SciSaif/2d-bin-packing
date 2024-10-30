@@ -1,9 +1,9 @@
 // ImageStage.tsx
 import React from "react";
 import { Stage, Layer, Image as KonvaImage, Rect } from "react-konva";
-import { ImageBox } from "../Pack";
+import { ImageBox } from "../pages/pack/Pack";
 import Konva from "konva";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 
 interface StageProps {
     boxSet: ImageBox[];
@@ -65,7 +65,7 @@ const PageStage: React.FC<StageProps> = ({ boxSet, stageRef, index }) => {
                                             container.scaleFactor
                                         }
                                         stroke="black"
-                                        strokeWidth={1}
+                                        strokeWidth={0.5}
                                         rotation={box.rotated ? -90 : 0}
                                         offsetX={
                                             box.rotated

@@ -1,7 +1,7 @@
-import Button from '../../../../components/Button';
-import { terminateWorkerInstance } from '../../../../workerUtils';
-import { useAppDispatch } from '../../../../redux/hooks';
-import { setInResizeMode, setIsPacking, setPackingProgress } from '../../../../redux/features/slices/mainSlice';
+import Button from '../Button';
+import { terminateWorkerInstance } from '../../workerUtils';
+import { useAppDispatch } from '../../redux/hooks';
+import { setInResizeMode, setIsPacking, setPackingProgress } from '../../redux/features/slices/mainSlice';
 
 const StopButton = () => {
     const dispatch = useAppDispatch();
