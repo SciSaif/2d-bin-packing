@@ -3,9 +3,10 @@ import { useAppSelector } from "@/redux/hooks";
 import { ImageBox } from "@/pages/pack/Pack";
 import { positionImages } from "@/pages/pack/components/resizingWindow/utils";
 import {
-    positionImage,
     positionNewImages,
+    resizeImages,
 } from "@/pages/freeform/components/freeFormWindow/utils";
+import { getPhotoSizeInPixels, PhotoSizeDefinition } from "@/data/paperSizes";
 
 interface UseFreeFormProps {
     containerRef: React.RefObject<HTMLDivElement>;
@@ -24,6 +25,31 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
 
     const [maxY, setMaxY] = useState(container.h);
     const [imageUrls, setImageUrls] = useState<Map<string, string>>(new Map());
+
+    const setImageToPresetSize = useCallback(
+        (imageId: string, photoSize: PhotoSizeDefinition) => {
+            const selectedImage = localImages.find((img) => img.id === imageId);
+            if (!selectedImage) return;
+
+            const { width: targetWidthInPixels } = getPhotoSizeInPixels(
+                photoSize,
+                container
+            );
+
+            // Calculate new height maintaining aspect ratio
+            const aspectRatio = selectedImage.w / selectedImage.h;
+            const newHeight = targetWidthInPixels / aspectRatio;
+
+            const updatedImages = localImages.map((img) =>
+                img.id === imageId
+                    ? { ...img, w: targetWidthInPixels, h: newHeight }
+                    : img
+            );
+
+            handleResizeImages(updatedImages);
+        },
+        [localImages, container.paperSize]
+    );
 
     useEffect(() => {
         // set the image urls ( this is done so that we don't have to re-render the images when resizing)
@@ -134,16 +160,16 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
         return null;
     };
 
-    const repositionImages = (updatedImages: ImageBox[]) => {
+    const handleResizeImages = (updatedImages: ImageBox[]) => {
         console.log("reposition images");
-        const repositionedImages = positionImage(
+        const resizedImages = resizeImages(
             updatedImages,
             container
         )._localImages;
 
-        setLocalImages(repositionedImages);
+        setLocalImages(resizedImages);
         // Update maxY if needed
-        const newMaxY = repositionedImages.reduce(
+        const newMaxY = resizedImages.reduce(
             (acc, img) => Math.max(acc, img.y + img.h),
             0
         );
@@ -154,7 +180,7 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
         if (isResizing && selectedId) {
             const updatedImages = updateImageSize(clientX, clientY);
             if (updatedImages) {
-                repositionImages(updatedImages);
+                handleResizeImages(updatedImages);
             }
         }
     };
@@ -239,6 +265,7 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
         selectedId,
         setMaxY,
         maxY,
+        setImageToPresetSize,
     };
 };
 

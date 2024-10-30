@@ -4,13 +4,11 @@ import { ImageBox } from "../Pack";
 import { useAppSelector } from "../../../redux/hooks";
 import ResetButton from "./actionButtons/ResetButton";
 import StartPackingButton from "./actionButtons/StartPackingButton";
-import PrintButton from "./actionButtons/PrintButton";
 import ResizeButton from "./actionButtons/ResizeButton";
 import StopButton from "./actionButtons/StopButton";
 
 
 type ActionButtonsProps = {
-    stageRefs: React.RefObject<Stage>[];
     setBoxes: React.Dispatch<React.SetStateAction<ImageBox[][]>>;
     boxes: ImageBox[][];
     images: ImageBox[];
@@ -21,7 +19,6 @@ type ActionButtonsProps = {
 const ActionButtons = ({
     boxes,
     setBoxes,
-    stageRefs,
     images,
     setImages,
     updateScaleFactor,
@@ -32,7 +29,6 @@ const ActionButtons = ({
             {boxes.length > 0 && (
                 <>
                     <SaveAsPdfButton boxes={boxes} />
-                    {/* <PrintButton stageRefs={stageRefs} /> */}
                     <ResizeButton setBoxes={setBoxes} />
                 </>
             )}

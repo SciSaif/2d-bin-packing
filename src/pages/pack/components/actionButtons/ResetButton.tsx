@@ -1,6 +1,6 @@
 import { RefreshCw } from "lucide-react";
 import Button from "../../../../components/Button";
-import { resetState } from "../../../../redux/features/slices/mainSlice";
+import { resetMargin, resetState, setContainer } from "../../../../redux/features/slices/mainSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { clearFileInput } from "../../../../utils";
 import { ImageBox } from "../../Pack";
@@ -24,6 +24,8 @@ const ResetButton = ({
         dispatch(resetState());
         updateScaleFactor();
         clearFileInput();
+        dispatch(resetMargin());
+
     };
 
     return (

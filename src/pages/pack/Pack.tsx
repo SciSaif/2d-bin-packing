@@ -85,7 +85,6 @@ const Pack = () => {
                 setBoxes={setBoxes}
                 images={images}
                 setImages={setImages}
-                stageRefs={stageRefs}
                 updateScaleFactor={updateScaleFactor}
             />
 

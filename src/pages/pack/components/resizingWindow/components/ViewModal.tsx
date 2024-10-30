@@ -19,6 +19,7 @@ const ViewModal = (
 
     const adjustedScaleFactor = container.scaleFactor * 0.8;
 
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
             <div
@@ -43,6 +44,7 @@ const ViewModal = (
                         maxHeight: container.h * adjustedScaleFactor,
                         border: "1px solid black",
                         position: "relative",
+                        overflow: "hidden",
 
                     }}
                     className="bg-white shadow-xl "

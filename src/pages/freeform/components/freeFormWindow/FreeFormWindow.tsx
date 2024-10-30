@@ -1,5 +1,8 @@
+import PageEndIndicators from "@/components/PageEndIndicators";
 import useFreeForm from "@/hooks/useFreeForm";
+import MarginHandles from "@/pages/pack/components/resizingWindow/components/MarginHandles";
 import MarginInputs from "@/pages/pack/components/resizingWindow/components/MarginInputs";
+import Options from "@/pages/pack/components/resizingWindow/components/Options";
 import ResizeAnchor from "@/pages/pack/components/resizingWindow/components/ResizeAnchor";
 import ResizeWindowSettings from "@/pages/pack/components/resizingWindow/components/ResizeWindowSettings";
 import { ImageBox } from "@/pages/pack/Pack";
@@ -16,11 +19,13 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
     const { container, showBorder } = useAppSelector((state) => state.main);
-    const { localImages, imageUrls, handleMouseDown, selectedId, maxY, setLocalImages, setMaxY } = useFreeForm({
+    const { localImages, imageUrls, handleMouseDown, selectedId, maxY, setLocalImages, setMaxY, setImageToPresetSize } = useFreeForm({
         containerRef,
         images,
         setImages,
     });
+
+
 
     return (
         <div className="flex flex-col items-center justify-center w-full pt-5 border-t">
@@ -37,6 +42,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                 setShowMarginControls={setShowMarginControls}
                 freeform
             />
+            {showMarginControls && <MarginInputs localImages={localImages} setLocalImages={setLocalImages} setMaxY={setMaxY} />}
 
             <div
                 ref={containerRef}
@@ -61,20 +67,17 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                     </div>
                 </div>
 
-                {/* page end indicator */}
-                {maxY > container.h * container.scaleFactor && (
-                    <div
-                        className="absolute w-full bg-gray-300 "
-                        style={{
-                            top: container.h * container.scaleFactor,
-                            height: 1,
-                        }}
-                    >
-                        <p className="absolute text-[8px] opacity-50 -top-3 right-1">
-                            Page End
-                        </p>
-                    </div>
+                {showMarginControls && (
+                    <MarginHandles
+                        localImages={localImages}
+                        setLocalImages={setLocalImages}
+                        setMaxY={setMaxY}
+                        containerRef={containerRef}
+                    />
+
                 )}
+
+                <PageEndIndicators maxY={maxY} />
                 {localImages.map((imgData) => {
                     const imageUrl = imageUrls.get(imgData.id) || "";
 
@@ -102,6 +105,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                             onTouchStart={(e) => handleMouseDown(e, imgData)}
 
                         >
+                            {selectedId === imgData.id && <Options id={imgData.id} images={images} setImages={setImages} imageUrl={imageUrl} setImageToPresetSize={setImageToPresetSize} />}
                             {selectedId === imgData.id && <ResizeAnchor />}
                         </div>
                     );

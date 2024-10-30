@@ -74,6 +74,10 @@ export const mainSlice = createSlice({
             state.container = action.payload;
         },
 
+        resetMargin: (state) => {
+            state.container.margin = { top: 0, right: 0, bottom: 0, left: 0 };
+        },
+
         setStartingMaxWidthFactor: (state, action: PayloadAction<number>) => {
             state.startingMaxWidthFactor = action.payload;
         },
@@ -110,5 +114,6 @@ export const {
     setPackingProgress,
     setFilesChangedFlag,
     setAlgorithm,
+    resetMargin,
 } = mainSlice.actions;
 export default mainSlice.reducer;

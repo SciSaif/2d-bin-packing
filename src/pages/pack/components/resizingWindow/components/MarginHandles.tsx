@@ -58,6 +58,18 @@ const MarginHandles = ({ localImages, setLocalImages, setMaxY, containerRef }: P
                 <MarginHandleIcon className="rotate-90" />
             </div>
 
+            {/* bottom margin handle  */}
+            <div
+                className="absolute w-5 h-5 translate-y-1/2 cursor-pointer -right-5"
+                style={{
+                    bottom: container.margin.bottom * container.scaleFactor,
+                }}
+                onMouseDown={(e) => handleMarginDragStart(e, "bottom")}
+                onTouchStart={(e) => handleMarginDragStart(e, "bottom")}
+            >
+                <MarginHandleIcon className="rotate-90" />
+            </div>
+
             {/* margin lines */}
             <div
                 className="absolute top-0 w-full bg-gray-200"
@@ -76,6 +88,13 @@ const MarginHandles = ({ localImages, setLocalImages, setMaxY, containerRef }: P
                 className="absolute right-0 h-full bg-gray-200"
                 style={{
                     width: container.margin.right * container.scaleFactor,
+                }}
+            ></div>
+
+            <div
+                className="absolute bottom-0 w-full bg-gray-200"
+                style={{
+                    height: container.margin.bottom * container.scaleFactor,
                 }}
             ></div>
         </>

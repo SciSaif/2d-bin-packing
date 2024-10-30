@@ -10,6 +10,7 @@ import { ImageBox } from "../../Pack";
 import MarginInputs from "./components/MarginInputs";
 import ResizeWindowSettings from "./components/ResizeWindowSettings";
 import Options from "./components/Options";
+import PageEndIndicators from "@/components/PageEndIndicators";
 
 interface Props {
     images: ImageBox[];
@@ -36,6 +37,8 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
         setImages,
     });
 
+    console.log('container', container)
+    console.log('localImages', localImages)
     return (
         <div className="flex flex-col items-center justify-center w-full pt-5 border-t">
             <div className="mb-4">
@@ -87,21 +90,7 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
 
                 )}
 
-                {/* page end indicator */}
-                {maxY > container.h * container.scaleFactor && (
-                    <div
-                        className="absolute w-full bg-gray-300 "
-                        style={{
-                            top: container.h * container.scaleFactor,
-                            height: 1,
-                        }}
-                    >
-                        <p className="absolute text-[8px] opacity-50 -top-3 right-1">
-                            Page End
-                        </p>
-                    </div>
-                )}
-
+                <PageEndIndicators maxY={maxY} />
                 {localImages.map((imgData) => {
                     const imageUrl = imageUrls.get(imgData.id) || "";
 
