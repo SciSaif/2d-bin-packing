@@ -294,11 +294,9 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
 
     return {
         localImages,
-        setLocalImages,
         imageUrls,
         handleMouseDown,
         selectedId,
-        setMaxY,
         maxY,
         setImageToPresetSize,
     };

@@ -18,7 +18,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
     const { container, showBorder } = useAppSelector((state) => state.main);
-    const { localImages, imageUrls, handleMouseDown, selectedId, maxY, setLocalImages, setMaxY, setImageToPresetSize } = useFreeForm({
+    const { localImages, imageUrls, handleMouseDown, selectedId, maxY,  setImageToPresetSize } = useFreeForm({
         containerRef,
         images,
         setImages,

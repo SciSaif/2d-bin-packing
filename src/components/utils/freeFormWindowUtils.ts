@@ -9,14 +9,11 @@ export const resizeImages = (
     let maxY = 0;
 
     let localImagesTemp = images.map((img) => {
-        let availableContainerWidth =
-            container.w - container.margin.left - container.margin.right;
-
         // Determine the maximum width for the image based on the constrainWidthFactor parameter
         const maxWidth =
             constrainWidthFactor && img.new
-                ? availableContainerWidth * constrainWidthFactor
-                : availableContainerWidth;
+                ? container.w * constrainWidthFactor
+                : container.w;
 
         // Calculate the scale factor to maintain aspect ratio while fitting within constraints
         let aspectRatio = Math.min(
@@ -51,14 +48,15 @@ export const resizeImages = (
 // find the starting coordinate where we will place the new images. the starting coordinate will be the top right corner of the
 // last old image + some padding of 5 px, after that we just place the images one after the other
 // in the x direction until we reach the end of the container, then we move to the next row.
+// Also, If the new image won't fit in the container height wise, we will move it to the next container by changing the y coordinate
 export const positionNewImages = (
     images: ImageBox[],
     container: ContainerType,
     constrainWidthFactor?: number
 ) => {
     let maxY = 0;
-    let currentX = container.margin.left;
-    let currentY = container.margin.top; // Start from the top margin
+    let currentX = 0,
+        currentY = 0;
 
     // Find the x, y coordinates of the old image that is at the lowest y coordinate
     let oldImages = images.filter((img) => !img.new);
@@ -69,19 +67,22 @@ export const positionNewImages = (
                   prev.y > current.y ? prev : current
               )
             : { x: 0, y: 0, w: 0, h: 0 };
-    let lastOldImageX = lastOldImage.x;
-    let lastOldImageY = lastOldImage.y;
-    let lastOldImageW = lastOldImage.w;
-    let lastOldImageH = lastOldImage.h;
 
     // Find the starting coordinate where we will place the new images
     let startingX =
-        lastOldImageX +
-        lastOldImageW +
-        (lastOldImageX + lastOldImageW > 0 ? container.padding : 0);
-    let startingY = lastOldImageY + (lastOldImageY > 0 ? container.padding : 0);
+        lastOldImage.x +
+        lastOldImage.w +
+        (lastOldImage.x + lastOldImage.w > 0 ? container.padding : 0);
+    let startingY =
+        lastOldImage.y + (lastOldImage.y > 0 ? container.padding : 0);
+
     currentX = startingX;
     currentY = startingY;
+
+    // Determine the maximum width for the image based on the constrainWidthFactor parameter
+    const maxWidth = constrainWidthFactor
+        ? container.w * constrainWidthFactor
+        : container.w;
 
     let localImagesTemp = images.map((img) => {
         // if its an old image, we don't change its position
@@ -89,14 +90,6 @@ export const positionNewImages = (
             maxY = Math.max(maxY, img.y + img.h);
             return img;
         }
-
-        let availableContainerWidth =
-            container.w - container.margin.left - container.margin.right;
-
-        // Determine the maximum width for the image based on the constrainWidthFactor parameter
-        const maxWidth = constrainWidthFactor
-            ? availableContainerWidth * constrainWidthFactor
-            : availableContainerWidth;
 
         // Calculate the scale factor to maintain aspect ratio while fitting within constraints
         let aspectRatio = Math.min(
@@ -109,11 +102,21 @@ export const positionNewImages = (
         const scaledHeight = img.h * aspectRatio;
 
         // Move to the next row if the image doesn't fit in the current row
-        if (currentX + scaledWidth > container.w - container.margin.right) {
-            currentY = maxY + container.padding; // Add padding for the new row
-            currentX = container.margin.left; // Reset X to left margin for the new row
+        if (currentX + scaledWidth > container.w) {
+            currentY = maxY + container.padding; // Add vertical padding for the new row
+            currentX = 0; // Reset X to 0 for the new row
         } else {
             maxY = Math.max(maxY, currentY + scaledHeight);
+        }
+
+        // if image overlaps with the line between the two containers, move it to the next container
+        const currentContainerNumber = Math.floor(currentY / container.h) + 1;
+        const currentContainerEndingY = currentContainerNumber * container.h;
+
+
+        if (currentY + scaledHeight > currentContainerEndingY) {
+            currentY = currentContainerEndingY;
+            currentX = 0;
         }
 
         const positionedImage = {
