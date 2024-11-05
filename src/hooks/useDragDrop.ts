@@ -1,4 +1,5 @@
 // hooks/useDragAndDrop.js
+import { t } from "@vite-pwa/assets-generator/shared/assets-generator.5e51fd40";
 import { useState, useEffect, useRef } from "react";
 
 const useDragAndDrop = () => {
@@ -89,8 +90,9 @@ const useDragAndDrop = () => {
         };
     }, []);
 
-    const handlePaste = (e: React.ClipboardEvent) => {
-        const items = e.clipboardData.items;
+    const handlePaste = (e: ClipboardEvent) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
         const files = [];
         for (let i = 0; i < items.length; i++) {
             if (items[i].kind === "file") {
@@ -104,6 +106,13 @@ const useDragAndDrop = () => {
             setFiles(files);
         }
     };
+
+    useEffect(() => {
+        window.addEventListener("paste", handlePaste);
+        return () => {
+            window.removeEventListener("paste", handlePaste);
+        };
+    }, []);
     return {
         dragging,
         files,
@@ -111,7 +120,6 @@ const useDragAndDrop = () => {
         handleDragOver,
         handleDrop,
         mainRef,
-        handlePaste,
         fileInputRef,
         triggerFileInput,
         handleFileInputChange,
