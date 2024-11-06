@@ -7,6 +7,7 @@ import ResizeWindowSettings from "@/components/window/ResizeWindowSettings";
 import { ImageBox } from "@/pages/pack/Pack";
 import { useAppSelector } from "@/redux/hooks";
 import React, { useState } from "react";
+import RotateButton from "@/components/window/RotateButton";
 
 
 interface Props {
@@ -18,7 +19,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const [showMarginControls, setShowMarginControls] = useState(false);
     const { container, showBorder } = useAppSelector((state) => state.main);
-    const { localImages, imageUrls, handleMouseDown, selectedId, maxY,  setImageToPresetSize } = useFreeForm({
+    const { localImages, imageUrls, handleMouseDown, selectedId, maxY, setImageToPresetSize, rotateImage } = useFreeForm({
         containerRef,
         images,
         setImages,
@@ -66,8 +67,6 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                                 top: imgData.y * container.scaleFactor,
                                 width: imgData.w * container.scaleFactor,
                                 height: imgData.h * container.scaleFactor,
-                                backgroundImage: `url(${imageUrl})`,
-                                backgroundSize: "cover",
                                 border:
                                     selectedId === imgData.id
                                         ? "2px solid blue"
@@ -75,14 +74,37 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                                             ? "1px solid black"
                                             : "none",
                                 zIndex: selectedId === imgData.id ? 1 : 0,
+                                cursor: "grab",
+                                boxSizing: "revert",
                             }}
                             onMouseDown={(e) => handleMouseDown(e, imgData)}
                             onTouchStart={(e) => handleMouseDown(e, imgData)}
-
                         >
+                            <div
+                                key={imgData.id}
+                                data-id={imgData.id}
+                                style={{
+
+                                    width: (imgData.rotated ? imgData.h : imgData.w) * container.scaleFactor,
+                                    height: (imgData.rotated ? imgData.w : imgData.h) * container.scaleFactor,
+                                    transform: imgData.rotated ? ` rotate(-90deg) translate(-${imgData.h * container.scaleFactor}px,0) ` : "none",
+                                    transformOrigin: "top left",
+                                    backgroundImage: `url(${imageUrl})`,
+                                    backgroundSize: "cover",
+                                    zIndex: -1,
+                                    cursor: "grab",
+                                }}
+                                onMouseDown={(e) => handleMouseDown(e, imgData)}
+                                onTouchStart={(e) => handleMouseDown(e, imgData)}
+
+                            >
+
+                            </div>
                             {selectedId === imgData.id && <Options id={imgData.id} images={images} setImages={setImages} imageUrl={imageUrl} setImageToPresetSize={setImageToPresetSize} />}
                             {selectedId === imgData.id && <ResizeAnchor />}
+                            {selectedId === imgData.id && <RotateButton rotateImage={rotateImage} />}
                         </div>
+
                     );
                 })}
             </div>
@@ -93,3 +115,5 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
 };
 
 export default FreeFormWindow;
+
+

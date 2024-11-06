@@ -292,6 +292,17 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
         setLocalImages(repositionedImages);
     }, [container]);
 
+    const rotateImage = () => {
+        // rotate the selected image
+
+        const updatedImages = localImages.map((img) =>
+            img.id === selectedId
+                ? { ...img, rotated: !img.rotated, w: img.h, h: img.w }
+                : img
+        );
+        setLocalImages(updatedImages);
+    };
+
     return {
         localImages,
         imageUrls,
@@ -299,6 +310,7 @@ const useFreeForm = ({ containerRef, images, setImages }: UseFreeFormProps) => {
         selectedId,
         maxY,
         setImageToPresetSize,
+        rotateImage,
     };
 };
 
