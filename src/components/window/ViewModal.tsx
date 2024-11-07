@@ -56,8 +56,10 @@ const ViewModal = (
                             position: "absolute",
                             left: 0,
                             top: 0,
-                            width: imgData.w * adjustedScaleFactor,
-                            height: imgData.h * adjustedScaleFactor,
+                            width: (imgData.rotated ? imgData.h : imgData.w) * adjustedScaleFactor,
+                            height: (imgData.rotated ? imgData.w : imgData.h) * adjustedScaleFactor,
+                            transform: imgData.rotated ? ` rotate(-90deg) translate(-${imgData.h * adjustedScaleFactor}px,0) ` : "none",
+                            transformOrigin: "top left",
                             backgroundImage: `url(${imageUrl})`,
                             backgroundSize: "cover",
                             border:
