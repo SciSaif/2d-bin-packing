@@ -7,6 +7,7 @@ import About from "./pages/about/About";
 
 // wrapper with Header and Footer
 const w = (Component: React.FC) => {
+    console.log('hiiii')
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
