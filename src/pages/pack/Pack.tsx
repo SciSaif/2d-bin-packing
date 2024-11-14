@@ -86,6 +86,7 @@ const Pack = () => {
                 images={images}
                 setImages={setImages}
                 updateScaleFactor={updateScaleFactor}
+                stageRefs={stageRefs}
             />
 
             {isPacking && (

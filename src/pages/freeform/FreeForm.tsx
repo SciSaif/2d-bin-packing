@@ -53,10 +53,13 @@ const FreeForm = () => {
                     FreeForm Mode
                 </h1>
                 <p className="sm:text-lg">Freely arrange the images on the paper for printing</p>
-                <FileDropArea
-                    images={images}
-                    setImages={setImages}
-                />
+                {boxes.length === 0 &&
+
+                    <FileDropArea
+                        images={images}
+                        setImages={setImages}
+                    />
+                }
                 <SettingsPanel freeform />
 
                 <FreeFormActionButtons
