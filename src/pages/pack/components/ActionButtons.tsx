@@ -29,7 +29,9 @@ const ActionButtons = ({
             {boxes.length > 0 && (
                 <>
                     <SaveAsPdfButton boxes={boxes} />
-                    <PrintButton boxes={boxes} />
+                    <div className="hidden lg:flex">
+                        <PrintButton boxes={boxes} />
+                    </div>
                     <ResizeButton setBoxes={setBoxes} />
                 </>
             )}

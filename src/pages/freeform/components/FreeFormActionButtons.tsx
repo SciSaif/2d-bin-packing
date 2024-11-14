@@ -29,7 +29,12 @@ const FreeFormActionButtons = ({
             {boxes.length > 0 && (
                 <>
                     <SaveAsPdfButton boxes={boxes} />
-                    <PrintButton boxes={boxes} />
+                    {
+                        <div className="hidden md:flex">
+
+                            <PrintButton boxes={boxes} />
+                        </div>
+                    }
                     <ResizeButton setBoxes={setBoxes} />
                 </>
             )}
