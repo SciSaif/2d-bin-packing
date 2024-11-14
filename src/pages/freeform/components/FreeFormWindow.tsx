@@ -44,7 +44,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
             <div
                 ref={containerRef}
                 style={{
-                    width: container.w * container.scaleFactor,
+                    width: container.w * container.scaleFactor + 2,
                     height: (maxY + 5) * container.scaleFactor,
                     border: "1px solid black",
                     position: "relative",
@@ -75,7 +75,7 @@ const FreeFormWindow: React.FC<Props> = ({ images, setImages }) => {
                                             : "none",
                                 zIndex: selectedId === imgData.id ? 1 : 0,
                                 cursor: "grab",
-                                boxSizing: "revert",
+                                boxSizing: "content-box",
                             }}
                             onMouseDown={(e) => handleMouseDown(e, imgData)}
                             onTouchStart={(e) => handleMouseDown(e, imgData)}
