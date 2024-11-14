@@ -1,9 +1,7 @@
-import { Stage } from "konva/lib/Stage";
 import Button from "../Button";
-import { handlePrintMultipleStages } from "@/utils";
 
 type PrintButtonProps = {
-    stageRefs: React.RefObject<Stage>[];
+    stageRefs: any
 };
 
 const PrintButton = ({ stageRefs }: PrintButtonProps) => {
@@ -11,9 +9,9 @@ const PrintButton = ({ stageRefs }: PrintButtonProps) => {
 
     return (
         <Button
-            onClick={() =>
-                handlePrintMultipleStages(stageRefs.map((ref) => ref.current))
-            }
+            // onClick={() =>
+            //     // handlePrintMultipleStages(stageRefs.map((ref) => ref.current))
+            // }
             className="bg-purple-500 hover:bg-purple-600"
         >
             Print

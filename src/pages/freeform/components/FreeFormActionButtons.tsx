@@ -1,4 +1,3 @@
-import { Stage } from "konva/lib/Stage";
 import { useAppSelector } from "../../../redux/hooks";
 import { ImageBox } from "@/pages/pack/Pack";
 import ResetButton from "@/components/actionButtons/ResetButton";

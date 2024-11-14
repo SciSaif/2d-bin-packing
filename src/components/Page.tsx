@@ -5,48 +5,53 @@ import { useAppSelector } from "@/redux/hooks";
 
 interface PageProps {
     boxSet: ImageBox[];
+    index: number
 
 }
 
-const Page: React.FC<PageProps> = ({ boxSet }) => {
+const Page: React.FC<PageProps> = ({ boxSet, index }) => {
     const { container, imagesLoaded, showBorder } = useAppSelector((state) => state.main);
     const scaleFactor = container.scaleFactor;
 
 
     return (
         <div
-            className="relative bg-white border border-gray-400 shadow"
-            style={{
-                width: `${container.w * scaleFactor}px`, // Adjust based on desired page width
-                height: `${container.h * scaleFactor}px`, // Adjust based on desired page height
-            }}
+            className="border box-content border-gray-400 shadow"
         >
-            {imagesLoaded && boxSet.map((box) => {
-                if (box.rotated) {
-                    console.log(box);
-                }
-                return (
 
-                    box.imageElement && (
-                        <img
-                            key={box.id}
-                            src={box.imageElement?.src}
-                            alt=""
-                            style={{
-                                position: "absolute",
-                                top: `${box.y * scaleFactor}px`,
-                                left: `${box.x * scaleFactor}px`,
-                                width: `${(box.rotated ? box.h : box.w) * scaleFactor}px`,
-                                height: `${(box.rotated ? box.w : box.h) * scaleFactor}px`,
-                                transform: box.rotated ? `rotate(-90deg) translateX(-${box.h * scaleFactor}px)` : "none",
-                                transformOrigin: "top left",
-                                border: showBorder ? "1px solid black" : "none",
-                            }}
-                        />
+            <div
+                id={`page-${index}`}
+                className="relative bg-white "
+                style={{
+                    width: `${container.w * scaleFactor}px`,
+                    height: `${container.h * scaleFactor}px`,
+                }}
+            >
+                {imagesLoaded && boxSet.map((box) => {
+
+                    return (
+                        box.imageElement && (
+                            <img
+                                key={box.id}
+                                src={box.imageElement?.src}
+                                alt=""
+                                style={{
+                                    position: "absolute",
+                                    top: `${box.y * scaleFactor}px`,
+                                    left: `${box.x * scaleFactor}px`,
+                                    width: `${(box.rotated ? box.h : box.w) * scaleFactor}px`,
+                                    height: `${(box.rotated ? box.w : box.h) * scaleFactor}px`,
+                                    transform: box.rotated ? `rotate(-90deg) translateX(-${box.h * scaleFactor}px)` : "none",
+                                    transformOrigin: "top left",
+                                    border: showBorder ? "1px solid black" : "none",
+                                }}
+                            />
+                        )
                     )
-                )
-            })}
+                })}
+            </div>
         </div>
+
     );
 };
 

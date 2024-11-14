@@ -11,11 +11,11 @@ interface SaveAsPdfButtonProps {
 
 const SaveAsPdfButton = ({ boxes }: SaveAsPdfButtonProps) => {
     const [loadingPDF, setLoadingPDF] = useState(false);
-    const { container, showBorder } = useAppSelector((state) => state.main);
+    const { container } = useAppSelector((state) => state.main);
 
     const handlePdfSave = async () => {
         setLoadingPDF(true);
-        await saveAsPDF({ boxes, container, showBorder });
+        await saveAsPDF({ boxes, container });
         setLoadingPDF(false);
     };
 

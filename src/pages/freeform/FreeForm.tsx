@@ -5,18 +5,16 @@ import SettingsPanel from '../../components/SettingsPanel';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import FreeFormWindow from './components/FreeFormWindow';
 import { useScaleFactor } from '@/hooks/useScaleFactor';
-import PageStage from '../../components/PageStage';
-import Konva from 'konva';
 import ActionButtons from '../pack/components/ActionButtons';
 import { setImagesLoaded } from '@/redux/features/slices/mainSlice';
 import FreeFormActionButtons from './components/FreeFormActionButtons';
+import Page from '@/components/Page';
 
 const FreeForm = () => {
     const dispatch = useAppDispatch();
     const { inResizeMode, container } = useAppSelector((state) => state.main);
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
     const [images, setImages] = useState<ImageBox[]>([]);
-    const stageRefs = boxes.map(() => createRef<Konva.Stage>());
     const containerWrapper = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -75,18 +73,12 @@ const FreeForm = () => {
                 )}
                 <div
                     ref={containerWrapper}
-                    className="flex flex-wrap mb-10 w-full items-center justify-center mx-auto   max-w-[1050px] gap-y-10 gap-x-5 "
+                    className="flex flex-wrap w-full items-center justify-center mx-auto max-w-[1050px] gap-y-10 gap-x-5"
                     style={{ overscrollBehavior: "auto" }}
                 >
-                    {boxes &&
-                        boxes.map((boxSet, index) => (
-                            <PageStage
-                                key={index}
-                                boxSet={boxSet}
-                                stageRef={stageRefs}
-                                index={index}
-                            />
-                        ))}
+                    {boxes.map((boxSet, index) => (
+                        <Page key={index} boxSet={boxSet} index={index} />
+                    ))}
                 </div>
 
 

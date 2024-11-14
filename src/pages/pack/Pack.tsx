@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Konva from "konva";
 import FileDropArea from "../../components/FileDropArea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
@@ -11,7 +10,6 @@ import Content from "./components/Content";
 
 import ActionButtons from "./components/ActionButtons";
 import { useScaleFactor } from "../../hooks/useScaleFactor";
-import PageStage from "../../components/PageStage";
 import SettingsPanel from "../../components/SettingsPanel";
 
 import Loading from "./components/Loading";
@@ -102,7 +100,7 @@ const Pack = () => {
                 style={{ overscrollBehavior: "auto" }}
             >
                 {boxes.map((boxSet, index) => (
-                    <Page key={index} boxSet={boxSet} />
+                    <Page key={index} boxSet={boxSet} index={index} />
                 ))}
             </div>
             {/* dont remove */}

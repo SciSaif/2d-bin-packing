@@ -1,151 +1,43 @@
 import jsPDF from "jspdf";
 // import { Box } from "./ImagePacker";
-import Konva from "konva";
 import { v4 as uuidv4 } from "uuid";
 import { ImageBox } from "./pages/pack/Pack";
 import { ContainerType } from "./redux/features/slices/mainSlice";
+import html2canvas from "html2canvas";
 
 export type SaveAsPDFProps = {
     boxes: ImageBox[][];
     container: ContainerType;
-    showBorder: boolean;
 };
 
-export const saveAsPDF = async ({
-    boxes,
-    container,
-    showBorder,
-}: SaveAsPDFProps) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const pdf = new jsPDF("p", "pt", "a4");
-            pdf.setTextColor("#000000");
-
-            const a4Width = 595; // A4 width in points
-            const a4Height = 842; // A4 height in points
-
-            const scaleX = a4Width / container.w;
-            const scaleY = a4Height / container.h;
-
-            boxes.forEach((boxSet, index) => {
-                if (index > 0) {
-                    pdf.addPage("a4", "portrait");
-                }
-
-                const stage = new Konva.Stage({
-                    container: "temp-container",
-                    width: container.w,
-                    height: container.h,
-                });
-
-                const layer = new Konva.Layer();
-                stage.add(layer);
-
-                boxSet.forEach((box) => {
-                    if (box.imageElement) {
-                        if (showBorder) {
-                            const border = new Konva.Rect({
-                                x: box.x - 1,
-                                y: box.y - 1,
-                                width: box.rotated ? box.h + 2 : box.w + 2,
-                                height: box.rotated ? box.w + 2 : box.h + 2,
-                                stroke: "#000000",
-                                strokeWidth: 1,
-                                rotation: box.rotated ? -90 : 0,
-                                offsetX: box.rotated ? box.h : 0,
-                            });
-                            layer.add(border);
-                        }
-
-                        const konvaImage = new Konva.Image({
-                            x: box.x,
-                            y: box.y,
-                            width: box.rotated ? box.h : box.w,
-                            height: box.rotated ? box.w : box.h,
-                            image: box.imageElement,
-                            rotation: box.rotated ? -90 : 0,
-                            offsetX: box.rotated ? box.h : 0,
-                        });
-                        layer.add(konvaImage);
-                    }
-                });
-
-                pdf.addImage(
-                    stage.toDataURL({ pixelRatio: 0.9 }),
-                    0,
-                    0,
-                    container.w * scaleX,
-                    container.h * scaleY
-                );
-
-                stage.destroy();
-            });
-            console.log("pdf created");
-
-            pdf.save("packed-images.pdf");
-            resolve(null);
-        }, 0);
+export const saveAsPDF = async ({ boxes, container }: SaveAsPDFProps) => {
+    const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [container.w, container.h],
     });
-};
 
-export const handlePrintMultipleStages = (stages: (Konva.Stage | null)[]) => {
-    let imagesContent = "";
+    // Iterate through each box set to create individual pages in the PDF
+    for (let i = 0; i < boxes.length; i++) {
+        const page = document.getElementById(`page-${i}`);
 
-    stages.forEach((stage, index) => {
-        if (!stage) {
-            return;
+        if (page) {
+            // Use html2canvas to take a snapshot of the page content
+            const canvas = await html2canvas(page, { scale: 2.5 });
+            const imgData = canvas.toDataURL("image/png");
+
+            // Add the captured image to the PDF as a new page
+            pdf.addImage(imgData, "PNG", 0, 0, container.w, container.h);
+
+            // Add a new page in the PDF if this is not the last page
+            if (i < boxes.length - 1) {
+                pdf.addPage([container.w, container.h]);
+            }
         }
-        const dataUrl = stage.toDataURL();
-        imagesContent += `<img class="print-page" src="${dataUrl}">`;
-    });
-
-    const printContent = `
-        <html>
-            <head>
-                <title>Print canvas</title>
-                <style>
-                    body {
-                        margin: 0;
-                        padding: 0;
-                    }
-                    .print-page {
-                        width: 100%;
-                        height: auto;
-                        display: block;
-                        page-break-before: auto;
-                    }
-                    @media print {
-                        body {
-                            margin: 0;
-                            padding: 0;
-                        }
-                        .print-page {
-                            width: 100%;
-                            height: auto;
-                            display: block;
-                            page-break-before: auto;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                ${imagesContent}
-            </body>
-        </html>`;
-
-    const printWindow = window.open("", "_blank");
-    if (printWindow) {
-        printWindow.document.open();
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-
-        printWindow.onload = function () {
-            printWindow.print();
-            printWindow.onafterprint = function () {
-                printWindow.close();
-            };
-        };
     }
+
+    // Save the PDF file
+    pdf.save("packed_images.pdf");
 };
 
 // function to create the images from files

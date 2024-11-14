@@ -1,4 +1,3 @@
-import { Stage } from "konva/lib/Stage";
 import SaveAsPdfButton from "../../../components/actionButtons/SaveAsPDFButton";
 import { ImageBox } from "../Pack";
 import { useAppSelector } from "../../../redux/hooks";
