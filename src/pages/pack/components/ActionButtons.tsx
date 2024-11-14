@@ -15,7 +15,6 @@ type ActionButtonsProps = {
     images: ImageBox[];
     setImages: React.Dispatch<React.SetStateAction<ImageBox[]>>;
     updateScaleFactor: () => void;
-    stageRefs: React.RefObject<Stage>[];
 };
 
 const ActionButtons = ({
@@ -24,7 +23,6 @@ const ActionButtons = ({
     images,
     setImages,
     updateScaleFactor,
-    stageRefs,
 }: ActionButtonsProps) => {
     const { inResizeMode, isPacking } = useAppSelector((state) => state.main);
     return (
@@ -32,7 +30,6 @@ const ActionButtons = ({
             {boxes.length > 0 && (
                 <>
                     <SaveAsPdfButton boxes={boxes} />
-                    <PrintButton stageRefs={stageRefs} />
                     <ResizeButton setBoxes={setBoxes} />
                 </>
             )}

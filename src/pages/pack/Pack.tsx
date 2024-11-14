@@ -15,6 +15,7 @@ import PageStage from "../../components/PageStage";
 import SettingsPanel from "../../components/SettingsPanel";
 
 import Loading from "./components/Loading";
+import Page from "@/components/Page";
 
 export interface ImageBox {
     id: string;
@@ -37,7 +38,6 @@ const Pack = () => {
     const [boxes, setBoxes] = useState<ImageBox[][]>([]);
     const [images, setImages] = useState<ImageBox[]>([]);
 
-    const stageRefs = boxes.map(() => React.createRef<Konva.Stage>());
 
     useEffect(() => {
         if (!boxes || boxes.length === 0) return;
@@ -86,7 +86,6 @@ const Pack = () => {
                 images={images}
                 setImages={setImages}
                 updateScaleFactor={updateScaleFactor}
-                stageRefs={stageRefs}
             />
 
             {isPacking && (
@@ -99,20 +98,13 @@ const Pack = () => {
 
             <div
                 ref={containerWrapper}
-                className="flex flex-wrap w-full items-center justify-center mx-auto   max-w-[1050px] gap-y-10 gap-x-5 "
+                className="flex flex-wrap w-full items-center justify-center mx-auto max-w-[1050px] gap-y-10 gap-x-5"
                 style={{ overscrollBehavior: "auto" }}
             >
-                {boxes &&
-                    boxes.map((boxSet, index) => (
-                        <PageStage
-                            key={index}
-                            boxSet={boxSet}
-                            stageRef={stageRefs}
-                            index={index}
-                        />
-                    ))}
+                {boxes.map((boxSet, index) => (
+                    <Page key={index} boxSet={boxSet} />
+                ))}
             </div>
-
             {/* dont remove */}
             <div id="temp-container" style={{ display: "none" }}></div>
         </div>
