@@ -38,8 +38,6 @@ const ResizingWindow: React.FC<Props> = ({ images, setImages }) => {
         setImages,
     });
 
-    console.log('container', container)
-    console.log('localImages', localImages)
     return (
         <div className="flex flex-col items-center justify-center w-full pt-5 border-t">
             <div className="mb-4">

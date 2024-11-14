@@ -4,40 +4,51 @@ import { v4 as uuidv4 } from "uuid";
 import { ImageBox } from "./pages/pack/Pack";
 import { ContainerType } from "./redux/features/slices/mainSlice";
 import html2canvas from "html2canvas";
+import printJS from "print-js";
 
-export type SaveAsPDFProps = {
-    boxes: ImageBox[][];
-    container: ContainerType;
-};
-
-export const saveAsPDF = async ({ boxes, container }: SaveAsPDFProps) => {
+const makePDF = async (boxes: ImageBox[][], container: ContainerType) => {
     const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
         format: [container.w, container.h],
     });
 
-    // Iterate through each box set to create individual pages in the PDF
     for (let i = 0; i < boxes.length; i++) {
         const page = document.getElementById(`page-${i}`);
 
         if (page) {
-            // Use html2canvas to take a snapshot of the page content
             const canvas = await html2canvas(page, { scale: 2.5 });
             const imgData = canvas.toDataURL("image/png");
 
-            // Add the captured image to the PDF as a new page
             pdf.addImage(imgData, "PNG", 0, 0, container.w, container.h);
 
-            // Add a new page in the PDF if this is not the last page
             if (i < boxes.length - 1) {
                 pdf.addPage([container.w, container.h]);
             }
         }
     }
 
+    return pdf;
+};
+
+export type PrintAndSaveProps = {
+    boxes: ImageBox[][];
+    container: ContainerType;
+};
+
+export const saveAsPDF = async ({ boxes, container }: PrintAndSaveProps) => {
+    const pdf = await makePDF(boxes, container);
+
     // Save the PDF file
     pdf.save("packed_images.pdf");
+    return pdf;
+};
+
+export const printPages = async ({ boxes, container }: PrintAndSaveProps) => {
+    const pdf = await makePDF(boxes, container);
+
+    // Print the PDF file
+    printJS({ printable: pdf.output("bloburl"), type: "pdf", showModal: true });
 };
 
 // function to create the images from files

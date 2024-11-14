@@ -28,6 +28,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.441.0",
     "mini-svg-data-uri": "^1.4.4",
+    "print-js": "^1.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-image-crop": "^11.0.7",

@@ -4,6 +4,7 @@ import ResetButton from "@/components/actionButtons/ResetButton";
 import SaveAsPdfButton from "@/components/actionButtons/SaveAsPDFButton";
 import ResizeButton from "@/components/actionButtons/ResizeButton";
 import ShowFreeFormResult from "@/components/actionButtons/ShowFreeFormResult";
+import PrintButton from "@/components/actionButtons/PrintButton";
 
 
 
@@ -28,6 +29,7 @@ const FreeFormActionButtons = ({
             {boxes.length > 0 && (
                 <>
                     <SaveAsPdfButton boxes={boxes} />
+                    <PrintButton boxes={boxes} />
                     <ResizeButton setBoxes={setBoxes} />
                 </>
             )}
