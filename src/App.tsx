@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/header/Header";
 import Home from "./pages/home/Home";
-import About from "./pages/about/About";
 import Pack from "./pages/pack/Pack";
 import ModeSelection from "./pages/modeSelection/ModeSelection";
 import FreeForm from "./pages/freeform/FreeForm";
@@ -27,7 +26,6 @@ const App = () => {
             <Router>
                 <Routes>
                     <Route path="/" element={w(Home)} />
-                    <Route path="/about" element={w(About)} />
                     <Route path="/modeSelection" element={w(ModeSelection)} />
                     <Route path="/freeForm" element={w(FreeForm)} />
                     <Route path="/pack" element={w(Pack)} />
