@@ -6,7 +6,7 @@ const VisualDemoSection: React.FC = () => {
             <h2 className="text-2xl font-bold text-secondary-900">See Pack4Print in Action</h2>
             <div className="mt-6">
                 <img
-                    src="freelance.gif" // Replace with your actual demo image/GIF URL
+                    src="FullVideo.gif" // Replace with your actual demo image/GIF URL
                     alt="Pack4Print Demo"
                     className="w-full max-w-lg mx-auto border border-gray-300 rounded-md shadow-md"
                 />
