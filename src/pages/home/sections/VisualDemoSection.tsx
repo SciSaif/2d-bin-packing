@@ -5,7 +5,7 @@ const VisualDemoSection: React.FC = () => {
         <section className="my-10 text-center">
             <h2 className="text-2xl font-bold text-secondary-900">See Pack4Print in Action</h2>
             <div className="mt-6">
-            <video src="Timeline 1.mp4" alt="Pack4Print Demo" className="w-full max-w-lg mx-auto border border-gray-300 rounded-md shadow-md" controls />
+            <video src="Timeline 1.mp4"  className="w-full max-w-lg mx-auto border border-gray-300 rounded-md shadow-md" controls />
     
             </div>
             <p className="mt-4 text-sm text-gray-600">
