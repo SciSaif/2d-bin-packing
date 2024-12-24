@@ -45,14 +45,14 @@ const HowItWorks: React.FC = () => {
           <div
             key={index}
             className="relative bg-teal-50 text-gray-800 p-8 rounded-xl shadow-xl flex flex-col items-center"
-            style={{ height: "420px" }} // Increase container height
+            style={{ height: "450px" }} // Increase container height
           >
             {/* Image (GIF) */}
             <div className="w-full h-48 mb-4">
               <img
                 src={step.imgPath}
                 alt={`Step ${step.number}`}
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-contain rounded-lg"
               />
             </div>
 

@@ -4,29 +4,31 @@ const FeaturesSection: React.FC = () => {
     const features = [
         {
             title: "Efficient Packing",
-            description: "Automatically arrange images to save paper and reduce waste. Automatically arrange images to save paper and reduce waste. Automatically arrange images to save paper and reduce waste. Automatically arrange images to save paper and reduce waste.",
+            description: "Optimize image arrangement to save paper and reduce waste, ensuring every inch of the sheet is utilized effectively.",
         },
         {
             title: "Custom Layout Options",
-            description: "Switch between automatic and manual modes for flexibility. Automatically arrange images to save paper and reduce waste. Automatically arrange images to save paper and reduce waste. Automatically arrange images to save paper and reduce waste.",
+            description: "Switch seamlessly between Freeform (manual) and Efficient (automatic) modes, giving you full control over your layout preferences.",
         },
         {
             title: "Save as PDF or Print",
-            description: "Export your layouts or print directly from your desktop. Automatically arrange images to save paper and reduce waste. Automatically arrange images to save paper and reduce waste.",
+            description: "Easily export your layouts as high-quality PDFs or print them directly from your device for instant results.",
         },
         {
             title: "Drag-and-Drop Simplicity",
-            description: "Upload images quickly or paste directly with Ctrl+V. Automatically arrange images to save paper and reduce waste.",
+            description: "Quickly upload images with a simple drag-and-drop or paste them directly using Ctrl+V for effortless workflow.",
         },
         {
             title: "Resizing & Cropping",
-            description: "Resize images to fit paper or standard photo sizes like passport or visa. Automatically arrange images to save paper and reduce waste.",
+            description: "Adjust image sizes to fit your custom dimensions for personalized layouts.",
         },
         {
             title: "Completely Free",
-            description: "No hidden costs, no subscriptions — just smarter printing. Automatically arrange images to save paper and reduce waste.",
+            description: "Enjoy all features at no cost — no hidden fees, no subscriptions, just smarter and sustainable printing.",
         },
     ];
+    
+    
 
     return (
         <section className="my-10">
