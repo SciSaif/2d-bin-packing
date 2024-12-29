@@ -27,7 +27,7 @@ const StartPackingButton = ({ setBoxes, images }: StartPackingButtonsProps) => {
             const workerInstance = createWorkerInstance();
 
             // Set up a message handler for the worker
-            workerInstance.addEventListener('message', (event) => {
+            workerInstance.addEventListener('message', (event: MessageEvent) => {
                 if (event.data.type === 'progress') {
                     console.log(event.data.progress);
                     dispatch(setPackingProgress(Number(event.data.progress)));
