@@ -1,5 +1,4 @@
 // hooks/useDragAndDrop.js
-import { t } from "@vite-pwa/assets-generator/shared/assets-generator.5e51fd40";
 import { useState, useEffect, useRef } from "react";
 
 const useDragAndDrop = () => {
